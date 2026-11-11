@@ -1271,6 +1271,57 @@ G.m1KA3 = () => { // (M+r)(M−r)
   return mark(Q('', `${par(padd(M,mk([r,''])))}${par(padd(M,mk([-r,''])))}`, pfmt(ans), [pfmt(w1),pfmt(w2),pfmt(w3)],
     `${pfmt(M)}＝A とおくと (A＋${r})(A−${r}) です。和と差の積の公式が使えます。`,
     `${pfmt(M)}＝A とおくと<br>(A＋${r})(A−${r})＝A²−${r*r}<br>A をもとにもどして<br>＝(${pfmt(M)})²−${r*r}<br>＝<b>${pfmt(ans)}</b><br><span class="small">(${pfmt(M)})² を ${pfmt(noX)} としないこと。真ん中の項を忘れずに。</span>`), '展開'); };
+
+/* 因数分解（□に数を入れる形） */
+const LB=['ア','イ','ウ','エ'];
+const S2 = n => n<0?'−':'＋';
+function BQ(target, tpl, ans, build, hint, explain, note, extra){
+  const T=pfmt(target), lab=v=>v.map((n,i)=>`${LB[i]} ${n}`).join('　'), key=v=>v.join(',');
+  const perms=[]; const pr=(a,l=[])=>{ if(!a.length){ perms.push(l); return; } a.forEach((x,i)=>pr(a.filter((_,j)=>j!==i),[...l,x])); }; pr(ans);
+  const near=[]; ans.forEach((n,i)=>[1,-1,2,-2,3].forEach(d=>{ const v=[...ans]; v[i]=n+d; if(v[i]>=1&&v[i]<=9) near.push(v); }));
+  const om=/([アイウエ])＜([アイウエ])/.exec(note||''), oi=om?[LB.indexOf(om[1]),LB.indexOf(om[2])]:null;
+  const seen=new Set([key(ans)]), wr=[];
+  for(const v of [...(extra||[]), ...shuffle(perms), ...shuffle(near)]){ if(!v.every(n=>n>=1&&n<=12)||seen.has(key(v))||(oi&&!(v[oi[0]]<v[oi[1]]))) continue; seen.add(key(v)); if(pfmt(build(v))===T) continue; wr.push(lab(v)); }
+  return Q(`${ans.map((_,i)=>LB[i]).join('・')} に当てはまる数は？`, `${T} を因数分解すると、${tpl} になる。${note?`<br><span class="small">${note}</span>`:''}`, lab(ans), wr.slice(0,3), hint, explain, { long:true, words:true });
+}
+const X1=n=>mk([1,'x'],[n,'']), XL=(a,b)=>mk([a,'x'],[b,'']);
+G.m1KF1 = () => { const t=pick(['ab','ab','ds','sq']);
+  if(t==='ab'){ let a,b; do { a=nz(-7,7); b=nz(-7,7); } while(a===b||a+b===0||Math.abs(a*b)>40);
+    const same=Math.sign(a)===Math.sign(b); if(same){ if(Math.abs(a)>Math.abs(b)) [a,b]=[b,a]; } else if(a<0) [a,b]=[b,a];
+    const sa=Math.sign(a), sb=Math.sign(b), T=pmul(X1(a),X1(b));
+    return BQ(T, `(x${S2(a)}${BOX('ア')})(x${S2(b)}${BOX('イ')})`, [Math.abs(a),Math.abs(b)], v=>pmul(X1(sa*v[0]),X1(sb*v[1])),
+      `<b>かけて ${a*b}、たして ${a+b}</b> になる2つの数を探します。`,
+      `かけて ${a*b}、たして ${a+b} になる2数は ${a} と ${b}。<br>${pfmt(T)}＝<b>${par(X1(a))}${par(X1(b))}</b>`, same?'ただし ア＜イ とする。':''); }
+  if(t==='ds'){ const p=pick([1,1,2,3]); let q=ri(1,9); while(gcd(p,q)!==1||(p===1&&q===1)) q=ri(1,9);
+    const T=mk([p*p,'x2'],[-q*q,'']);
+    if(p===1) return BQ(T, `(x＋${BOX('ア')})(x−${BOX('イ')})`, [q,q], v=>pmul(X1(v[0]),X1(-v[1])),
+      'a²−b²＝(a＋b)(a−b) の公式を使います。', `${pfmt(T)}＝x²−${q}²<br>＝<b>(x+${q})(x−${q})</b>`, '', [[q*q,1],[q*q,q*q],[q,1]]);
+    return BQ(T, `(${BOX('ア')}x＋${BOX('イ')})(${BOX('ア')}x−${BOX('イ')})`, [p,q], v=>pmul(XL(v[0],v[1]),XL(v[0],-v[1])),
+      'a²−b²＝(a＋b)(a−b)。何の2乗かを考えます。', `${pfmt(T)}＝(${p}x)²−${q}²<br>＝<b>(${p}x+${q})(${p}x−${q})</b>`, '', [[p*p,q*q],[p*p,q],[p,q*q]]); }
+  const a=nz(-7,7), T=pmul(X1(a),X1(a));
+  return BQ(T, `(x${S2(a)}${BOX('ア')})²`, [Math.abs(a)], v=>pmul(X1(Math.sign(a)*v[0]),X1(Math.sign(a)*v[0])),
+    '両はしが2乗、真ん中が 2×□ になっているか見ます。a²±2ab＋b²＝(a±b)²', `${pfmt(T)}＝x²${a<0?'−':'+'}2×${Math.abs(a)}×x＋${Math.abs(a)}²<br>＝<b>${par(X1(a))}²</b>`, '', [[2*Math.abs(a)],[a*a]].filter(v=>v[0]<=12)); };
+G.m1KF2 = () => { const t=pick(['kx','ds','ab']), k=ri(2,6);
+  if(t==='kx'){ const b=nz(-9,9), T=pmul(mk([k,'x']),X1(b));
+    return BQ(T, `${BOX('ア')}x(x${S2(b)}${BOX('イ')})`, [k,Math.abs(b)], v=>pmul(mk([v[0],'x']),X1(Math.sign(b)*v[1])),
+      '各項に共通な<b>数</b>と<b>文字</b>をくくり出します。', `どの項にも ${k}x がふくまれているので<br>${pfmt(T)}＝<b>${k}x${par(X1(b))}</b>`, '', [[k*Math.abs(b),1],[1,Math.abs(b)]].filter(v=>v[0]<=12)); }
+  if(t==='ds'){ const k2=pick([2,3,5]), q=ri(1,5), T=psc(mk([1,'x2'],[-q*q,'']),k2);
+    return BQ(T, `${BOX('ア')}(x＋${BOX('イ')})(x−${BOX('ウ')})`, [k2,q,q], v=>psc(pmul(X1(v[1]),X1(-v[2])),v[0]),
+      '① まず共通因数をくくり出す　② かっこの中を a²−b² の公式で。', `${pfmt(T)}＝${k2}(x²−${q*q})<br>＝<b>${k2}(x+${q})(x−${q})</b>`, '', [[k2,q*q,1],[1,k2*q,q]].filter(v=>v.every(n=>n<=12))); }
+  const k3=pick([2,3]); let a,b; do { a=ri(1,6); b=ri(1,6); } while(a===b); if(a>b)[a,b]=[b,a]; const s=pick([1,-1]);
+  const T=psc(pmul(X1(s*a),X1(s*b)),k3);
+  return BQ(T, `${BOX('ア')}(x${S2(s)}${BOX('イ')})(x${S2(s)}${BOX('ウ')})`, [k3,a,b], v=>psc(pmul(X1(s*v[1]),X1(s*v[2])),v[0]),
+    '① まず共通因数をくくり出す　② かっこの中を「かけて・たして」で因数分解。', `${pfmt(T)}＝${k3}(${pfmt(pmul(X1(s*a),X1(s*b)))})<br>＝<b>${k3}${par(X1(s*a))}${par(X1(s*b))}</b>`, 'ただし イ＜ウ とする。'); };
+G.m1KF3 = () => { if(Math.random()<.7){ let a,b,c; do { a=nz(-5,5); b=ri(2,5); c=nz(-7,7); } while(gcd(b,c)!==1||a*b+c===0||Math.abs(a*c)>30);
+    const T=pmul(X1(a),XL(b,c));
+    return BQ(T, `(x${S2(a)}${BOX('ア')})(${BOX('イ')}x${S2(c)}${BOX('ウ')})`, [Math.abs(a),b,Math.abs(c)], v=>pmul(X1(Math.sign(a)*v[0]),XL(v[1],Math.sign(c)*v[2])),
+      `たすき掛け：x² の係数 ${b} を 1×${b}、数の項 ${a*c} を 2つの数の積に分けて、ななめにかけてたすと ${a*b+c} になる組を探します。`,
+      `${tskNum(1,a,b,c)}1×${pm(c)}＋${pm(a)}×${b}＝${a*b+c} ✓<br>${pfmt(T)}＝<b>${par(X1(a))}${par(XL(b,c))}</b>`); }
+  let p,q,r,s; do { p=ri(2,3); r=ri(2,4); q=nz(-5,5); s=nz(-5,5); } while(p>=r||gcd(p,q)!==1||gcd(r,s)!==1||p*s+q*r===0);
+  const T=pmul(XL(p,q),XL(r,s));
+  return BQ(T, `(${BOX('ア')}x${S2(q)}${BOX('イ')})(${BOX('ウ')}x${S2(s)}${BOX('エ')})`, [p,Math.abs(q),r,Math.abs(s)], v=>pmul(XL(v[0],Math.sign(q)*v[1]),XL(v[2],Math.sign(s)*v[3])),
+    `たすき掛け：x² の係数 ${p*r} と数の項 ${q*s} をそれぞれ2つの積に分けて、ななめにかけてたすと ${p*s+q*r} になる組を探します。`,
+    `${tskNum(p,q,r,s)}${p}×${pm(s)}＋${pm(q)}×${r}＝${p*s+q*r} ✓<br>${pfmt(T)}＝<b>${par(XL(p,q))}${par(XL(r,s))}</b>`, 'ただし ア＜ウ とする。'); };
 G.m1KB = () => { let q; do { q=G[pick(['m1Sq','m1DS','m1XAB','m1AXB','m1Dist2'])](); } while(q.choices.length<4); return mark(q,'展開'); };
 G.m1KC = () => { let q; do { q=G[pick(['m1CF','m1PSF','m1DSF','m1XABF','m1XABF','m1TkF1'])](); } while(q.choices.length<4); return mark(q,'因数分解'); };
 function pm0(c,k){ const s=mono(c,k); return c<0?'('+s+')':s; }
@@ -1425,7 +1476,16 @@ const LESSONS = [
   L('高3-3',null,'(A＋r)(A−r) の形','和と差の積を使う','m1KA3',()=>`
     <section class="panel"><h3>解き方</h3>${rule('同じ式を A とおく<br>(A＋r)(A−r)＝A²−r²')}
     ${ex('(2a−b＋3)(2a−b−3)<br>2a−b＝A とおくと (A＋3)(A−3)＝A²−9<br>＝(2a−b)²−9<br>＝4a²−4ab＋b²−9')}${tip('選択肢に 4a²−b²−9 のような「真ん中の項をぬかしたもの」がよく入っています。')}</section>`),
-  { id:'高4', sec:'高-4　因数分解', t:'因数分解', sub:'準備中', soon:true },
+  L('高4-1','高-4　因数分解','公式を使う','かけて・たして／2乗の形','m1KF1',()=>`
+    <section class="panel"><h3>使う公式</h3>${sum(['x²＋(a＋b)x＋ab<br>＝(x＋a)(x＋b)','a²−b²<br>＝(a＋b)(a−b)','a²±2ab＋b²<br>＝(a±b)²'])}
+    ${ex('x²−2x−15 → かけて −15、たして −2 は 3 と −5<br>＝(x＋3)(x−5)')}</section>
+    <section class="panel"><h3>${BOX('ア')} の答え方</h3><p>「(x＋${BOX('ア')})(x−${BOX('イ')})」のように、<b>符号は式に書いてあります</b>。□ には数だけを入れます。</p>${tip('答えを展開して、もとの式にもどるか確かめるとまちがえません。')}</section>`),
+  L('高4-2',null,'共通因数をくくり出す','まずくくる、それから公式','m1KF2',()=>`
+    <section class="panel"><h3>解き方</h3>${rule('① すべての項に共通な数・文字をくくり出す<br>② かっこの中を、さらに公式で因数分解')}
+    ${ex('3x²＋12x＝3x(x＋4)')}${ex('2x²−18＝2(x²−9)＝2(x＋3)(x−3)')}${ex('3x²−15x＋18＝3(x²−5x＋6)＝3(x−2)(x−3)')}${tip('くくり出したあと、かっこの中がまだ因数分解できないか必ず確かめよう。')}</section>`),
+  L('高4-3',null,'たすき掛け','2x²＋5x＋3 の形','m1KF3',()=>`
+    <section class="panel"><h3>解き方</h3>${rule('x² の係数と数の項を、それぞれ2つの数の積に分ける<br>→ ななめにかけてたすと x の係数になる組を探す')}
+    ${tskNum(1,1,3,2)}${ex('3x²＋5x＋2＝(x＋1)(3x＋2)')}${tip('(x＋2)(3x＋1) のように、数を入れかえたものはまちがい。展開して確かめよう。')}</section>`),
   { id:'高5', sec:'高-5　因数分解の工夫', t:'因数分解の工夫', sub:'準備中', soon:true },
 ];
 LESSONS.find(l=>l.id==='3-5').plan=['m1Sq','m1DS','m1XAB','m1AXB','m1ExpMix'];
