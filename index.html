@@ -1212,6 +1212,42 @@ function mark(q, verb, fixed){ // 通常の問題を高認のマーク式にす�
   const lab = ch.map((c,i)=>`${MK[i]}　${c}`), ai = ch.indexOf(q.answer);
   return Object.assign({}, q, { prompt:`次の ${BOX('ア')} を適切にうめなさい。`, expr:`${q.expr} を${verb}すると、${BOX('ア')} になる。<br><span class="small">次の ①〜④ のうちから正しいものを一つ選べ。</span>`,
     long:true, words:true, choices:lab, answer:lab[ai], explain:q.explain+`<br>正解は <b>${MK[ai]}</b> です。` }); }
+
+/* 整式の計算（ア・イ・ウ に数を入れる形） */
+function ksGen(kind){
+  const X=pick(['x','a']), mkP=()=>mk([pick([1,1,2,3,-1,-2,-3]),X+'2'],[nz(-5,5),X],[nz(-5,5),'']);
+  let A,B,kA,kB,expr,how='';
+  for(let t=0;t<400;t++){
+    A=mkP(); B=mkP();
+    if(kind===1){ kA=1; kB=pick([1,-1,-1]); expr=kB<0?'A−B':'A＋B'; }
+    else if(kind===2){ [kA,kB]=pick([[2,-1],[1,2],[1,-2],[3,-2],[2,3],[2,1],[3,1],[1,-3],[2,-3]]); expr=`${kA===1?'':kA}A${kB<0?'−':'＋'}${Math.abs(kB)===1?'':Math.abs(kB)}B`; }
+    else { const f=pick([
+        ()=>{ const a=ri(2,4), c=ri(1,3); return [`${a}A−(A−${c===1?'':c}B)`, a-1, c, `${a}A−A＋${c===1?'':c}B`]; },
+        ()=>{ const c=ri(2,3); return [`${c}(A＋B)−(A−B)`, c-1, c+1, `${c}A＋${c}B−A＋B`]; },
+        ()=>{ const c=ri(2,3); return [`2(A−B)−(A−${c}B)`, 1, c-2, `2A−2B−A＋${c}B`]; },
+        ()=>{ const c=ri(1,2); return [`A−${c===1?'':c}(B−A)`, 1+c, -c, `A−${c===1?'':c}B＋${c===1?'':c}A`]; },
+        ()=>{ const c=ri(2,3); return [`${c}(A−B)＋2B`, c, 2-c, `${c}A−${c}B＋2B`]; },
+      ])(); [expr,kA,kB,how]=f; if(!kB) continue; }
+    const T=padd(psc(A,kA),psc(B,kB)), c2=T.get(X+'2')||0, c1=T.get(X)||0, c0=T.get('')||0;
+    if(Math.abs(c2)>=2&&Math.abs(c2)<=9&&Math.abs(c1)>=2&&Math.abs(c1)<=9&&c0&&Math.abs(c0)<=9) break;
+  }
+  const T=padd(psc(A,kA),psc(B,kB)), co=P=>[P.get(X+'2')||0,P.get(X)||0,P.get('')||0], [c2,c1,c0]=co(T);
+  const tpl=`${c2<0?'−':''}${BOX('ア')}${X}²${c1<0?'−':'＋'}${BOX('イ')}${X}${c0<0?'−':'＋'}${BOX('ウ')}`;
+  const tri=P=>{ const v=co(P).map(Math.abs); return `ア ${v[0]}　イ ${v[1]}　ウ ${v[2]}`; };
+  const bk=[...B.keys()].sort(pcmp), Bf=mk([B.get(bk[0]),bk[0]]), Br=padd(B,Bf,-1);
+  const wr=[ padd(psc(A,kA),padd(psc(Bf,kB),psc(Br,-kB))),   // 2つめ以降の項の符号を変え忘れ
+             padd(psc(A,kA),psc(B,-kB)),                       // ＋とーをとりちがえ
+             Math.abs(kB)>1||Math.abs(kA)>1 ? padd(A,psc(B,Math.sign(kB))) : padd(psc(A,-1),B), // 係数のかけ忘れ／逆にひいた
+             padd(T,mk([1,X])), padd(T,mk([-1,''])) ].map(tri);
+  const cA=kA===1?'':kA===-1?'−':kA, sB=kB<0?'−':'＋', aB=Math.abs(kB)===1?'':Math.abs(kB);
+  const AB=`${cA}A${sB}${aB}B`;
+  const exp1=pfmt(psc(A,kA))+pfmt(psc(B,kB)).replace(/^(?=[^−])/,'+');
+  const explain=(kind===3?`まず A、B のまま整理します。<br>${expr}＝${how}＝<b>${AB}</b><br>`:'')+
+    `${AB}＝${cA}(${pfmt(A)})${sB}${aB}(${pfmt(B)})<br>＝${exp1}<br>＝<b>${pfmt(T)}</b>　（同類項をまとめた）<br>よって ${tri(T).replace(/　/g,'、')}`;
+  const hint = kind===3 ? '先に A、B のまま式を整理します。かっこは符号に気をつけてはずします。' : kind===2 ? `${kA===1?'':kA+'A は A の各項を '+kA+' 倍、'}${Math.abs(kB)===1?'':Math.abs(kB)+'B は B の各項を '+Math.abs(kB)+' 倍。'}${kB<0?'ひくときは、すべての項の符号が変わります。':''}` : (kB<0?'A−B は、B の<b>すべての項</b>の符号を変えてたします。':'かっこをはずして、同類項（x² どうし、x どうし、数どうし）をまとめます。');
+  return Q('ア・イ・ウ に当てはまる数は？', `A＝${pfmt(A)}、B＝${pfmt(B)} のとき、${expr} を計算すると、${tpl} になる。`, tri(T), wr, hint, explain, { long:true, words:true });
+}
+G.m1KS1 = () => ksGen(1); G.m1KS2 = () => ksGen(2); G.m1KS3 = () => ksGen(3);
 G.m1KA = () => { // 同じ式が2回出る展開 (pa+qb)(pa+qb+r)
   const [x,y]=VP(); let p=ri(1,3), q=nz(-4,4); while(gcd(p,q)!==1||(p===1&&Math.abs(q)===1&&Math.random()<.5)) q=nz(-4,4); const r=nz(-3,3);
   const P=mk([p,x],[q,y]), ans=padd(pmul(P,P),psc(P,r)), sq=pmul(P,P);
@@ -1219,6 +1255,22 @@ G.m1KA = () => { // 同じ式が2回出る展開 (pa+qb)(pa+qb+r)
   return mark(Q('', `${par(P)}${par(padd(P,mk([r,''])))}`, pfmt(ans), [pfmt(w1),pfmt(w2),pfmt(w3)],
     `${pfmt(P)} が2回出てきます。${pfmt(P)}＝A とおくと A(A${sg(r).replace(/^([+−])1$/,'$1')}) です。`,
     `${pfmt(P)}＝A とおくと<br>A(A${sg(r)})＝A²${sg(r).replace(/^([+−])1$/,'$1')}A<br>A をもとにもどして<br>＝(${pfmt(P)})²${r<0?'−':'+'}${Math.abs(r)===1?'':Math.abs(r)}(${pfmt(P)})<br>＝<b>${pfmt(ans)}</b><br><span class="small">よくあるまちがい：${sg(r)} を A にかけ忘れる／(　)² の真ん中の項をぬかす。</span>`.replace(/A\+1\b/,'A＋1')), '展開'); };
+
+G.m1KA2 = () => { // (M+p)(M+q)
+  const [x,y]=VP(); let a=ri(1,3), b=nz(-3,3); while(gcd(a,b)!==1) b=nz(-3,3); let p=nz(-4,4), q=nz(-4,4); while(p===q||p+q===0) q=nz(-4,4);
+  const M=mk([a,x],[b,y]), MM=pmul(M,M), ans=padd(padd(MM,psc(M,p+q)),mk([p*q,''])), noX=mk([a*a,x+'2'],[b*b,y+'2']);
+  const w1=padd(padd(noX,psc(M,p+q)),mk([p*q,''])), w2=padd(MM,mk([p*q,''])), w3=padd(padd(MM,psc(M,p+q)),mk([p+q,'']));
+  const s1=sg(p+q).replace(/^([+−])1$/,'$1');
+  return mark(Q('', `${par(padd(M,mk([p,''])))}${par(padd(M,mk([q,''])))}`, pfmt(ans), [pfmt(w1),pfmt(w2),pfmt(w3)],
+    `${pfmt(M)} が2回出てきます。${pfmt(M)}＝A とおくと (A${sg(p)})(A${sg(q)}) です。`,
+    `${pfmt(M)}＝A とおくと<br>(A${sg(p)})(A${sg(q)})＝A²${s1}A${sg(p*q)}<br>A をもとにもどして<br>＝(${pfmt(M)})²${p+q<0?'−':'+'}${Math.abs(p+q)===1?'':Math.abs(p+q)}(${pfmt(M)})${sg(p*q)}<br>＝<b>${pfmt(ans)}</b><br><span class="small">よくあるまちがい：(　)² の真ん中の項をぬかす／A の項を忘れる。</span>`), '展開'); };
+G.m1KA3 = () => { // (M+r)(M−r)
+  const [x,y]=VP(); let a=ri(1,3), b=nz(-3,3); while(gcd(a,b)!==1) b=nz(-3,3); const r=ri(1,5);
+  const M=mk([a,x],[b,y]), ans=padd(pmul(M,M),mk([-r*r,''])), noX=mk([a*a,x+'2'],[b*b,y+'2']);
+  const w1=padd(noX,mk([-r*r,''])), w2=padd(pmul(M,M),mk([r*r,''])), w3=mk([a*a,x+'2'],[-b*b,y+'2'],[-r*r,'']);
+  return mark(Q('', `${par(padd(M,mk([r,''])))}${par(padd(M,mk([-r,''])))}`, pfmt(ans), [pfmt(w1),pfmt(w2),pfmt(w3)],
+    `${pfmt(M)}＝A とおくと (A＋${r})(A−${r}) です。和と差の積の公式が使えます。`,
+    `${pfmt(M)}＝A とおくと<br>(A＋${r})(A−${r})＝A²−${r*r}<br>A をもとにもどして<br>＝(${pfmt(M)})²−${r*r}<br>＝<b>${pfmt(ans)}</b><br><span class="small">(${pfmt(M)})² を ${pfmt(noX)} としないこと。真ん中の項を忘れずに。</span>`), '展開'); };
 G.m1KB = () => { let q; do { q=G[pick(['m1Sq','m1DS','m1XAB','m1AXB','m1Dist2'])](); } while(q.choices.length<4); return mark(q,'展開'); };
 G.m1KC = () => { let q; do { q=G[pick(['m1CF','m1PSF','m1DSF','m1XABF','m1XABF','m1TkF1'])](); } while(q.choices.length<4); return mark(q,'因数分解'); };
 function pm0(c,k){ const s=mono(c,k); return c<0?'('+s+')':s; }
@@ -1351,22 +1403,30 @@ const LESSONS = [
   L('まとめ','章末テスト','章末テスト','1章の総まとめ','m1Sq',()=>`
     <section class="panel"><h3>1章の総まとめ</h3><p>展開と因数分解から10問出題します。問題の順番は毎回かわります。</p>${sum(['(a±b)²＝a²±2ab＋b²','(a＋b)(a−b)＝a²−b²','x²＋(a＋b)x＋ab＝(x＋a)(x＋b)','acx²＋(ad＋bc)x＋bd＝(ax＋b)(cx＋d)'])}</section>`,
     { test:true, plan:['m1Nest','m1MonoMul','m1AXB','m1Rep','m1Order','m1CF','m1XABF','m1TkF','m1RepF','m1Low'] }),
-  L('高-1','高認対策','展開（マーク式）','乗法公式で4択','m1KB',()=>`
-    <section class="panel"><h3>高認ではこう出る</h3><p>1章の内容は、高認の数学では<b>大問1の(1)</b>で出題されることが多いです。式を展開・因数分解して、<b>①〜④ の4つから1つ選ぶ</b>マーク式です。</p>
-    ${ex(`(x＋3)(x−5) を展開すると、${BOX('ア')} になる。`)}</section>
-    <section class="panel"><h3>選択肢を見くらべる</h3>${rule('① 先頭の項（x² の係数）<br>② 最後の項（数の項）の符号<br>③ 真ん中の項')}<p>ちがう選択肢どうしで、<b>ちがっている部分だけ</b>を計算すれば、全部展開しなくても答えがしぼれます。</p></section>
-    <section class="panel"><h3>数を入れて確かめる</h3><p>迷ったら、文字に<b>かんたんな数</b>を入れて、もとの式と選択肢の値をくらべます。</p>${ex('(x＋3)(x−5) に x＝1 を入れると 4×(−4)＝−16<br>x²−2x−15 に x＝1 を入れると 1−2−15＝−16 ✓')}${tip('x＝0 や x＝1 は計算がらくですが、たまたま一致することもあります。2つの数で確かめると安心です。')}</section>`),
-  L('高-2',null,'展開の工夫（マーク式）','同じ式をまとめて展開','m1KA',()=>`
+  L('高1-1','高-1　整式','整式の加法・減法','A＋B・A−B','m1KS1',()=>`
+    <section class="panel"><h3>解き方</h3>${rule('① A、B に<b>かっこをつけて</b>代入<br>② かっこをはずす（ひくときは全部の符号が変わる）<br>③ 同類項をまとめる')}
+    ${ex('A＝2x²−3x＋1、B＝x²＋x−4 のとき<br>A−B＝(2x²−3x＋1)−(x²＋x−4)<br>＝2x²−3x＋1−x²−x＋4<br>＝x²−4x＋5')}</section>
+    <section class="panel"><h3>${BOX('ア')} の答え方</h3><p>「${BOX('ア')}x²−${BOX('イ')}x＋${BOX('ウ')}」のように、<b>符号は式に書いてあります</b>。□ には数だけが入ります。</p>${ex(`x²−4x＋5 → ア 1、イ 4、ウ 5`)}${tip('計算した答えの符号と、□ のまわりの符号が合っているか確かめよう。合わないときは、計算ミスのサインです。')}</section>`),
+  L('高1-2',null,'係数のついた計算','2A−B・3A＋2B','m1KS2',()=>`
+    <section class="panel"><h3>解き方</h3>${rule('2A は A の<b>すべての項</b>を2倍する')}
+    ${ex('A＝x²−2x＋3、B＝x²＋x−1 のとき<br>2A−B＝2(x²−2x＋3)−(x²＋x−1)<br>＝2x²−4x＋6−x²−x＋1<br>＝x²−5x＋7')}${tip('2(x²−2x＋3)＝2x²−2x＋3 のように、最初の項だけにかけるのはよくあるまちがいです。')}</section>`),
+  L('高1-3',null,'かっこのある計算','A、B のまま整理してから','m1KS3',()=>`
+    <section class="panel"><h3>解き方</h3>${rule('① A、B のまま式を整理<br>② すっきりしてから代入')}
+    ${ex('3A−(A−2B)<br>＝3A−A＋2B<br>＝2A＋2B')}<p>このあと A、B を代入します。最初から代入するより計算がずっと少なくなります。</p></section>`),
+  { id:'高2', sec:'高-2　展開', t:'展開', sub:'準備中', soon:true },
+  L('高3-1','高-3　展開の工夫','A(A＋r) の形','同じ式をまとめて展開','m1KA',()=>`
     <section class="panel"><h3>よく出る形</h3>${ex(`(3x−y)(3x−y＋2) を展開すると、${BOX('ア')} になる。`)}<p class="small">このように、同じ式が2回出てくる展開がよく出ます。</p></section>
     <section class="panel"><h3>解き方</h3>${rule('同じ式が2回 → A とおく<br>A(A＋2)＝A²＋2A → A をもどす')}
     ${ex('3x−y＝A とおくと A(A＋2)＝A²＋2A<br>＝(3x−y)²＋2(3x−y)<br>＝9x²−6xy＋y²＋6x−2y')}</section>
     <section class="panel"><h3>選択肢のわなに注意</h3><p>まちがいの選択肢は、よくあるミスから作られています。</p>${sum(['＋2 を A にかけ忘れる<br>→ 9x²−6xy＋y²＋2','真ん中の項をぬかす<br>→ 9x²＋y²＋6x−2y','和と差の積とまちがえる<br>→ 9x²−y²＋2'])}</section>`),
-  L('高-3',null,'因数分解（マーク式）','4択でまちがえない','m1KC',()=>`
-    <section class="panel"><h3>選択肢は展開して確かめられる</h3>${rule('因数分解の答え合わせ ＝ 展開してもとの式にもどるか')}<p>マーク式では、選択肢を<b>展開してもとの式と同じになるもの</b>をえらべば必ず正解できます。とくに<b>最後の数の項</b>と<b>真ん中の項の符号</b>を見ると、すばやく見分けられます。</p>
-    ${ex('x²−x−6 の因数分解<br>(x＋2)(x−3) → 数の項 2×(−3)＝−6、x の係数 2−3＝−1 ✓')}${tip('まず共通因数がないかを確認。2(x＋1)(x−3) のように数がくくり出されている選択肢もあります。')}</section>`),
-  L('高-4',null,'高認形式テスト','展開・因数分解 10問','m1KB',()=>`
-    <section class="panel"><h3>本番のつもりで</h3><p>高認の大問1(1)と同じ形式で10問出題します。目安は <b>1問1分</b>。迷ったら、数を入れて確かめよう。</p></section>`,
-    { test:true, plan:['m1KA','m1KA','m1KA','m1KB','m1KB','m1KB','m1KC','m1KC','m1KC','m1KC'] }),
+  L('高3-2',null,'(A＋p)(A＋q) の形','和と積の公式を使う','m1KA2',()=>`
+    <section class="panel"><h3>解き方</h3>${rule('同じ式を A とおく<br>(A＋p)(A＋q)＝A²＋(p＋q)A＋pq')}
+    ${ex('(x＋y＋2)(x＋y−3)<br>x＋y＝A とおくと (A＋2)(A−3)＝A²−A−6<br>＝(x＋y)²−(x＋y)−6<br>＝x²＋2xy＋y²−x−y−6')}${tip('A をもどしたあとの (x＋y)² も、真ん中の 2xy を忘れずに。')}</section>`),
+  L('高3-3',null,'(A＋r)(A−r) の形','和と差の積を使う','m1KA3',()=>`
+    <section class="panel"><h3>解き方</h3>${rule('同じ式を A とおく<br>(A＋r)(A−r)＝A²−r²')}
+    ${ex('(2a−b＋3)(2a−b−3)<br>2a−b＝A とおくと (A＋3)(A−3)＝A²−9<br>＝(2a−b)²−9<br>＝4a²−4ab＋b²−9')}${tip('選択肢に 4a²−b²−9 のような「真ん中の項をぬかしたもの」がよく入っています。')}</section>`),
+  { id:'高4', sec:'高-4　因数分解', t:'因数分解', sub:'準備中', soon:true },
+  { id:'高5', sec:'高-5　因数分解の工夫', t:'因数分解の工夫', sub:'準備中', soon:true },
 ];
 LESSONS.find(l=>l.id==='3-5').plan=['m1Sq','m1DS','m1XAB','m1AXB','m1ExpMix'];
 LESSONS.find(l=>l.id==='6-4').plan=['m1CF','m1PSF','m1DSF','m1XABF','m1TkF'];
@@ -1429,7 +1489,7 @@ const UNITS = {
   gk:{ no:'国', title:'語句高校レベル', subject:'国語', course:'jpn', subj:3, lessons:GK_LESSONS, cards:'gk', drill:'gk' },
   cj:{ no:'国', title:'接続語', subject:'国語', course:'jpn', subj:4, lessons:CJ_LESSONS, cards:'cj', drill:'cj' },
   hk:{ no:'国', title:'漢字高校レベル', subject:'国語', course:'jpn', subj:3, lessons:KJ_LESSONS, cards:'hk', drill:'hk' },
-  m1:{ no:'数Ⅰ 1章', title:'式の展開と因数分解', subject:'数学', course:'math', subj:0, lessons:M1.LESSONS, cards:'m1', drill:'m1' },
+  m1:{ no:'数Ⅰ 1章', title:'式の展開と因数分解', subject:'数学', course:'math', subj:0, lessons:M1.LESSONS.filter(l=>!l.soon), show:M1.LESSONS, cards:'m1', drill:'m1' },
   bc:{ no:'生1', title:'細胞と体', subject:'生物', course:'bio', subj:0, lessons:BC_LESSONS, cards:'bc', drill:'bc' },
 };
 const U = (...t) => t.map(x => typeof x === 'string' ? { t:x } : x);
@@ -1652,7 +1712,7 @@ function vGoto(){
 function vUnit(){
   const u=CU(), uid=S.uid, T=TERMS[u.cards]||[], kn=(R.known[uid]||[]).length, hasPdf=Object.keys(PDF).some(k=>k.startsWith(u.drill+'-')&&PDF[k].q);
   return `${top(u.no+'　'+u.title)}<div class="stack"><p class="muted small">${u.lessons.length<10?u.lessons.length+"つ":u.lessons.length}の波　1つ約5分。上から順に進めるのがおすすめです。ぜんぶクリアすると海のカードが1まい届きます。</p><div class="list">
-  ${u.lessons.map(l=>`${l.sec?`<div class="secrow">${l.sec}</div>`:''}<button class="item" data-act="lesson" data-arg="${l.id}"><span class="lid ${R.lessons[lkey(uid,l.id)]?'done':''}">${l.id}</span><span class="body"><b>${l.t}</b><br><span class="small muted">${l.sub}</span></span>${lTag(uid,l.id)}<span class="chev">›</span></button>`).join('')}
+  ${(u.show||u.lessons).map(l=>l.soon?`${l.sec?`<div class="secrow">${l.sec}</div>`:''}<div class="item" style="opacity:.55"><span class="lid">${l.id}</span><span class="body"><b>${l.t}</b><br><span class="small muted">準備中</span></span></div>`:`${l.sec?`<div class="secrow">${l.sec}</div>`:''}<button class="item" data-act="lesson" data-arg="${l.id}"><span class="lid ${R.lessons[lkey(uid,l.id)]?'done':''}">${l.id}</span><span class="body"><b>${l.t}</b><br><span class="small muted">${l.sub}</span></span>${lTag(uid,l.id)}<span class="chev">›</span></button>`).join('')}
   ${hasPdf?`<button class="item" data-act="go" data-arg="drill"><span class="lid">▶</span><span class="body"><b>演習問題</b><br><span class="small muted">PDF・Lv1〜Lv5</span></span><span class="chev">›</span></button>`:''}
   </div>${T.length?`<div class="list"><button class="item" data-act="cards"><span class="body"><b>用語カード</b><br><span class="small muted">用語の確認 ${T.length}枚</span></span><span class="tag ${kn===T.length?'done':kn?'mid':''}">${kn}/${T.length}</span><span class="chev">›</span></button></div>`:''}</div>`;
 }
