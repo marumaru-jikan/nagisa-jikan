@@ -97,6 +97,15 @@ p{margin:0}
 /* lesson */
 .lesson section{display:flex;flex-direction:column;gap:10px}
 .kbox{display:inline-block;border:1.5px solid currentColor;border-radius:3px;padding:0 .7em;margin:0 .15em;font-family:var(--f-display);font-weight:900;font-style:normal;line-height:1.45}
+.ov{text-decoration:overline;text-decoration-thickness:1.5px}
+.venn{display:block;width:100%;max-width:300px;margin:8px auto}
+.venn .vu{fill:none;stroke:var(--ink);stroke-width:1.5}.venn .vc{fill:none;stroke:var(--ink);stroke-width:1.5}
+.venn .vf{fill:var(--accent-soft)}.venn .vbg{fill:var(--surface)}
+.venn text{font-family:"Times New Roman",serif;font-size:17px;font-weight:700;text-anchor:middle;dominant-baseline:middle;fill:var(--ink)}
+.venn .vl{font-style:italic;fill:var(--muted);font-size:16px}
+.feedback .venn .vbg,.hint .venn .vbg{fill:var(--surface)}
+.nline{display:block;width:100%;max-width:320px;margin:8px auto}.nline .nl{stroke:var(--ink);stroke-width:1.5}
+.nline .nt{font-family:"Times New Roman",serif;font-size:13px;text-anchor:middle;fill:var(--ink)}
 .secrow{font-family:var(--f-display);font-weight:900;color:var(--teal);font-size:.95rem;padding:14px 4px 2px;letter-spacing:.04em}
 .secrow:first-child{padding-top:2px}
 .mth{font-family:"Times New Roman","Hiragino Mincho ProN","Yu Mincho",serif;font-variant-numeric:normal;letter-spacing:.02em}
@@ -888,7 +897,7 @@ const RK_LESSONS = [['科学の説明は変わる','本文の前半　問1',['rk
 const NF_LESSONS = novelLessons('nf','7',[['「普通」という言葉','本文のはじめ　問1'],['文化祭の絵','本文の前半　問2'],['図書館へ','本文の中ほど　問3'],['先生との会話と文化祭','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
 const NV_LESSONS = novelLessons('nv','5',[['駅での再会','本文の前半　問1'],['無人駅','本文の中ほど　問2'],['「簡単に言うなよ」','本文の中ほど　問3'],['特急に抜かされる','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
 const NW_LESSONS = novelLessons('nw','6',[['二番目という場所','本文のはじめ　問1'],['航平の欠場','本文の前半　問2'],['決勝のスタート','本文の中ほど　問3'],['リレーの前に','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
-const makeQs = plan => { const used={}; return plan.map(k=>{ { const m=/^(nv|nw|rk|nf|ai|mu|mj|bs|sl)(\d+)$/.exec(k); if(m) return nq2(m[1],+m[2]); } if(/^m1[A-Z]/.test(k)) return M1.G[k](); if(k.startsWith('gm')) return mq(GM[+k.slice(2)]); if(k.startsWith('gk')) return gq(GQ[+k.slice(2)]); if(k.startsWith('cj')) return cq(CJ[+k.slice(2)]); if(k.startsWith('kj')) return kq(KJ[+k.slice(2)]); const P=POOL[k]; used[k]=used[k]||shuffle(P.map((_,i)=>i)); if(!used[k].length) used[k]=shuffle(P.map((_,i)=>i)); return fq(P[used[k].pop()]); }); };
+const makeQs = plan => { const used={}; return plan.map(k=>{ { const m=/^(nv|nw|rk|nf|ai|mu|mj|bs|sl)(\d+)$/.exec(k); if(m) return nq2(m[1],+m[2]); } if(/^m1[A-Z]/.test(k)) return M1.G[k](); if(/^s[1-5][A-Z]/.test(k)) return M3.G[k](); if(k.startsWith('gm')) return mq(GM[+k.slice(2)]); if(k.startsWith('gk')) return gq(GQ[+k.slice(2)]); if(k.startsWith('cj')) return cq(CJ[+k.slice(2)]); if(k.startsWith('kj')) return kq(KJ[+k.slice(2)]); const P=POOL[k]; used[k]=used[k]||shuffle(P.map((_,i)=>i)); if(!used[k].length) used[k]=shuffle(P.map((_,i)=>i)); return fq(P[used[k].pop()]); }); };
 
 /* ===== 説明ページの部品 ===== */
 const rule = s => `<div class="rule">${s}</div>`;
@@ -1467,6 +1476,274 @@ return { G, LESSONS, TERMS:[
   ['たすき掛け','acx²＋(ad＋bc)x＋bd を、図を使って (ax＋b)(cx＋d) に因数分解する方法。'],['複2次式','ax⁴＋bx²＋c の形の式。x²＝X とおくと2次式になる。'] ] };
 })();
 
+/* ===== 数学Ⅰ 集合と命題（問題は毎回つくりかわります） ===== */
+const M3 = (() => {
+const nz = (a,b) => { let n=0; while(n===0) n=ri(a,b); return n; };
+const uniq = a => a.filter((v,i,s)=>s.indexOf(v)===i);
+const mi = t => typeof t==='string' ? t.replace(/-(?=\d)/g,'−') : t;
+function Q(prompt, expr, ans, wrongs, hint, explain, extra){
+  ans=mi(ans); const ch=uniq([ans, ...wrongs.filter(Boolean).map(mi).filter(w=>w!==ans)]).slice(0,4);
+  return Object.assign({ raw:true, prompt:mi(prompt), expr:mi(expr), answer:ans, choices:shuffle(ch), words:ch.some(c=>c.replace(/<[^>]+>/g,'').length>9), hint:mi(hint), explain:mi(explain), long:true }, extra||{}); }
+const TF = (prompt, expr, ok, hint, explain) => Object.assign(Q(prompt, expr, ok?'真':'偽', [ok?'偽':'真'], hint, explain), { choices:['真','偽'], words:false });
+const ov = s => `<span class="ov">${s}</span>`;
+const S = a => a.length ? `{${[...a].sort((x,y)=>x-y).join(', ')}}` : 'φ';
+const inter = (a,b) => a.filter(x=>b.includes(x)), unite = (a,b) => uniq([...a,...b]).sort((x,y)=>x-y), minus = (a,b) => a.filter(x=>!b.includes(x));
+const pert = (ans,U) => { const o=[]; if(ans.length>1) o.push(S(ans.filter(x=>x!==pick(ans)))); const add=U.filter(x=>!ans.includes(x)); if(add.length) o.push(S([...ans,pick(add)])); if(add.length>1) o.push(S([...ans,...shuffle(add).slice(0,2)])); return o; };
+const range = n => Array.from({length:n},(_,i)=>i+1);
+const sample = (arr,k) => shuffle([...arr]).slice(0,k).sort((x,y)=>x-y);
+const ex = s => `<p class="ex">${s}</p>`;
+const tip = s => `<p class="small muted">${s}</p>`;
+const sum = arr => `<div class="signs">${arr.map(s=>`<div>${s}</div>`).join('')}</div>`;
+
+/* --- ベン図（要素を書きこむ） --- */
+function venn(U,A,B,shade){ // shade: 'AB' 'A|B' 'A' 'B' 'nA' 'nB' 'n(A|B)' 'n(AB)' など
+  const reg = x => A.includes(x) ? (B.includes(x)?'ab':'a') : (B.includes(x)?'b':'o');
+  const pos = { a:[88,100], ab:[150,100], b:[212,100], o:[30,30] }, put={a:[],ab:[],b:[],o:[]};
+  U.forEach(x=>put[reg(x)].push(x));
+  const txt = (k) => put[k].map((x,i)=>{ let [cx,cy]=pos[k];
+    if(k==='o'){ const spots=[[278,24],[24,178],[278,178],[150,184],[62,184],[238,184],[24,100],[278,100],[150,18],[60,20]]; [cx,cy]=spots[i%spots.length]; }
+    else { const n=put[k].length, cols=k==='ab'?1:2, r=Math.floor(i/cols), c=i%cols, rows=Math.ceil(n/cols); cx+= (c-(Math.min(cols,n)-1)/2)*22; cy+= (r-(rows-1)/2)*22; }
+    return `<text x="${cx}" y="${cy}">${x}</text>`; }).join('');
+  const fill = { a:false, ab:false, b:false, o:false };
+  ({ 'AB':['ab'], 'A|B':['a','ab','b'], 'A':['a','ab'], 'B':['b','ab'], 'nA':['b','o'], 'nB':['a','o'], 'n(A|B)':['o'], 'n(AB)':['a','b','o'], 'nAB':['b'] }[shade]||[]).forEach(k=>fill[k]=true);
+  const R={ a:'M150,46.9 A62,62 0 1,0 150,153.1 A62,62 0 0,1 150,46.9 Z', b:'M150,46.9 A62,62 0 1,1 150,153.1 A62,62 0 0,0 150,46.9 Z', ab:'M150,46.9 A62,62 0 0,1 150,153.1 A62,62 0 0,1 150,46.9 Z' };
+  const sh = `<rect x="6" y="6" width="288" height="188" class="${fill.o?'vf':'vbg'}"/>${['a','ab','b'].map(k=>`<path d="${R[k]}" class="${fill[k]?'vf':'vbg'}"/>`).join('')}`;
+  return `<svg class="venn" viewBox="0 0 300 200" role="img" aria-label="ベン図">${sh}<rect x="6" y="6" width="288" height="188" class="vu"/><circle cx="118" cy="100" r="62" class="vc"/><circle cx="182" cy="100" r="62" class="vc"/>
+  <text x="14" y="20" class="vl">U</text><text x="70" y="44" class="vl">A</text><text x="230" y="44" class="vl">B</text>${txt('a')}${txt('ab')}${txt('b')}${txt('o')}</svg>`; }
+/* --- 数直線（範囲） --- */
+function nline(P,Q){ // P,Q: [a,b,'P'] 範囲（a＜x＜b）
+  const lo=Math.min(P[0],Q[0])-1, hi=Math.max(P[1],Q[1])+1, X=v=>20+(v-lo)/(hi-lo)*260;
+  let g=`<line x1="12" y1="70" x2="290" y2="70" class="nl"/>`;
+  for(let v=lo; v<=hi; v++) g+=`<line x1="${X(v)}" y1="66" x2="${X(v)}" y2="74" class="nl"/><text x="${X(v)}" y="90" class="nt">${v}</text>`;
+  [[P,40,'var(--teal)'],[Q,54,'var(--accent)']].forEach(([[a,b,l],y,c])=>{ g+=`<line x1="${X(a)}" y1="${y}" x2="${X(b)}" y2="${y}" stroke="${c}" stroke-width="5" stroke-linecap="round" opacity=".8"/><circle cx="${X(a)}" cy="${y}" r="4" fill="var(--surface)" stroke="${c}" stroke-width="2"/><circle cx="${X(b)}" cy="${y}" r="4" fill="var(--surface)" stroke="${c}" stroke-width="2"/><text x="${X(a)-10}" y="${y+4}" class="nt" fill="${c}" style="fill:${c}">${l}</text>`; });
+  return `<svg class="nline" viewBox="0 0 300 100" role="img" aria-label="数直線">${g}</svg>`; }
+
+/* --- 条件のペア：[p, q, p⇒q, q⇒p, p⇒q の反例, q⇒p の反例, 前置き] --- */
+function pairs(){
+  const a=ri(2,6), b=ri(1,6), c=a+ri(1,4), L=[];
+  L.push([`x＝${a}`,`x²＝${a*a}`,true,false,'',`x＝−${a}`,'実数 x について']);
+  L.push([`x＞${c}`,`x＞${a}`,true,false,'',`x＝${c}`,'実数 x について']);
+  L.push([`x＜${a}`,`x＜${c}`,true,false,'',`x＝${a}`,'実数 x について']);
+  const [k,m]=pick([[6,3],[4,2],[6,2],[9,3],[10,5],[12,4]]);
+  L.push([`n は ${k} の倍数`,`n は ${m} の倍数`,true,false,'',`n＝${m}`,'整数 n について']);
+  L.push([`x＝0`,`xy＝0`,true,false,'',`x＝1、y＝0`,'実数 x、y について']);
+  L.push([`x＝0 かつ y＝0`,`x²＋y²＝0`,true,true,'','','実数 x、y について']);
+  L.push([`n は奇数`,`n² は奇数`,true,true,'','','整数 n について']);
+  L.push([`x＞y`,`x²＞y²`,false,false,`x＝1、y＝−2`,`x＝−3、y＝1`,'実数 x、y について']);
+  L.push([`x＝${b}`,`x＞0`,true,false,'',`x＝${b+1}`,'実数 x について']);
+  L.push([`四角形が正方形`,`四角形が長方形`,true,false,'','（正方形でない長方形）','']);
+  L.push([`△ABC が正三角形`,`△ABC の3つの角が等しい`,true,true,'','','']);
+  L.push([`x＋${b}＝${b+a}`,`x＝${a}`,true,true,'','','実数 x について']);
+  return L; }
+const flip = r => [r[1],r[0],r[3],r[2],r[5],r[4],r[6]];
+const NS = ['必要十分条件である','必要条件であるが十分条件ではない','十分条件であるが必要条件ではない','必要条件でも十分条件でもない'];
+const nsOf = (pq,qp) => pq&&qp?NS[0]:pq?NS[2]:qp?NS[1]:NS[3];
+
+/* --- 否定 --- */
+const NEG = () => { const a=nz(-4,6), b=nz(-4,6);
+  return pick([
+    [`x＞${a}`,`x≦${a}`,[`x＜${a}`,`x≧${a}`,`x≠${a}`]],
+    [`x≧${a}`,`x＜${a}`,[`x≦${a}`,`x＞${a}`,`x≠${a}`]],
+    [`x＝${a}`,`x≠${a}`,[`x＞${a}`,`x＜${a}`,`x≦${a}`]],
+    [`x＝${a} かつ y＝${b}`,`x≠${a} または y≠${b}`,[`x≠${a} かつ y≠${b}`,`x＝${a} または y＝${b}`,`x≠${a} かつ y＝${b}`]],
+    [`x＞${a} または y＞${b}`,`x≦${a} かつ y≦${b}`,[`x≦${a} または y≦${b}`,`x＜${a} かつ y＜${b}`,`x＞${a} かつ y＞${b}`]],
+    [`x≧${a} かつ y≧${b}`,`x＜${a} または y＜${b}`,[`x＜${a} かつ y＜${b}`,`x≦${a} または y≦${b}`,`x≧${a} または y≧${b}`]],
+    [`n は偶数`,`n は奇数`,[`n は 0`,`n は 2 の倍数`,`n は 4 の倍数`]],
+  ]); };
+const CONDS = () => { const a=ri(2,5);
+  return pick([
+    [['x＝'+a,'x≠'+a],['x²＝'+a*a,'x²≠'+a*a],'実数 x について'],
+    [['n は 6 の倍数','n は 6 の倍数でない'],['n は 3 の倍数','n は 3 の倍数でない'],'整数 n について'],
+    [['n² は偶数','n² は奇数'],['n は偶数','n は奇数'],'整数 n について'],
+    [['x＞'+(a+2),'x≦'+(a+2)],['x＞'+a,'x≦'+a],'実数 x について'],
+    [['x＋y＞0','x＋y≦0'],['x＞0 または y＞0','x≦0 かつ y≦0'],'実数 x、y について'],
+  ]); };
+
+const G = {
+  /* 1 集合と要素 */
+  s1List(){ if(Math.random()<.3){ const N=pick([8,12,18,20,16]), d=range(N).filter(x=>N%x===0);
+      return Q('要素を書き並べて表すと？', `A＝{x | x は ${N} の正の約数}`, S(d), [S(d.filter(x=>x!==1&&x!==N)), S(range(5).map(i=>N*i)), S(d.filter(x=>x!==1))],
+        '「正の約数」は、わり切れる正の整数。1 と自分自身もふくみます。', `${N} をわり切る正の整数は ${d.join('、')}。<br>A＝<b>${S(d)}</b>`); }
+    const F=pick([[n=>2*n,'2n'],[n=>2*n-1,'2n−1'],[n=>3*n,'3n'],[n=>3*n-1,'3n−1'],[n=>n*n,'n²'],[n=>2*n+1,'2n＋1']]), k=ri(3,5), O=pick([[n=>2*n,'2n'],[n=>2*n-1,'2n−1'],[n=>3*n,'3n'],[n=>n+1,'n＋1']].filter(o=>o[1]!==F[1]));
+    const ok=range(k).map(F[0]);
+    return Q('要素を書き並べて表すと？', `A＝{${F[1]} | 1≦n≦${k}、n は整数}`, S(ok), [S(range(k).map(n=>F[0](n-1))), S(range(k+1).map(F[0])), S(range(k).map(O[0])), S(range(k-1).map(F[0])), S(range(k).map(n=>F[0](n+1)))],
+      `n に 1、2、…、${k} を順に代入します。`, `n＝${range(k).join('、')} を ${F[1]} に代入すると ${ok.join('、')}。<br>A＝<b>${S(ok)}</b>`); },
+  s1In(){ const F=pick([[n=>2*n,'2n'],[n=>2*n-1,'2n−1'],[n=>3*n,'3n']]), k=ri(4,5), A=range(k).map(F[0]), mx=Math.max(...A);
+    const ins=A, outs=range(mx+2).filter(x=>!A.includes(x));
+    const T=[...shuffle(ins).slice(0,2).map(x=>[`${x}∈A`,1,x]), ...shuffle(outs).slice(0,2).map(x=>[`${x}∉A`,1,x])];
+    const Fs=[...shuffle(outs).slice(0,3).map(x=>[`${x}∈A`,0,x]), ...shuffle(ins).slice(0,3).map(x=>[`${x}∉A`,0,x])];
+    const t=pick(T), f=shuffle(Fs.filter(z=>z[0]!==t[0])).slice(0,3);
+    return Q('正しいものは？', `A＝{${F[1]} | 1≦n≦${k}、n は整数}`, t[0], f.map(z=>z[0]),
+      'まず A を書き並べます。a∈A は「a は A の要素である」、a∉A は「a は A の要素でない」。', `A＝${S(A)}<br>${t[2]} は A の要素${t[0].includes('∉')?'ではない':'である'}ので、<b>${t[0]}</b> が正しい。`); },
+  s1Sub(){ const A=sample(range(9),5), B=sample(A,3), out=pick(range(9).filter(x=>!A.includes(x))), C=[...sample(A,2),out].sort((x,y)=>x-y);
+    const T=[['B⊂A',`B の要素 ${B.join('、')} はすべて A の要素なので正しい。`],['A⊂A','どんな集合も、自分自身の部分集合です。'],['φ⊂A','空集合 φ は、すべての集合の部分集合と決められています。']];
+    const F=[['C⊂A',`C の要素 ${out} は A にふくまれないので、C⊂A ではない。`],['A⊂B',`A の要素のうち ${minus(A,B).join('、')} は B にふくまれない。`],['B＝C','B と C は要素が一致しない。'],['A⊂C',`A の要素のうち ${minus(A,C).join('、')} は C にふくまれない。`]];
+    const t=pick(T);
+    return Q('正しいものは？', `A＝${S(A)}、B＝${S(B)}、C＝${S(C)}`, t[0], shuffle(F).slice(0,3).map(z=>z[0]),
+      'X⊂Y は「X のすべての要素が Y の要素」。1つでも Y にない要素があれば成り立ちません。', `<b>${t[0]}</b>：${t[1]}<br>${F.map(z=>`${z[0]}：${z[1]}`).join('<br>')}`); },
+  s1Cap(){ const N=ri(8,10), U=range(N); let A,B; do { A=sample(U,ri(3,5)); B=sample(U,ri(3,5)); } while(inter(A,B).length<1||inter(A,B).length===A.length||inter(A,B).length===B.length);
+    const cap=Math.random()<.5, ok=cap?inter(A,B):unite(A,B), op=cap?'A∩B':'A∪B';
+    return Q(`${op} は？`, `U＝${S(U)} を全体集合とする。<br>A＝${S(A)}、B＝${S(B)}`, S(ok), [S(cap?unite(A,B):inter(A,B)), S(minus(A,B)), S(minus(unite(A,B),inter(A,B))), ...pert(ok,U)],
+      cap?'A∩B（共通部分）は、A と B の<b>どちらにも</b>属する要素。':'A∪B（和集合）は、A と B の<b>少なくとも一方</b>に属する要素。',
+      `${venn(U,A,B,cap?'AB':'A|B')}${op}＝<b>${S(ok)}</b>`); },
+  s1Comp(){ const N=ri(7,9), U=range(N); let A,B; do { A=sample(U,ri(3,4)); B=sample(U,ri(3,4)); } while(inter(A,B).length<1||inter(A,B).length===A.length||inter(A,B).length===B.length);
+    const t=pick(['nA','nB','nAB']), lab={nA:ov('A'),nB:ov('B'),nAB:`${ov('A')}∩B`}[t], ok={nA:minus(U,A),nB:minus(U,B),nAB:minus(B,A)}[t];
+    const wr={nA:[A,minus(U,B),minus(A,B)],nB:[B,minus(U,A),minus(B,A)],nAB:[minus(U,A),inter(A,B),minus(A,B)]}[t];
+    return Q(`${lab} は？`, `U＝${S(U)} を全体集合とする。<br>A＝${S(A)}、B＝${S(B)}`, S(ok), [...wr.map(S), ...pert(ok,U)],
+      `${ov('A')}（A の補集合）は、U の要素のうち A に<b>属さない</b>もの。`,
+      `${venn(U,A,B,t)}${t==='nAB'?`${ov('A')}＝${S(minus(U,A))} なので、これと B の共通部分は `:''}${lab}＝<b>${S(ok)}</b>`); },
+  s1DeM(){ const N=ri(7,9), U=range(N); let A,B; do { A=sample(U,ri(2,4)); B=sample(U,ri(2,4)); } while(inter(A,B).length<1||unite(A,B).length>=N-1);
+    if(Math.random()<.5){ const cup=Math.random()<.5, L=cup?ov('A∪B'):ov('A∩B'), R=cup?`${ov('A')}∩${ov('B')}`:`${ov('A')}∪${ov('B')}`, W=cup?`${ov('A')}∪${ov('B')}`:`${ov('A')}∩${ov('B')}`;
+      return Q(`${L} と等しいものは？`, 'ド・モルガンの法則', R, [W, cup?`${ov('A')}∪B`:`${ov('A')}∩B`, cup?'A∩B':'A∪B'],
+        '補集合をとると、∪ と ∩ が入れかわります。', `ド・モルガンの法則<br>${ov('A∪B')}＝${ov('A')}∩${ov('B')}<br>${ov('A∩B')}＝${ov('A')}∪${ov('B')}<br>よって ${L}＝<b>${R}</b>`); }
+    const cup=Math.random()<.5, ok=cup?minus(U,unite(A,B)):minus(U,inter(A,B)), Q2=cup?`${ov('A')}∩${ov('B')}`:`${ov('A')}∪${ov('B')}`;
+    return Q(`${Q2} は？`, `U＝${S(U)} を全体集合とする。<br>A＝${S(A)}、B＝${S(B)}`, S(ok), [S(cup?minus(U,inter(A,B)):minus(U,unite(A,B))), S(cup?unite(A,B):inter(A,B)), S(minus(U,A)), ...pert(ok,U)],
+      `ド・モルガンの法則で ${Q2}＝${cup?ov('A∪B'):ov('A∩B')}。先に ${cup?'A∪B':'A∩B'} を求めると楽です。`,
+      `${venn(U,A,B,cup?'n(A|B)':'n(AB)')}${Q2}＝${cup?ov('A∪B'):ov('A∩B')}<br>${cup?'A∪B':'A∩B'}＝${S(cup?unite(A,B):inter(A,B))} なので<br>${Q2}＝<b>${S(ok)}</b>`); },
+
+  /* 2 命題の真偽 */
+  s2TF(){ let r=pick(pairs()); if(Math.random()<.5) r=flip(r);
+    const pre=r[6]?r[6]+'、':'', ok=r[2];
+    return TF('次の命題の真偽は？', `${pre}「${r[0]} ならば ${r[1]}」`, ok, '「ならば」の前（仮定）が成り立つものが、必ず後ろ（結論）も成り立つか考えます。1つでも成り立たない例（反例）があれば偽。',
+      ok ? `${r[0]} のとき、必ず ${r[1]} が成り立つので <b>真</b>。` : `反例：<b>${r[4]}</b>。${r[0]} は成り立つが、${r[1]} は成り立たない。よって <b>偽</b>。`); },
+  s2Ce(){ const a=ri(2,6), c=a+ri(2,4), [k,m]=pick([[2,4],[3,6],[2,6],[3,9],[5,10]]);
+    const it=pick([
+      [`実数 x について「x²＝${a*a} ならば x＝${a}」`,`x＝−${a}`,[`x＝${a}`,`x＝0`,`x＝${a*a}`],`x＝−${a} のとき x²＝${a*a} だが、x＝${a} ではない。`],
+      [`実数 x について「x＞${a} ならば x＞${c}」`,`x＝${c}`,[`x＝${c+1}`,`x＝${a}`,`x＝${a-1}`],`x＝${c} は x＞${a} を満たすが、x＞${c} を満たさない。`],
+      [`整数 n について「n が ${k} の倍数ならば n は ${m} の倍数」`,`n＝${k}`,[`n＝${m}`,`n＝${m*2}`,`n＝1`],`n＝${k} は ${k} の倍数だが、${m} の倍数ではない。`],
+      [`実数 x、y について「xy＝0 ならば x＝0」`,`x＝1、y＝0`,[`x＝0、y＝1`,`x＝0、y＝0`,`x＝1、y＝1`],`x＝1、y＝0 のとき xy＝0 だが、x＝0 ではない。`],
+      [`実数 x、y について「x＞y ならば x²＞y²」`,`x＝1、y＝−2`,[`x＝3、y＝1`,`x＝2、y＝0`,`x＝−1、y＝0`],`x＝1、y＝−2 のとき x＞y だが、x²＝1、y²＝4 で x²＞y² ではない。`],
+    ]);
+    return Q('この命題は偽です。反例として正しいものは？', it[0], it[1], it[2],
+      '反例は「仮定は満たすのに、結論は満たさない」例。仮定を満たさないものは反例になりません。', `${it[3]}<br>反例は <b>${it[1]}</b>。`); },
+  s2Set(){ let a,b,c,d; do { a=ri(-3,3); b=a+ri(2,5); c=ri(-3,3); d=c+ri(2,5); } while(a===c&&b===d);
+    const ok = c<=a && b<=d;
+    return TF('次の命題の真偽は？', `実数 x について「${a}＜x＜${b} ならば ${c}＜x＜${d}」`, ok,
+      'P＝{x | 仮定}、Q＝{x | 結論} として、P⊂Q なら真。数直線で考えます。',
+      `${nline([a,b,'P'],[c,d,'Q'])}P＝{x | ${a}＜x＜${b}}、Q＝{x | ${c}＜x＜${d}}<br>${ok?'P⊂Q なので <b>真</b>。':`P は Q にふくまれない（はみ出す部分がある）ので <b>偽</b>。`}`); },
+
+  /* 3 必要条件・十分条件 */
+  s3NS(){ let r=pick(pairs()); if(Math.random()<.5) r=flip(r);
+    const ok=nsOf(r[2],r[3]), pre=r[6]?r[6]+'、':'';
+    return Q('□ に当てはまるものは？', `${pre}${r[0]} は ${r[1]} であるための □。`, ok, NS.filter(x=>x!==ok),
+      'p⇒q と q⇒p の真偽を両方調べます。p⇒q が真なら、p は十分条件、q は必要条件。',
+      `${r[0]} ⇒ ${r[1]}：${r[2]?'真':`偽（反例 ${r[4]}）`}<br>${r[1]} ⇒ ${r[0]}：${r[3]?'真':`偽（反例 ${r[5]}）`}<br>よって <b>${ok}</b>。`, { words:true }); },
+  s3Range(){ let a,b,c,d; do { a=ri(-3,3); b=a+ri(2,5); c=ri(-3,3); d=c+ri(2,5); } while((a===c&&b===d)||Math.random()<.4&&!((c<=a&&b<=d)||(a<=c&&d<=b)));
+    const pq=c<=a&&b<=d, qp=a<=c&&d<=b, ok=nsOf(pq,qp);
+    return Q('□ に当てはまるものは？', `実数 x について、${a}＜x＜${b} は ${c}＜x＜${d} であるための □。`, ok, NS.filter(x=>x!==ok),
+      '集合で考えます。P⊂Q なら p は q の十分条件、Q⊂P なら p は q の必要条件。', `${nline([a,b,'P'],[c,d,'Q'])}${pq?'P⊂Q なので p⇒q は真。':'P は Q からはみ出すので p⇒q は偽。'}<br>${qp?'Q⊂P なので q⇒p は真。':'Q は P からはみ出すので q⇒p は偽。'}<br>よって <b>${ok}</b>。`, { words:true }); },
+  s3Mix(){ return G[pick(['s3NS','s3NS','s3Range'])](); },
+
+  /* 4 対偶 */
+  s4Neg(){ const [p,ok,wr]=NEG();
+    return Q('条件の否定は？', p, ok, wr,
+      '＞ の否定は ≦、＝ の否定は ≠。「かつ」の否定は「または」、「または」の否定は「かつ」（ド・モルガンの法則）。', `「${p}」の否定は <b>${ok}</b>。`); },
+  s4Rev(){ const [[p,np],[q,nq],pre]=CONDS(), kind=pick(['逆','裏','対偶']);
+    const F={ '逆':`${q} ならば ${p}`, '裏':`${np} ならば ${nq}`, '対偶':`${nq} ならば ${np}` }, wrong=`${p} ならば ${nq}`;
+    return Q(`この命題の${kind}は？`, `${pre}「${p} ならば ${q}」`, F[kind], [...Object.keys(F).filter(k=>k!==kind).map(k=>F[k]), wrong],
+      '逆：q ならば p　裏：p でない ならば q でない　対偶：q でない ならば p でない', `逆：${F['逆']}<br>裏：${F['裏']}<br>対偶：${F['対偶']}<br>${kind}は <b>${F[kind]}</b>。`, { words:true }); },
+  s4Use(){ let r=pick(pairs().filter(x=>x[2]!==x[3]||Math.random()<.3)); if(Math.random()<.5) r=flip(r);
+    const kind=pick(['対偶','対偶','逆','裏']), ok = kind==='対偶'?r[2]:r[3], pre=r[6]?r[6]+'、':'';
+    return TF(`命題は${r[2]?'真':'偽'}です。この命題の${kind}の真偽は？`, `${pre}「${r[0]} ならば ${r[1]}」`, ok,
+      'もとの命題と対偶の真偽は必ず一致します。逆と裏の真偽は一致するとは限りません。',
+      kind==='対偶' ? `もとの命題と対偶の真偽は一致するので <b>${ok?'真':'偽'}</b>。` : `${kind}の真偽は、逆「${r[1]} ならば ${r[0]}」と同じ。<br>${r[3]?'これは真。':`反例 ${r[5]} があるので偽。`}よって <b>${ok?'真':'偽'}</b>。`); },
+
+  /* 5 背理法 */
+  s5Step(){ const p=pick([2,3,5]), R=`√${p}`;
+    const it=pick([
+      [`r、s は有理数で s≠0 とする。r＋s${R} が無理数であることを背理法で証明するとき、はじめに仮定することは？`,`r＋s${R} は有理数である`,[`r＋s${R} は無理数である`,`${R} は有理数である`,`r と s は無理数である`],'背理法では、証明したいことの<b>反対</b>を仮定します。'],
+      [`r＋s${R}＝t（t は有理数）とおく。s≠0 のとき、${R} を r、s、t で表すと？`,`${R}＝(t−r)/s`,[`${R}＝(t＋r)/s`,`${R}＝(r−t)/s`,`${R}＝s(t−r)`],`r を移項して s${R}＝t−r、両辺を s でわります。`],
+      [`${R}＝(t−r)/s（r、s、t は有理数）と表せた。何と矛盾する？`,`${R} が無理数であること`,[`s≠0 であること`,`t が有理数であること`,`r が有理数であること`],'有理数どうしの和・差・積・商（0 でわるのは除く）は有理数です。'],
+      [`r＋s${R} が無理数である証明で、「s≠0」はどこで使う？`,`両辺を s でわるとき`,[`両辺を2乗するとき`,`r を移項するとき`,`最初に仮定するとき`],'0 でわることはできないので、s でわるときに s≠0 が必要です。'],
+      [`背理法とは、どんな証明のしかた？`,`命題が成り立たないと仮定して、矛盾を導く`,[`対偶が真であることを示す`,`具体的な数をいくつか代入して確かめる`,`反例を1つ示す`],'「成り立たないとすると、おかしなことになる」と示す方法です。'],
+    ]);
+    return Q(it[0], '', it[1], it[2], it[3], `答えは <b>${it[1]}</b>。<br>流れ：r＋s${R} が有理数 t と仮定 → ${R}＝(t−r)/s → 右辺は有理数 → ${R} が無理数であることに矛盾。`, { words:true }); },
+  s5Root(){ const p=pick([2,2,3]), R=`√${p}`, kind=p===2?'偶数':'3 の倍数';
+    const it=pick([
+      [`${R} が無理数であることを背理法で証明する。はじめに仮定することは？`,`${R} は有理数で、${R}＝a/b と表せる`,[`${R} は無理数である`,`a と b はともに${kind}である`,`${R}＝a²/b² と表せる`]],
+      [`${R}＝a/b とおくとき、a、b はどんな数？`,`1 以外に正の公約数をもたない自然数`,[`ともに${kind}`,`ともに無理数`,`a＞b を満たす整数`]],
+      [`a＝${R}b の両辺を2乗すると？`,`a²＝${p}b²`,[`a²＝${p}b`,`a＝${p}b²`,`a²＝${p*p}b²`]],
+      [`a²＝${p}b² から、a² は${kind}。すると a は？`,`a も${kind}`,[`a は${kind}ではない`,`a は無理数`,`b は${kind}ではない`]],
+      [`a＝${p}c を a²＝${p}b² に代入すると？`,`b²＝${p}c²`,[`b²＝${p*p}c²`,`b＝${p}c`,`b²＝c²`]],
+      [`a も b も${kind}になった。何と矛盾する？`,`a、b が 1 以外に正の公約数をもたないこと`,[`${R} が無理数であること`,`a²＝${p}b² であること`,`a、b が自然数であること`]],
+    ]);
+    return Q(it[0], '', it[1], it[2], '証明の流れ：有理数と仮定 → a/b とおく → 2乗 → a も b も' + kind + ' → 矛盾。',
+      `答えは <b>${it[1]}</b>。<br>${R}＝a/b → a²＝${p}b² → a は${kind}（a＝${p}c）→ b²＝${p}c² → b も${kind} → 公約数 ${p} をもち矛盾。`, { words:true }); },
+};
+
+const rul = s => `<div class="rule">${s}</div>`;
+const L = (id,sec,t,sub,key,body,extra) => Object.assign({ id, sec, t, sub, plan:Array.isArray(key)?key:Array(5).fill(key), body }, extra||{});
+const VS = venn([1,2,3,4,5,6],[2,4,6],[2,3,5],'');
+const LESSONS = [
+  L('1-1','1　集合と要素','集合と要素','∈ と ∉、集合の表し方',['s1List','s1List','s1List','s1In','s1In'],()=>`
+    <section class="panel"><h3>集合と要素</h3><p>はっきり区別できるものの集まりを<b>集合</b>、集合をつくっている1つ1つのものを<b>要素</b>といいます。</p>
+    ${rul('a が A の要素 → a∈A（a は A に属する）<br>b が A の要素でない → b∉A')}</section>
+    <section class="panel"><h3>集合の表し方</h3><p>① 要素を書き並べる　② 要素が満たす条件を書く</p>
+    ${ex('1けたの奇数の集合<br>{1, 3, 5, 7, 9}<br>{x | 1≦x≦9、x は奇数}<br>{2n−1 | 1≦n≦5、n は整数}')}${tip('{2n | 1≦n≦4、n は整数} は、n に 1〜4 を代入して {2, 4, 6, 8}。')}</section>`),
+  L('1-2',null,'部分集合と空集合','⊂、φ','s1Sub',()=>`
+    <section class="panel"><h3>部分集合</h3>${rul('A のすべての要素が B の要素 → A⊂B<br>（A は B の部分集合）')}${ex('A＝{1, 3}、B＝{1, 2, 3} のとき A⊂B')}
+    <p>A と B の要素がすべて一致するとき <b>A＝B</b>（A⊂B かつ B⊂A）。</p></section>
+    <section class="panel"><h3>覚えておくこと</h3>${sum(['A⊂A<br>自分自身も部分集合','φ⊂A<br>空集合はすべての集合の部分集合'])}${tip('要素が1つもない集合を<b>空集合</b>といい、φ で表します。')}</section>`),
+  L('1-3',null,'共通部分と和集合','∩（かつ）と ∪（または）','s1Cap',()=>`
+    <section class="panel"><h3>共通部分と和集合</h3>${rul('A∩B：A と B の<b>どちらにも</b>属する要素<br>A∪B：A と B の<b>少なくとも一方</b>に属する要素')}
+    ${VS}${ex('A＝{2, 4, 6}、B＝{2, 3, 5}<br>A∩B＝{2}<br>A∪B＝{2, 3, 4, 5, 6}')}${tip('ベン図をかいて、それぞれの数を書きこむとまちがえません。')}</section>`),
+  L('1-4',null,'補集合','全体集合 U と A のバー','s1Comp',()=>`
+    <section class="panel"><h3>全体集合と補集合</h3><p>考える範囲全体の集合 U を<b>全体集合</b>といいます。U の要素のうち A に属さないもの全体を A の<b>補集合</b>といい、${ov('A')} で表します。</p>
+    ${VS}${ex(`U＝{1, 2, 3, 4, 5, 6}、A＝{2, 4, 6}、B＝{2, 3, 5}<br>${ov('A')}＝{1, 3, 5}　${ov('B')}＝{1, 4, 6}`)}</section>
+    <section class="panel"><h3>成り立つこと</h3>${sum([`A∩${ov('A')}＝φ`,`A∪${ov('A')}＝U`,`${ov(ov('A'))}＝A`])}</section>`),
+  L('1-5',null,'ド・モルガンの法則','補集合で ∪ と ∩ が入れかわる','s1DeM',()=>`
+    <section class="panel"><h3>ド・モルガンの法則</h3>${rul(`${ov('A∪B')}＝${ov('A')}∩${ov('B')}<br>${ov('A∩B')}＝${ov('A')}∪${ov('B')}`)}
+    <p>全体にバーをかけて分けると、<b>∪ と ∩ が入れかわります</b>。</p>${venn([1,2,3,4,5,6],[2,4,6],[2,3,5],'n(A|B)')}${ex(`${ov('A∪B')}＝{1}<br>${ov('A')}∩${ov('B')}＝{1, 3, 5}∩{1, 4, 6}＝{1}`)}</section>`),
+  L('2-1','2　命題の真偽','命題と真偽','真・偽を判断する','s2TF',()=>`
+    <section class="panel"><h3>命題</h3><p>正しいか正しくないかがはっきり決まる式や文を<b>命題</b>といいます。正しいとき<b>真</b>、正しくないとき<b>偽</b>。</p>
+    ${rul('命題「p ならば q」を p⇒q と書く<br>p：仮定　q：結論')}</section>
+    <section class="panel"><h3>例</h3>${ex('実数 a について「a²＝0 ならば a＝0」→ 真')}${ex('実数 x について「x²＝1 ならば x＝1」→ 偽<br>（x＝−1 のとき x²＝1 だが x＝1 ではない）')}${tip('偽を示すには、成り立たない例（反例）を1つ挙げれば十分です。')}</section>`),
+  L('2-2',null,'反例','偽であることを示す例','s2Ce',()=>`
+    <section class="panel"><h3>反例とは</h3>${rul('反例：仮定 p は満たすのに、結論 q は満たさない例')}
+    ${ex('「x²＝4 ならば x＝2」の反例 → x＝−2')}
+    <p class="small">x＝2 は仮定も結論も満たすので反例ではありません。x＝0 は仮定を満たさないので反例ではありません。</p></section>`),
+  L('2-3',null,'条件と集合','P⊂Q なら真','s2Set',()=>`
+    <section class="panel"><h3>集合で考える</h3><p>条件 p、q を満たすもの全体の集合を P、Q とすると</p>${rul('p⇒q が真 ⇔ P⊂Q')}
+    ${nline([1,3,'P'],[0,4,'Q'])}${ex('「1＜x＜3 ならば 0＜x＜4」<br>P⊂Q なので真')}${tip('P が Q からはみ出していたら偽。はみ出した部分が反例です。')}</section>`),
+  L('3-1','3　必要条件・十分条件','必要条件と十分条件','p⇒q が真のとき','s3NS',()=>`
+    <section class="panel"><h3>必要条件・十分条件</h3>${rul('p⇒q が真のとき<br>p は q であるための<b>十分条件</b><br>q は p であるための<b>必要条件</b>')}
+    <p>p⇒q と q⇒p がともに真のとき、p は q であるための<b>必要十分条件</b>（p と q は<b>同値</b>、p⇔q）。</p></section>
+    <section class="panel"><h3>覚え方</h3>${ex('「マグロ ⇒ 魚」は真<br>マグロであることは、魚であるための十分条件<br>魚であることは、マグロであるための必要条件')}${tip('矢印の出発点が「十分」、矢印の先が「必要」。')}</section>
+    <section class="panel"><h3>例</h3>${ex('x＝2 は x²＝4 であるための<br>x＝2 ⇒ x²＝4：真<br>x²＝4 ⇒ x＝2：偽（反例 x＝−2）<br>→ 十分条件であるが必要条件ではない')}</section>`),
+  L('3-2',null,'集合で考える','範囲の条件','s3Range',()=>`
+    <section class="panel"><h3>集合で考える</h3>${rul('P⊂Q ⇔ p は q の十分条件<br>Q⊂P ⇔ p は q の必要条件<br>P＝Q ⇔ 必要十分条件')}
+    ${nline([1,3,'P'],[0,4,'Q'])}${ex('1＜x＜3 は 0＜x＜4 であるための<br>P⊂Q で Q⊂P ではない<br>→ 十分条件であるが必要条件ではない')}${tip('小さいほう（ふくまれるほう）が十分条件、大きいほうが必要条件です。')}</section>`),
+  L('3-3',null,'必要・十分のまとめ','3-1・3-2','s3Mix',()=>`
+    <section class="panel"><h3>判断の手順</h3>${rul('① p⇒q の真偽を調べる<br>② q⇒p の真偽を調べる<br>③ 下の表で答える')}
+    <table class="dtab"><tr><th>p⇒q</th><th>q⇒p</th><th>p は q であるための</th></tr><tr><td>真</td><td>真</td><td>必要十分条件</td></tr><tr><td>真</td><td>偽</td><td>十分条件（必要条件ではない）</td></tr><tr><td>偽</td><td>真</td><td>必要条件（十分条件ではない）</td></tr><tr><td>偽</td><td>偽</td><td>どちらでもない</td></tr></table></section>`),
+  L('4-1','4　対偶を利用した命題の証明','条件の否定','＞の否定は≦、かつ⇔または','s4Neg',()=>`
+    <section class="panel"><h3>条件の否定</h3><p>「p でない」を p の<b>否定</b>といい、${ov('p')} で表します。</p>
+    <table class="dtab"><tr><th>条件</th><th>否定</th></tr><tr><td>x＞3</td><td>x≦3</td></tr><tr><td>x≧3</td><td>x＜3</td></tr><tr><td>x＝3</td><td>x≠3</td></tr></table></section>
+    <section class="panel"><h3>かつ・または の否定</h3>${rul('「p かつ q」の否定 → 「p でない または q でない」<br>「p または q」の否定 → 「p でない かつ q でない」')}${ex('「x＝1 かつ y＝2」の否定<br>→「x≠1 または y≠2」')}${tip('集合のド・モルガンの法則と同じしくみです。')}</section>`),
+  L('4-2',null,'逆・裏・対偶','p⇒q から作る3つの命題','s4Rev',()=>`
+    <section class="panel"><h3>逆・裏・対偶</h3><table class="dtab"><tr><th></th><th>形</th></tr><tr><td>もとの命題</td><td>p ⇒ q</td></tr><tr><td>逆</td><td>q ⇒ p</td></tr><tr><td>裏</td><td>${ov('p')} ⇒ ${ov('q')}</td></tr><tr><td>対偶</td><td>${ov('q')} ⇒ ${ov('p')}</td></tr></table>
+    ${ex('「x＝2 ならば x²＝4」<br>逆：x²＝4 ならば x＝2<br>裏：x≠2 ならば x²≠4<br>対偶：x²≠4 ならば x≠2')}${tip('対偶は「入れかえて、両方否定」。')}</section>`),
+  L('4-3',null,'対偶を利用した証明','もとの命題と対偶の真偽は一致','s4Use',()=>`
+    <section class="panel"><h3>大事な性質</h3>${rul('もとの命題と<b>対偶</b>の真偽は一致する<br>逆・裏の真偽は一致するとは限らない')}
+    <p>だから、もとの命題の代わりに対偶を証明してもよいのです。</p></section>
+    <section class="panel"><h3>例</h3>${ex('「n が 3 の倍数でないならば、n は 6 の倍数でない」<br>対偶：n が 6 の倍数ならば、n は 3 の倍数<br>→ 6 の倍数は 3 の倍数なので対偶は真<br>→ もとの命題も真')}
+    ${ex('「x＋y＞0 ならば、x＞0 または y＞0」<br>対偶：x≦0 かつ y≦0 ならば、x＋y≦0<br>→ 対偶は真なので、もとの命題も真')}</section>`),
+  L('5-1','5　背理法','背理法','成り立たないと仮定して矛盾','s5Step',()=>`
+    <section class="panel"><h3>背理法</h3>${rul('命題が成り立たないと仮定する → 矛盾を導く → もとの命題は真')}</section>
+    <section class="panel"><h3>例　r＋s√2 は無理数（r、s は有理数、s≠0）</h3>${ex('r＋s√2 が有理数 t であると仮定する<br>r＋s√2＝t<br>s≠0 なので　√2＝(t−r)/s<br>右辺は有理数なので、√2 も有理数になる<br>→ √2 が無理数であることに矛盾')}<p>したがって r＋s√2 は無理数です。</p>${tip('有理数どうしの和・差・積・商（0 でわる場合を除く）は有理数です。')}</section>`),
+  L('研-1','研究　√2 が無理数であることの証明','√2 が無理数であることの証明','背理法の代表例','s5Root',()=>`
+    <section class="panel"><h3>証明の流れ</h3>${ex('√2 が有理数と仮定すると<br>√2＝a/b（a、b は 1 以外に正の公約数をもたない自然数）<br>a＝√2b　両辺を2乗して a²＝2b² …①<br>a² は偶数 → a も偶数　a＝2c とおく<br>①に代入　4c²＝2b²　すなわち b²＝2c²<br>b² は偶数 → b も偶数')}
+    <p>a も b も偶数になり、公約数 2 をもつ。これは「1 以外に正の公約数をもたない」ことに矛盾。よって √2 は無理数です。</p>${tip('「n² が偶数ならば n は偶数」は、対偶「n が奇数ならば n² は奇数」で証明できます。')}</section>`),
+  L('まとめ','章末テスト','章末テスト','集合と命題の総まとめ','s1Cap',()=>`
+    <section class="panel"><h3>総まとめ</h3><p>集合・命題・必要十分・対偶・背理法から10問出題します。</p>${sum(['A∩B：どちらにも<br>A∪B：少なくとも一方','p⇒q が真<br>⇔ P⊂Q','p は十分条件<br>q は必要条件','もとの命題と対偶<br>真偽が一致'])}</section>`,
+    { test:true, plan:['s1Cap','s1Comp','s1DeM','s2TF','s2Ce','s3NS','s3Range','s4Neg','s4Rev','s5Step'] }),
+];
+return { G, LESSONS, TERMS:[
+  ['集合','はっきり区別できるものの集まり。'],['要素','集合をつくっている1つ1つのもの。a∈A と書く。'],['部分集合','A のすべての要素が B の要素のとき、A は B の部分集合（A⊂B）。'],['空集合','要素が1つもない集合。φ。すべての集合の部分集合。'],
+  ['共通部分','A∩B。A と B のどちらにも属する要素の集合。'],['和集合','A∪B。A と B の少なくとも一方に属する要素の集合。'],['補集合','全体集合 U のうち、A に属さない要素の集合。'],['ド・モルガンの法則','A∪B のバー＝A のバー∩B のバー、A∩B のバー＝A のバー∪B のバー。'],
+  ['命題','正しいか正しくないかがはっきり決まる式や文。'],['反例','仮定は満たすが結論は満たさない例。命題が偽であることを示す。'],['必要条件・十分条件','p⇒q が真のとき、p は q の十分条件、q は p の必要条件。'],['対偶','p⇒q に対する「q でない ⇒ p でない」。真偽はもとの命題と一致。'],['背理法','命題が成り立たないと仮定して矛盾を導く証明法。'] ] };
+})();
+
 /* ===== 波（1つ約5分） ===== */
 const MQ_LESSONS = [
   { id:'1-1', t:'式の展開', sub:'乗法公式', plan:['exp','exp','exp','exp','exp'], body:()=>`
@@ -1498,6 +1775,7 @@ const BC_LESSONS = [
 /* ===== 用語カード ===== */
 const TERMS = {
   m1:M1.TERMS,
+  m3:M3.TERMS,
   mq:[['展開','かっこのついた式を、かけ算して足し算の形にすること。'],['因数分解','足し算の式を、かけ算の形にすること。展開の逆。'],['乗法公式','(a＋b)² ＝ a²＋2ab＋b² など。'],['一次不等式','負の数をかける・割ると、不等号の向きが逆になる。']],
   bc:[['原核生物','核膜をもたない生物。大腸菌など。'],['転写','DNAの情報からRNAをつくること。'],['翻訳','RNAの情報からタンパク質をつくること。'],['インスリン','血糖値を下げるホルモン。']],
 };
@@ -1516,6 +1794,7 @@ const UNITS = {
   gk:{ no:'国', title:'語句高校レベル', subject:'国語', course:'jpn', subj:3, lessons:GK_LESSONS, cards:'gk', drill:'gk' },
   cj:{ no:'国', title:'接続語', subject:'国語', course:'jpn', subj:4, lessons:CJ_LESSONS, cards:'cj', drill:'cj' },
   hk:{ no:'国', title:'漢字高校レベル', subject:'国語', course:'jpn', subj:3, lessons:KJ_LESSONS, cards:'hk', drill:'hk' },
+  m3:{ no:'数Ⅰ 3章', title:'集合と命題', subject:'数学', course:'math', subj:0, lessons:M3.LESSONS, cards:'m3', drill:'m3' },
   m1:{ no:'数Ⅰ 1章', title:'式の展開と因数分解', subject:'数学', course:'math', subj:0, lessons:M1.LESSONS.filter(l=>!l.soon), show:M1.LESSONS, cards:'m1', drill:'m1' },
   bc:{ no:'生1', title:'細胞と体', subject:'生物', course:'bio', subj:0, lessons:BC_LESSONS, cards:'bc', drill:'bc' },
 };
@@ -1527,7 +1806,7 @@ const CATALOG = [
     { id:'jpn', name:'国語', k:'国', note:'現代文・古文・漢文', subjects:[
       K('現代文','現',{ t:'現代文基礎', go:'海月時間 ▶ 国語 ▶ 読解' },{ t:'論説『科学との向き合い方』', ready:'rk' },{ t:'論説『AI時代に考える力とは』', ready:'ai' },{ t:'論説『音楽はなぜ人の心を動かすのか』', ready:'mu' },{ t:'小説『各駅停車』', ready:'nv' },{ t:'小説『2番目の走者』', ready:'nw' },{ t:'小説『普通の教室』', ready:'nf' },{ t:'会話文『多数決は本当に公平か』', ready:'mj' },{ t:'会話文『便利な社会は幸せな社会か』', ready:'bs' },{ t:'資料問題『睡眠と現代社会』', ready:'sl' }), K('古文','古',{ t:'古文基礎', go:'海月時間 ▶ 国語 ▶ 古文' },'古典単語','古典文法','古文読解','『更級日記』','『？？？』','『？？？』'), K('漢文','漢',{ t:'漢文基礎', go:'海月時間 ▶ 国語 ▶ 漢文' },'句法','漢文読解','『？？？』','『？？？』','『？？？』'), K('漢字・語句','字',{ t:'基礎漢字', go:'海月時間 ▶ 国語 ▶ 漢字' },{ t:'漢字高校レベル', ready:'hk' },{ t:'言葉の基礎', go:'海月時間 ▶ 国語 ▶ 言葉' },{ t:'語句高校レベル', ready:'gk' }), K('文法','法',{ t:'接続語', ready:'cj' }), KAKO ] },
     { id:'math', name:'数学', k:'数', note:'数学Ⅰ', subjects:[
-      K('数と式','式',{ t:'式の展開と因数分解', ready:'m1' },'実数と平方根','集合と命題'), K('二次関数','関','二次関数のグラフ','最大・最小','二次方程式・二次不等式'), K('図形と計量','図','三角比','正弦定理・余弦定理'), K('データの分析','デ','代表値と散らばり','相関'), KAKO ] },
+      K('数と式','式',{ t:'式の展開と因数分解', ready:'m1' },'実数と平方根',{ t:'集合と命題', ready:'m3' }), K('二次関数','関','二次関数のグラフ','最大・最小','二次方程式・二次不等式'), K('図形と計量','図','三角比','正弦定理・余弦定理'), K('データの分析','デ','代表値と散らばり','相関'), KAKO ] },
     { id:'eng', name:'英語', k:'英', note:'文法・読解', subjects:[
       { name:'文法', k:'文', go:'海月時間 ▶ 英語 ▶ 文法', units:[] }, K('語い・会話文','語','単語・熟語','会話文'), K('読解','読','短い英文','長文読解'), KAKO ] },
     { id:'geo', name:'地理', k:'理', note:'地理総合', subjects:[
