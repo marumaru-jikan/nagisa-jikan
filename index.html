@@ -96,6 +96,7 @@ p{margin:0}
 
 /* lesson */
 .lesson section{display:flex;flex-direction:column;gap:10px}
+.kbox{display:inline-block;border:1.5px solid currentColor;border-radius:3px;padding:0 .7em;margin:0 .15em;font-family:var(--f-display);font-weight:900;font-style:normal;line-height:1.45}
 .secrow{font-family:var(--f-display);font-weight:900;color:var(--teal);font-size:.95rem;padding:14px 4px 2px;letter-spacing:.04em}
 .secrow:first-child{padding-top:2px}
 .mth{font-family:"Times New Roman","Hiragino Mincho ProN","Yu Mincho",serif;font-variant-numeric:normal;letter-spacing:.02em}
@@ -1202,6 +1203,29 @@ const G = {
       `x²＝X とおいても因数分解できないときは、<b>(　)²−(　)²</b> の形を作ります。x⁴ と ${b*b} から (x²＋${b})² を作って、足りない分・多い分を調整します。`,
       `(x²＋${b})²＝x⁴＋${2*b}x²＋${b*b} なので<br>${pfmt(T)}＝(x²＋${b})²−${a*a===1?'':a*a}x²<br>＝(x²＋${b})²−(${mono(a,'x')})²<br>＝{(x²＋${b})＋${mono(a,'x')}}{(x²＋${b})−${mono(a,'x')}}<br>＝<b>${par(A)}${par(B)}</b>`); },
 };
+
+/* ---------- 高認対策（マーク式 ①〜④） ---------- */
+const BOX = s => `<span class="kbox">${s}</span>`;
+const MK = ['①','②','③','④'];
+function mark(q, verb, fixed){ // 通常の問題を高認のマーク式にする
+  const ch = fixed ? q.choices : shuffle([...q.choices]).slice(0,4);
+  const lab = ch.map((c,i)=>`${MK[i]}　${c}`), ai = ch.indexOf(q.answer);
+  return Object.assign({}, q, { prompt:`次の ${BOX('ア')} を適切にうめなさい。`, expr:`${q.expr} を${verb}すると、${BOX('ア')} になる。<br><span class="small">次の ①〜④ のうちから正しいものを一つ選べ。</span>`,
+    long:true, words:true, choices:lab, answer:lab[ai], explain:q.explain+`<br>正解は <b>${MK[ai]}</b> です。` }); }
+G.m1Kako0 = () => { // 実際の過去問（大問1(1)）
+  const c=['4a²+b²−4ab+2a−b','4a²+b²−4ab+1','4a²+b²+2a−b','4a²−b²+1'];
+  const q0=Q('', '(2a−b)(2a−b+1)', c[0], c.slice(1),
+    '2a−b が2回出てきます。2a−b＝A とおくと A(A＋1) です。',
+    '2a−b＝A とおくと<br>(2a−b)(2a−b+1)＝A(A＋1)＝A²＋A<br>A をもとにもどして<br>＝(2a−b)²＋(2a−b)<br>＝4a²−4ab＋b²＋2a−b<br><span class="small">② は「＋1」を A にかけ忘れたもの、③ は −4ab（2×2a×b）をぬかしたもの、④ は (2a−b)(2a＋b) とまちがえたものです。</span>'); q0.choices=c; return mark(q0,'展開',true); };
+G.m1KA = () => { // 過去問と同じ形 (pa+qb)(pa+qb+r)
+  const [x,y]=VP(); let p=ri(1,3), q=nz(-4,4); while(gcd(p,q)!==1||(p===1&&Math.abs(q)===1&&Math.random()<.5)) q=nz(-4,4); const r=nz(-3,3);
+  const P=mk([p,x],[q,y]), ans=padd(pmul(P,P),psc(P,r)), sq=pmul(P,P);
+  const w1=padd(sq,mk([r,''])), w2=padd(mk([p*p,x+'2'],[q*q,y+'2']),psc(P,r)), w3=mk([p*p,x+'2'],[-q*q,y+'2'],[r,'']);
+  return mark(Q('', `${par(P)}${par(padd(P,mk([r,''])))}`, pfmt(ans), [pfmt(w1),pfmt(w2),pfmt(w3)],
+    `${pfmt(P)} が2回出てきます。${pfmt(P)}＝A とおくと A(A${sg(r).replace(/^([+−])1$/,'$1')}) です。`,
+    `${pfmt(P)}＝A とおくと<br>A(A${sg(r)})＝A²${sg(r).replace(/^([+−])1$/,'$1')}A<br>A をもとにもどして<br>＝(${pfmt(P)})²${r<0?'−':'+'}${Math.abs(r)===1?'':Math.abs(r)}(${pfmt(P)})<br>＝<b>${pfmt(ans)}</b><br><span class="small">よくあるまちがい：${sg(r)} を A にかけ忘れる／(　)² の真ん中の項をぬかす。</span>`.replace(/A\+1\b/,'A＋1')), '展開'); };
+G.m1KB = () => { let q; do { q=G[pick(['m1Sq','m1DS','m1XAB','m1AXB','m1Dist2'])](); } while(q.choices.length<4); return mark(q,'展開'); };
+G.m1KC = () => { let q; do { q=G[pick(['m1CF','m1PSF','m1DSF','m1XABF','m1XABF','m1TkF1'])](); } while(q.choices.length<4); return mark(q,'因数分解'); };
 function pm0(c,k){ const s=mono(c,k); return c<0?'('+s+')':s; }
 
 /* --- 図 --- */
@@ -1332,6 +1356,21 @@ const LESSONS = [
   L('まとめ','章末テスト','章末テスト','1章の総まとめ','m1Sq',()=>`
     <section class="panel"><h3>1章の総まとめ</h3><p>展開と因数分解から10問出題します。問題の順番は毎回かわります。</p>${sum(['(a±b)²＝a²±2ab＋b²','(a＋b)(a−b)＝a²−b²','x²＋(a＋b)x＋ab＝(x＋a)(x＋b)','acx²＋(ad＋bc)x＋bd＝(ax＋b)(cx＋d)'])}</section>`,
     { test:true, plan:['m1Nest','m1MonoMul','m1AXB','m1Rep','m1Order','m1CF','m1XABF','m1TkF','m1RepF','m1Low'] }),
+  L('高-1','高認対策','過去問にチャレンジ','大問1(1)　展開の工夫',['m1Kako0','m1KA','m1KA','m1KA','m1KA'],()=>`
+    <section class="panel"><h3>高認ではこう出る</h3><p>1章の内容は、高認の数学では<b>大問1の(1)</b>で出題されます。式を展開・因数分解して、<b>①〜④ の4つから1つ選ぶ</b>マーク式です。</p>
+    ${ex(`(2a−b)(2a−b＋1) を展開すると、${BOX('ア')} になる。`)}<p class="small">このような問題が出ています。この波の1問目は、この過去問そのものです。</p></section>
+    <section class="panel"><h3>解き方</h3>${rule('同じ式が2回 → A とおく<br>A(A＋1)＝A²＋A → A をもどす')}
+    ${ex('2a−b＝A とおくと A(A＋1)＝A²＋A<br>＝(2a−b)²＋(2a−b)<br>＝4a²−4ab＋b²＋2a−b')}</section>
+    <section class="panel"><h3>選択肢のわなに注意</h3><p>まちがいの選択肢は、よくあるミスから作られています。</p>${sum(['＋1 を A にかけ忘れる<br>→ 4a²＋b²−4ab＋1','真ん中の項をぬかす<br>→ 4a²＋b²＋2a−b','和と差の積とまちがえる<br>→ 4a²−b²＋1'])}</section>`),
+  L('高-2',null,'展開（マーク式）','乗法公式で4択','m1KB',()=>`
+    <section class="panel"><h3>選択肢を見くらべる</h3>${rule('① 先頭の項（x² の係数）<br>② 最後の項（数の項）の符号<br>③ 真ん中の項')}<p>ちがう選択肢どうしで、<b>ちがっている部分だけ</b>を計算すれば、全部展開しなくても答えがしぼれます。</p></section>
+    <section class="panel"><h3>数を入れて確かめる</h3><p>迷ったら、文字に<b>かんたんな数</b>を入れて、もとの式と選択肢の値をくらべます。</p>${ex('(x＋3)(x−5) に x＝1 を入れると 4×(−4)＝−16<br>x²−2x−15 に x＝1 を入れると 1−2−15＝−16 ✓')}${tip('x＝0 や x＝1 は計算がらくですが、たまたま一致することもあります。2つの数で確かめると安心です。')}</section>`),
+  L('高-3',null,'因数分解（マーク式）','4択でまちがえない','m1KC',()=>`
+    <section class="panel"><h3>選択肢は展開して確かめられる</h3>${rule('因数分解の答え合わせ ＝ 展開してもとの式にもどるか')}<p>マーク式では、選択肢を<b>展開してもとの式と同じになるもの</b>をえらべば必ず正解できます。とくに<b>最後の数の項</b>と<b>真ん中の項の符号</b>を見ると、すばやく見分けられます。</p>
+    ${ex('x²−x−6 の因数分解<br>(x＋2)(x−3) → 数の項 2×(−3)＝−6、x の係数 2−3＝−1 ✓')}${tip('まず共通因数がないかを確認。2(x＋1)(x−3) のように数がくくり出されている選択肢もあります。')}</section>`),
+  L('高-4',null,'高認形式テスト','展開・因数分解 10問','m1KB',()=>`
+    <section class="panel"><h3>本番のつもりで</h3><p>高認の大問1(1)の形式で10問出題します。目安は <b>1問1分</b>。迷ったら、数を入れて確かめよう。</p></section>`,
+    { test:true, plan:['m1Kako0','m1KA','m1KA','m1KB','m1KB','m1KB','m1KC','m1KC','m1KC','m1KC'] }),
 ];
 LESSONS.find(l=>l.id==='3-5').plan=['m1Sq','m1DS','m1XAB','m1AXB','m1ExpMix'];
 LESSONS.find(l=>l.id==='6-4').plan=['m1CF','m1PSF','m1DSF','m1XABF','m1TkF'];
