@@ -118,6 +118,13 @@ p{margin:0}
 .tfig .ts{font-family:"Times New Roman","Hiragino Mincho ProN",serif;font-weight:700;font-size:15px;fill:var(--accent-ink);text-anchor:middle}
 .tfig .tsm{font-family:"Times New Roman","Hiragino Mincho ProN",serif;font-size:13px;fill:var(--ink);text-anchor:middle}
 .tfig .ax{stroke:var(--muted);stroke-width:1.2}.tfig .ucc{fill:none;stroke:var(--teal);stroke-width:2}.tfig .ucr{stroke:var(--accent);stroke-width:2.2}.tfig .ucd{stroke:var(--muted);stroke-dasharray:4 3}.tfig .pp{fill:var(--ink)}
+.dfig{display:block;width:100%;max-width:300px;margin:8px auto}
+.dfig .ax{stroke:var(--muted);stroke-width:1.2}.dfig .hb{fill:var(--teal-soft);stroke:var(--teal);stroke-width:1.2}.dfig .hb2{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+.dfig .hv{font-size:11px;fill:var(--ink);text-anchor:middle;font-weight:700}.dfig .hx{font-size:10px;fill:var(--muted);text-anchor:middle}
+.dfig .gl{stroke:var(--line);stroke-width:1}.dfig .bw{stroke:var(--ink);stroke-width:1.8}.dfig .bb{fill:var(--teal-soft);stroke:var(--ink);stroke-width:1.8}.dfig .bm{stroke:var(--accent);stroke-width:3}
+.dfig .bl{font-size:12px;fill:var(--ink);font-weight:700}.dfig .bo{font-size:14px;fill:var(--ink);text-anchor:middle}.dfig .sp{fill:var(--teal);opacity:.85}
+.dfig.sc{max-width:220px}.sc3{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}.sc3 .dfig{margin:0}
+.ctab td,.ctab th{padding:3px 5px;text-align:center;font-size:.85rem}
 .secrow{font-family:var(--f-display);font-weight:900;color:var(--teal);font-size:.95rem;padding:14px 4px 2px;letter-spacing:.04em}
 .secrow:first-child{padding-top:2px}
 .mth{font-family:"Times New Roman","Hiragino Mincho ProN","Yu Mincho",serif;font-variant-numeric:normal;letter-spacing:.02em}
@@ -909,7 +916,7 @@ const RK_LESSONS = [['科学の説明は変わる','本文の前半　問1',['rk
 const NF_LESSONS = novelLessons('nf','7',[['「普通」という言葉','本文のはじめ　問1'],['文化祭の絵','本文の前半　問2'],['図書館へ','本文の中ほど　問3'],['先生との会話と文化祭','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
 const NV_LESSONS = novelLessons('nv','5',[['駅での再会','本文の前半　問1'],['無人駅','本文の中ほど　問2'],['「簡単に言うなよ」','本文の中ほど　問3'],['特急に抜かされる','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
 const NW_LESSONS = novelLessons('nw','6',[['二番目という場所','本文のはじめ　問1'],['航平の欠場','本文の前半　問2'],['決勝のスタート','本文の中ほど　問3'],['リレーの前に','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
-const makeQs = plan => { const used={}; return plan.map(k=>{ { const m=/^(nv|nw|rk|nf|ai|mu|mj|bs|sl)(\d+)$/.exec(k); if(m) return nq2(m[1],+m[2]); } if(/^m1[A-Z]/.test(k)) return M1.G[k](); if(/^s[1-5][A-Z]/.test(k)) return M3.G[k](); if(/^f2[A-Z]/.test(k)) return M5.G[k](); if(/^t3[A-Z]/.test(k)) return M6.G[k](); if(k.startsWith('gm')) return mq(GM[+k.slice(2)]); if(k.startsWith('gk')) return gq(GQ[+k.slice(2)]); if(k.startsWith('cj')) return cq(CJ[+k.slice(2)]); if(k.startsWith('kj')) return kq(KJ[+k.slice(2)]); const P=POOL[k]; used[k]=used[k]||shuffle(P.map((_,i)=>i)); if(!used[k].length) used[k]=shuffle(P.map((_,i)=>i)); return fq(P[used[k].pop()]); }); };
+const makeQs = plan => { const used={}; return plan.map(k=>{ { const m=/^(nv|nw|rk|nf|ai|mu|mj|bs|sl)(\d+)$/.exec(k); if(m) return nq2(m[1],+m[2]); } if(/^m1[A-Z]/.test(k)) return M1.G[k](); if(/^s[1-5][A-Z]/.test(k)) return M3.G[k](); if(/^f2[A-Z]/.test(k)) return M5.G[k](); if(/^t3[A-Z]/.test(k)) return M6.G[k](); if(/^d4[A-Z]/.test(k)) return M7.G[k](); if(k.startsWith('gm')) return mq(GM[+k.slice(2)]); if(k.startsWith('gk')) return gq(GQ[+k.slice(2)]); if(k.startsWith('cj')) return cq(CJ[+k.slice(2)]); if(k.startsWith('kj')) return kq(KJ[+k.slice(2)]); const P=POOL[k]; used[k]=used[k]||shuffle(P.map((_,i)=>i)); if(!used[k].length) used[k]=shuffle(P.map((_,i)=>i)); return fq(P[used[k].pop()]); }); };
 
 /* ===== 説明ページの部品 ===== */
 const rule = s => `<div class="rule">${s}</div>`;
@@ -2312,6 +2319,208 @@ const TM=[
 return { G, CH:[C1,C2,C3,C4,C5], TM };
 })();
 
+/* ===== 数学Ⅰ データの分析（問題は毎回つくりかわります） ===== */
+const M7 = (() => {
+const uniq = a => a.filter((v,i,s)=>s.indexOf(v)===i);
+const mi = t => typeof t==='string' ? t.replace(/-(?=\d)/g,'−') : t;
+function Q(prompt, expr, ans, wrongs, hint, explain, extra){
+  ans=mi(ans); const ch=uniq([ans, ...wrongs.filter(w=>w!=null&&w!=='').map(mi).filter(w=>w!==ans)]).slice(0,4);
+  return Object.assign({ raw:true, prompt:mi(prompt), expr:mi(expr), answer:ans, choices:shuffle(ch), words:ch.some(c=>c.replace(/<[^>]+>/g,'').length>9), hint:mi(hint), explain:mi(explain), long:true }, extra||{}); }
+const D = x => { const v=Math.round(x*1000)/1000; return (v<0?'−':'')+String(Math.abs(v)); };
+const sum = a => a.reduce((s,x)=>s+x,0), mean = a => sum(a)/a.length;
+const sorted = a => [...a].sort((x,y)=>x-y);
+const med = a => { const s=sorted(a), n=s.length; return n%2 ? s[(n-1)/2] : (s[n/2-1]+s[n/2])/2; };
+const quart = a => { const s=sorted(a), n=s.length, h=Math.floor(n/2); return [s[0], med(s.slice(0,h)), med(s), med(s.slice(n-h)), s[n-1]]; };
+const list = a => a.join('，');
+const ex = s => `<p class="ex">${s}</p>`;
+const tip = s => `<p class="small muted">${s}</p>`;
+const rul = s => `<div class="rule">${s}</div>`;
+
+/* --- 図 --- */
+function hist(lo,w,f,o={}){ const W=280,H=170,pl=28,pb=30, n=f.length, mx=Math.max(...f), bw=(W-pl-10)/n, Y=v=>H-pb-v/mx*(H-pb-14);
+  let g=`<line x1="${pl}" y1="${H-pb}" x2="${W-6}" y2="${H-pb}" class="ax"/><line x1="${pl}" y1="8" x2="${pl}" y2="${H-pb}" class="ax"/>`;
+  f.forEach((v,i)=>{ g+=`<rect x="${pl+i*bw}" y="${Y(v)}" width="${bw}" height="${H-pb-Y(v)}" class="${o.hl&&o.hl(i)?'hb2':'hb'}"/><text x="${pl+i*bw+bw/2}" y="${Y(v)-4}" class="hv">${v}</text>`; });
+  for(let i=0;i<=n;i++) g+=`<text x="${pl+i*bw}" y="${H-pb+14}" class="hx">${lo+i*w}</text>`;
+  return `<svg class="dfig" viewBox="0 0 ${W} ${H}" role="img" aria-label="ヒストグラム">${g}<text x="${W/2}" y="${H-2}" class="hx">${o.xl||''}</text></svg>`; }
+function box(rows, lo, hi, step, sv){ const W=290, H=(sv?48:34)+rows.length*50, pl=40, X=v=>pl+(v-lo)/(hi-lo)*(W-pl-14);
+  let g=''; for(let v=lo; v<=hi; v+=step) g+=`<line x1="${X(v)}" y1="10" x2="${X(v)}" y2="${H-22}" class="gl"/><text x="${X(v)}" y="${H-8}" class="hx">${v}</text>`;
+  rows.forEach(([lab,q],i)=>{ const y=(sv?42:28)+i*50; g+=`<text x="6" y="${y+5}" class="bl">${lab}</text><line x1="${X(q[0])}" y1="${y}" x2="${X(q[1])}" y2="${y}" class="bw"/><line x1="${X(q[3])}" y1="${y}" x2="${X(q[4])}" y2="${y}" class="bw"/>
+    <line x1="${X(q[0])}" y1="${y-8}" x2="${X(q[0])}" y2="${y+8}" class="bw"/><line x1="${X(q[4])}" y1="${y-8}" x2="${X(q[4])}" y2="${y+8}" class="bw"/>
+    <rect x="${X(q[1])}" y="${y-13}" width="${X(q[3])-X(q[1])}" height="26" class="bb"/><line x1="${X(q[2])}" y1="${y-13}" x2="${X(q[2])}" y2="${y+13}" class="bm"/>${q[5]!=null?`<text x="${X(q[5])}" y="${y+5}" class="bo">○</text>`:''}${sv?q.slice(0,5).map((v,j)=>`<text x="${X(v)}" y="${y-18}" class="hv">${v}</text>`).join(''):''}`; });
+  return `<svg class="dfig" viewBox="0 0 ${W} ${H}" role="img" aria-label="箱ひげ図">${g}</svg>`; }
+function scat(pts,o={}){ const W=220,H=190,p=22, xs=pts.map(q=>q[0]), ys=pts.map(q=>q[1]), x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys);
+  const X=v=>p+(v-x0)/((x1-x0)||1)*(W-2*p), Y=v=>H-p-(v-y0)/((y1-y0)||1)*(H-2*p);
+  return `<svg class="dfig sc" viewBox="0 0 ${W} ${H}" role="img" aria-label="散布図"><line x1="${p-8}" y1="${H-p+8}" x2="${W-4}" y2="${H-p+8}" class="ax"/><line x1="${p-8}" y1="4" x2="${p-8}" y2="${H-p+8}" class="ax"/>
+  <text x="${W-8}" y="${H-p+20}" class="hx">x</text><text x="${p-14}" y="12" class="hx">y</text>${pts.map(q=>`<circle cx="${X(q[0]).toFixed(1)}" cy="${Y(q[1]).toFixed(1)}" r="3.4" class="sp"/>`).join('')}</svg>`; }
+const randn = () => { let u=0,v=0; while(!u) u=Math.random(); while(!v) v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); };
+const mkScat = (r,n=24) => Array.from({length:n},()=>{ const x=randn(), e=randn(); return [x, r*x+Math.sqrt(1-r*r)*e]; });
+
+/* --- データ作り --- */
+function intMeanData(n, lo, hi){ let a; do { a=Array.from({length:n},()=>ri(lo,hi)); } while(sum(a)%n!==0 || new Set(a).size<3); return a; }
+function freqTable(){ const w=10, lo=pick([40,50,55,60]), k=7, N=20; let f; do { f=Array.from({length:k},()=>ri(0,6)); } while(sum(f)!==N||f[0]===0||f[k-1]===0||Math.max(...f)===f.filter(x=>x===Math.max(...f)).length&&false||f.filter(x=>x===Math.max(...f)).length>1);
+  return { w, lo, k, N, f }; }
+const ftab = T => `<table class="dtab mth"><tr><th>階級（分）</th><th>度数</th></tr>${T.f.map((v,i)=>`<tr><td>${T.lo+i*T.w} 以上 ${T.lo+(i+1)*T.w} 未満</td><td>${v}</td></tr>`).join('')}<tr><td>合計</td><td>${T.N}</td></tr></table>`;
+
+/* --- 仮説検定のコイン投げ（15枚・1000回） --- */
+const C15 = (() => { const p=[]; let c=1; for(let k=0;k<=15;k++){ p.push(c/32768*1000); c=c*(15-k)/(k+1); } const r=p.map(Math.round); r[7]+=1000-sum(r); return r; })();
+
+const G = {
+  /* 1 データの整理 */
+  d4Freq(){ const T=freqTable(), t=ri(0,3), b=ri(2,T.k-2), cut=T.lo+b*T.w;
+    if(t===0){ const v=sum(T.f.slice(0,b)); return Q(`${cut} 分未満の生徒は何人？`, ftab(T), `${v}人`, [`${v+T.f[b]}人`, `${T.N-v}人`, `${v-T.f[b-1]}人`, `${v+1}人`, `${v+2}人`, `${v-1}人`],
+      `${cut} 分未満の階級の度数をすべてたします。`, `${hist(T.lo,T.w,T.f,{hl:i=>i<b,xl:'時間（分）'})}${T.f.slice(0,b).join('＋')}＝<b>${v}人</b>`); }
+    if(t===1){ const v=sum(T.f.slice(b)), pc=v/T.N*100; return Q(`${cut} 分以上の生徒は全体の何%？`, ftab(T), `${D(pc)}%`, [`${D((v-T.f[b])/T.N*100)}%`, `${D(100-pc)}%`, `${v}%`, `${D(pc+5)}%`, `${D(pc+10)}%`, `${D(Math.max(0,pc-5))}%`],
+      '（その範囲の度数の合計）÷（全体の人数）×100', `${hist(T.lo,T.w,T.f,{hl:i=>i>=b,xl:'時間（分）'})}${T.f.slice(b).join('＋')}＝${v}人<br>${v}÷${T.N}＝${D(v/T.N)}　→　<b>${D(pc)}%</b>`); }
+    if(t===2){ const v=T.f[b]/T.N; return Q(`${cut} 分以上 ${cut+T.w} 分未満の階級の相対度数は？`, ftab(T), D(v), [String(T.f[b]), D(T.f[b]/100), D(sum(T.f.slice(0,b+1))/T.N), D(v+0.05), D(v+0.1), D(Math.max(0.05,v-0.05))],
+      '相対度数＝その階級の度数 ÷ 度数の合計', `${T.f[b]}÷${T.N}＝<b>${D(v)}</b>`); }
+    const m=T.f.indexOf(Math.max(...T.f)), cv=T.lo+m*T.w+T.w/2;
+    return Q('最頻値（モード）は？', ftab(T), `${cv}分`, [`${Math.max(...T.f)}分`, `${cv-T.w}分`, `${cv+T.w}分`, `${T.lo+m*T.w}分`, `${T.lo+(m+1)*T.w}分`],
+      '度数分布表では、度数がいちばん大きい階級の<b>階級値</b>（階級の真ん中の値）が最頻値です。', `${hist(T.lo,T.w,T.f,{hl:i=>i===m,xl:'時間（分）'})}度数が最大の階級は ${T.lo+m*T.w}〜${T.lo+(m+1)*T.w} 分。階級値は <b>${cv}分</b>`); },
+  /* 2 平均値 */
+  d4Mean(){ const n=ri(5,8), a=intMeanData(n,0,12), m=mean(a);
+    return Q('このデータの平均値は？', list(a), D(m), [D(med(a)), D(sum(a)/(n-1)), D(m+1), D(sum(a)), D(m-1), D(m+0.5)],
+      '平均値＝（データの値の合計）÷（データの個数）', `合計 ${a.join('＋')}＝${sum(a)}<br>${sum(a)}÷${n}＝<b>${D(m)}</b>`); },
+  d4MeanT(){ const T=freqTable(), cv=T.f.map((_,i)=>T.lo+i*T.w+T.w/2), tot=sum(T.f.map((v,i)=>v*cv[i])), m=tot/T.N;
+    return Q('この表から平均値を求めると？（階級値を使う）', ftab(T), `${D(m)}分`, [`${D(sum(T.f.map((v,i)=>v*(T.lo+i*T.w)))/T.N)}分`, `${D(tot/T.k)}分`, `${D(m+T.w/2)}分`, `${D(m-3)}分`],
+      '（階級値 × 度数）の合計 ÷ 度数の合計。階級値は階級の真ん中の値です。', `階級値 × 度数：${cv.map((c,i)=>`${c}×${T.f[i]}`).join('＋')}＝${tot}<br>${tot}÷${T.N}＝<b>${D(m)}分</b>`); },
+  /* 3 中央値・最頻値 */
+  d4Med(){ const t=Math.random()<.65; let n=ri(6,11), a=Array.from({length:n},()=>ri(0,9));
+    if(t){ const s=sorted(a), m=med(a); return Q('このデータの中央値は？', list(a), D(m), [D(mean(a)), D(a[Math.floor(n/2)]), D(s[Math.floor((n-1)/2)]+(n%2?1:0)), D(m+0.5), D(m+1), D(m-1)],
+      '小さい順に並べて、真ん中の値。個数が偶数のときは、真ん中の2つの平均。', `小さい順に並べると ${list(s)}<br>${n} 個なので ${n%2?`${(n+1)/2} 番目の値`:`${n/2} 番目と ${n/2+1} 番目の平均`}<br>中央値は <b>${D(m)}</b>`); }
+    let mo; do { a=Array.from({length:n},()=>ri(0,9)); const c={}; a.forEach(x=>c[x]=(c[x]||0)+1); const mx=Math.max(...Object.values(c)), ks=Object.keys(c).filter(k=>c[k]===mx); mo=ks.length===1&&mx>=2?+ks[0]:null; } while(mo==null);
+    return Q('このデータの最頻値は？', list(a), String(mo), [D(med(a)), D(mean(a)), String(Math.max(...a)), String(mo+1), String(mo-1), String(a.filter(x=>x===mo).length)],
+      '最頻値（モード）は、いちばん多く出てくる値。', `${mo} が ${a.filter(x=>x===mo).length} 回でいちばん多い。最頻値は <b>${mo}</b>`); },
+  /* 4 四分位数 */
+  d4Quart(){ const n=ri(7,12), a=Array.from({length:n},()=>ri(40,99)), s=sorted(a), q=quart(a), t=pick(['範囲','Q1','Q3','四分位範囲','四分位偏差']), h=Math.floor(n/2);
+    const V={ '範囲':q[4]-q[0], 'Q1':q[1], 'Q3':q[3], '四分位範囲':q[3]-q[1], '四分位偏差':(q[3]-q[1])/2 }, lab={ '範囲':'範囲', 'Q1':'第1四分位数', 'Q3':'第3四分位数', '四分位範囲':'四分位範囲', '四分位偏差':'四分位偏差' };
+    return Q(`${lab[t]}は？`, list(a), D(V[t]), Object.keys(V).filter(k=>k!==t).map(k=>D(V[k])).concat([D(q[2])]),
+      '小さい順に並べる → 中央値で前半・後半に分ける（奇数のときは中央値を除く）→ それぞれの中央値が Q1、Q3。範囲＝最大−最小、四分位範囲＝Q3−Q1、四分位偏差＝四分位範囲÷2。',
+      `小さい順：${list(s)}<br>前半 ${list(s.slice(0,h))} → Q1＝${D(q[1])}<br>後半 ${list(s.slice(n-h))} → Q3＝${D(q[3])}<br>中央値 Q2＝${D(q[2])}　範囲＝${q[4]}−${q[0]}＝${q[4]-q[0]}<br>${lab[t]}は <b>${D(V[t])}</b>`); },
+  /* 5 箱ひげ図 */
+  d4Box(){ let q; do { q=[ri(2,6)*5]; q.push(q[0]+ri(2,4)*5); q.push(q[1]+ri(2,3)*5); q.push(q[2]+ri(2,3)*5); q.push(q[3]+ri(2,4)*5); } while(q[4]>100);
+    const t=pick(['中央値','四分位範囲','範囲','Q1','割合']), fig=box([['',q]],0,100,10,true);
+    if(t==='割合'){ const k=pick([['第3四分位数以上',25],['第1四分位数以上',75],['中央値以下',50],['第1四分位数以上 第3四分位数以下',50]]);
+      return Q(`${k[0]}の値は、全体のおよそ何%？`, fig, `${k[1]}%`, ['25%','50%','75%','100%'].filter(x=>x!==k[1]+'%'),
+        '箱ひげ図は、データを個数で4等分しています。最小〜Q1、Q1〜中央値、中央値〜Q3、Q3〜最大がそれぞれ約25%。', `${k[0]} → およそ <b>${k[1]}%</b>`); }
+    const V={ '中央値':q[2], '四分位範囲':q[3]-q[1], '範囲':q[4]-q[0], 'Q1':q[1] }, lab={ '中央値':'中央値', '四分位範囲':'四分位範囲', '範囲':'範囲', 'Q1':'第1四分位数' };
+    return Q(`この箱ひげ図の${lab[t]}は？`, fig, String(V[t]), Object.keys(V).filter(k=>k!==t).map(k=>String(V[k])).concat([String(q[3]), String(q[4])]),
+      '箱の左はし Q1、箱の中の線 中央値、箱の右はし Q3、ひげの両はし 最小値・最大値。', `最小 ${q[0]}、Q1 ${q[1]}、中央値 ${q[2]}、Q3 ${q[3]}、最大 ${q[4]}<br>${lab[t]}は <b>${V[t]}</b>`); },
+  /* 6 外れ値 */
+  d4Out(){ let a,q,lo,hi,out; do { const n=ri(8,11); a=Array.from({length:n-1},()=>ri(30,70)); a.push(pick([ri(5,15),ri(110,160)])); q=quart(a); const iqr=q[3]-q[1]; lo=q[1]-1.5*iqr; hi=q[3]+1.5*iqr; out=a.filter(x=>x<lo||x>hi); } while(out.length!==1);
+    const t=Math.random()<.5, iqr=q[3]-q[1], s=sorted(a);
+    if(t) return Q('外れ値はどれ？', list(a), String(out[0]), [String(s[1]), String(s[s.length-2]), String(q[3]), '外れ値はない'],
+      '外れ値の目安：Q1−1.5×(四分位範囲) 以下、または Q3＋1.5×(四分位範囲) 以上の値。', `Q1＝${D(q[1])}、Q3＝${D(q[3])}、四分位範囲＝${D(iqr)}<br>${D(q[1])}−1.5×${D(iqr)}＝${D(lo)}、${D(q[3])}＋1.5×${D(iqr)}＝${D(hi)}<br>この範囲の外にあるのは <b>${out[0]}</b>`, { words:true });
+    return Q('Q3＋1.5×(四分位範囲) の値は？', list(a), D(hi), [D(q[3]+iqr), D(q[4]+1.5*iqr), D(lo), D(q[3]+1.5*(q[4]-q[0]))],
+      'まず Q1、Q3 を求めて、四分位範囲＝Q3−Q1。', `小さい順：${list(s)}<br>Q1＝${D(q[1])}、Q3＝${D(q[3])}、四分位範囲＝${D(iqr)}<br>${D(q[3])}＋1.5×${D(iqr)}＝<b>${D(hi)}</b>`); },
+  /* 7 分散 */
+  d4Var(){ const n=pick([5,5,6,7]), a=intMeanData(n,0,12), m=mean(a), d=a.map(x=>x-m), ss=sum(d.map(x=>x*x)), v=ss/n, vs=Number.isInteger(v*100)?D(v):`${ss}/${n}`;
+    return Q('このデータの分散 s² は？', list(a), vs, [String(ss), Number.isInteger(ss/(n-1)*100)?D(ss/(n-1)):`${ss}/${n-1}`, D(Math.sqrt(v)), D(sum(d.map(Math.abs))/n)],
+      '分散＝（偏差）² の平均。偏差＝データの値 − 平均値。', `平均値 ${D(m)}<br>偏差：${d.map(D).join('，')}<br>偏差²の合計：${ss}<br>s²＝${ss}÷${n}＝<b>${vs}</b>`); },
+  d4Var2(){ const m=ri(2,9), v=pick([1,2,3,4,5,6,8,9]), m2=m*m+v;
+    return Q('分散 s² は？', `x の平均値 x̄＝${m}、x² の平均値＝${m2}`, String(v), [String(m2-m), String(m2), String(m*m), String(v+m), String(v+1), String(m2-2*m)],
+      's²＝（x² の平均値）−（x の平均値）²', `s²＝${m2}−${m}²＝${m2}−${m*m}＝<b>${v}</b>`); },
+  /* 8 標準偏差 */
+  d4Sd(){ let a,v; do { const n=pick([5,5,7]); a=intMeanData(n,0,10); const m=mean(a); v=sum(a.map(x=>(x-m)**2))/a.length; } while(![1,2,4,8,9,16,18].includes(v));
+    const S={1:'1',4:'2',9:'3',16:'4',2:'1.4',8:'2.8',18:'4.2'}[v], m=mean(a);
+    return Q(`このデータの標準偏差 s は？${[2,8,18].includes(v)?'（√2＝1.4 とする）':''}`, list(a), S, [String(v), D(v/2), [2,8,18].includes(v)?D(Number(S)+1.4):D(Number(S)+1), D(Math.sqrt(v)*2), ...['1','1.4','2','2.8','3','4','4.2'].filter(x=>x!==S)],
+      '標準偏差＝√（分散）。まず分散を求めます。', `平均値 ${D(m)}、偏差²：${a.map(x=>D((x-m)**2)).join('，')}<br>分散 s²＝${D(v)}<br>s＝√${D(v)}＝<b>${S}</b>`); },
+  /* 9 散布図 */
+  d4Scat(){ const t=pick(['正','負','なし']), r={正:pick([.75,.9]),負:-pick([.75,.9]),なし:pick([0,.05,-.05])}[t], A={正:'正の相関がある',負:'負の相関がある',なし:'相関はほとんどない'};
+    return Q('この散布図から読み取れることは？', scat(mkScat(r)), A[t], Object.values(A).filter(x=>x!==A[t]).concat(['x と y は等しい']),
+      '右上がり → 正の相関、右下がり → 負の相関、どちらともいえない → 相関はほとんどない。', `${t==='正'?'点が右上がりに並んでいる':t==='負'?'点が右下がりに並んでいる':'点がまんべんなく散らばっている'}ので <b>${A[t]}</b>`, { words:true }); },
+  /* 10 相関係数 */
+  d4R(){ const sx=ri(2,6), sy=ri(2,6), r=pick([-.9,-.8,-.75,-.6,-.5,.5,.6,.75,.8,.9]), sxy=Math.round(r*sx*sy*100)/100, rr=sxy/(sx*sy);
+    return Q('相関係数 r は？（小数第2位まで）', `x の標準偏差 ${sx}、y の標準偏差 ${sy}、共分散 ${D(sxy)}`, D(Math.round(rr*100)/100), [D(-Math.round(rr*100)/100), D(Math.round(sxy/(sx+sy)*100)/100), D(Math.round(sxy/(sx*sx*sy*sy)*1000)/1000), D(Math.round(rr*50)/100)],
+      'r＝（共分散）÷（x の標準偏差 × y の標準偏差）', `r＝${D(sxy)}÷(${sx}×${sy})＝<b>${D(Math.round(rr*100)/100)}</b>`); },
+  d4RJ(){ const it=pick([[.9,'強い正の相関がある'],[-.9,'強い負の相関がある'],[.05,'相関はほとんどない'],[-.85,'強い負の相関がある'],[.8,'強い正の相関がある'],[-.03,'相関はほとんどない']]);
+    return Q('相関係数 r がこの値のとき、いえることは？', `r＝${D(it[0])}`, it[1], ['強い正の相関がある','強い負の相関がある','相関はほとんどない','x が増えると y は必ず増える'].filter(x=>x!==it[1]),
+      '−1≦r≦1。1 に近いほど強い正の相関、−1 に近いほど強い負の相関、0 に近いと相関はほとんどない。', `${scat(mkScat(Math.max(-.97,Math.min(.97,it[0]))))}r＝${D(it[0])} なので <b>${it[1]}</b>`, { words:true }); },
+  d4Cov(){ const n=5; let x,y,cv; do { x=intMeanData(n,1,9); y=intMeanData(n,1,9); const mx=mean(x), my=mean(y); cv=sum(x.map((v,i)=>(v-mx)*(y[i]-my)))/n; } while(!Number.isInteger(cv*10)||cv===0);
+    const mx=mean(x), my=mean(y), dx=x.map(v=>v-mx), dy=y.map(v=>v-my), pr=dx.map((v,i)=>v*dy[i]);
+    const tb=`<table class="dtab mth"><tr><th></th>${x.map((_,i)=>`<th>${'ABCDE'[i]}</th>`).join('')}</tr><tr><td>x</td>${x.map(v=>`<td>${v}</td>`).join('')}</tr><tr><td>y</td>${y.map(v=>`<td>${v}</td>`).join('')}</tr></table>`;
+    return Q('x と y の共分散は？', tb, D(cv), [D(sum(pr)), D(-cv), D(sum(pr)/(n-1)), D(mx*my)],
+      '共分散＝（x の偏差 × y の偏差）の平均', `x̄＝${D(mx)}、ȳ＝${D(my)}<br>x の偏差：${dx.map(D).join('，')}<br>y の偏差：${dy.map(D).join('，')}<br>積：${pr.map(D).join('，')}　合計 ${D(sum(pr))}<br>共分散＝${D(sum(pr))}÷${n}＝<b>${D(cv)}</b>`); },
+  /* 11 仮説検定 */
+  d4Hyp(){ const k=ri(10,13), cnt=sum(C15.slice(k)), p=cnt/1000, rej=p<0.05, t=ri(0,2);
+    const tb=`<table class="dtab mth ctab"><tr><th>表</th>${C15.slice(0,8).map((_,i)=>`<td>${i}</td>`).join('')}</tr><tr><th>度数</th>${C15.slice(0,8).map(v=>`<td>${v}</td>`).join('')}</tr><tr><th>表</th>${C15.slice(8).map((_,i)=>`<td>${i+8}</td>`).join('')}</tr><tr><th>度数</th>${C15.slice(8).map(v=>`<td>${v}</td>`).join('')}</tr></table>`;
+    const st=`いつも五分五分だった A さんが、シューズを変えてから 15 回の競走で <b>${k} 勝 ${15-k} 敗</b>。シューズで速くなったといえるか。基準の確率は 0.05。<br><span class="small">コイン15枚を投げて表の枚数を記録する実験を1000回くり返した結果：</span>${tb}`;
+    if(t===0) return Q('はじめに立てる仮説は？', st, 'A さんと B さんの勝敗は五分五分である', ['A さんはシューズで速くなった','A さんはシューズで遅くなった','A さんは必ず勝つ'],
+      '仮説検定では、確かめたい主張に<b>反する</b>仮説を立てます。', '確かめたい主張は「シューズで速くなった」。これに反する仮説「<b>勝敗は五分五分である</b>」を立てます。', { words:true });
+    if(t===1) return Q(`仮説のもとで、A さんが ${k} 勝以上する確率はおよそ？`, st, D(p), [D(C15[k]/1000), D(sum(C15.slice(0,k+1))/1000), D(p*10), D(sum(C15.slice(k+1))/1000), D(Math.round(p*500)/1000), D(p+0.01)],
+      `表が ${k} 枚以上の度数をたして、1000 でわります。`, `${C15.slice(k).join('＋')}＝${cnt}<br>${cnt}÷1000＝<b>${D(p)}</b>`);
+    return Q('判断として正しいものは？', st, rej?'仮説は正しくなかったと考えられ、速くなったと判断してよい':'仮説が正しくないとは判断できず、速くなったとはいえない', ['仮説は正しくなかったと考えられ、速くなったと判断してよい','仮説が正しくないとは判断できず、速くなったとはいえない','仮説が正しいと証明された','A さんは遅くなったと判断できる'],
+      `${k} 勝以上の確率を求めて、0.05 とくらべます。小さければ仮説は正しくなかったと考えます。`,
+      `${k} 勝以上の確率は ${cnt}/1000＝${D(p)}<br>${rej?`0.05 より小さいので、仮説「五分五分」は正しくなかったと考えられます。<br><b>速くなったと判断してよい</b>`:`0.05 より大きいので、仮説が正しくないとは判断できません。<br><b>速くなったとはいえない</b>`}`, { words:true }); },
+  d4HypC(){ const it=pick([
+      ['仮説検定で、得られた結果が起こる確率が基準の確率より<b>大きい</b>とき、いえることは？','仮説が正しくないとは判断できない',['仮説は正しい','仮説は正しくない','主張が正しいと証明された']],
+      ['仮説検定で、得られた結果が起こる確率が基準の確率より<b>小さい</b>とき、いえることは？','仮説は正しくなかったと考えられる',['仮説は正しい','仮説が正しくないとは判断できない','データがまちがっている']],
+      ['仮説検定で、はじめに立てる仮説は？','確かめたい主張に反する仮説',['確かめたい主張そのもの','結果がまちがっているという仮説','どちらでもよい']],
+      ['基準となる確率としてよく使われるのは？','0.05 や 0.01',['0.5','0.9','1']],
+      ['「五分五分」の仮説のもとでの確率を調べるのに使える実験は？','コインを投げて表の枚数を数える',['サイコロを1回だけ投げる','平均値を計算する','箱ひげ図をかく']],
+    ]);
+    return Q(it[0], '仮説検定の考え方', it[1], it[2], '仮説検定：主張に反する仮説を立てる → その仮説のもとで結果が起こる確率を調べる → 基準とくらべる。', `答えは <b>${it[1]}</b>`, { words:true }); },
+};
+
+const L = (id,sec,t,sub,key,body,extra) => Object.assign({ id, sec, t, sub, plan:Array.isArray(key)?key:Array(5).fill(key), body }, extra||{});
+const T = (plan,desc) => L('まとめ','章末テスト','章末テスト',desc,plan[0],()=>`<section class="panel"><h3>章末テスト</h3><p>この章の内容から10問出題します。問題の順番は毎回かわります。</p></section>`, { test:true, plan });
+const C1 = [
+  L('1-1','1　データの整理','度数分布表とヒストグラム','階級・度数・相対度数','d4Freq',()=>`
+    <section class="panel"><h3>ことば</h3><table class="dtab"><tr><td><b>階級</b></td><td>区切った区間</td></tr><tr><td><b>階級値</b></td><td>階級の真ん中の値</td></tr><tr><td><b>度数</b></td><td>その階級に入るデータの個数</td></tr><tr><td><b>相対度数</b></td><td>度数 ÷ 度数の合計</td></tr></table>
+    ${hist(55,10,[2,2,3,4,6,2,1],{xl:'テレビをみた時間（分）'})}${ex('85 分未満：2＋2＋3＝7 人<br>95 分以上：(6＋2＋1)÷20＝0.45 → 45%')}${tip('縦に度数、横に階級をとった柱状のグラフを<b>ヒストグラム</b>といいます。')}</section>`),
+  L('2-1','2　平均値','平均値','合計 ÷ 個数','d4Mean',()=>`
+    <section class="panel"><h3>平均値</h3>${rul('x̄＝（データの値の合計）÷（データの個数）')}${ex('10，8，4，6，9，5，7<br>合計 49 → 49÷7＝7')}</section>`),
+  L('2-2',null,'度数分布表から平均値','階級値 × 度数','d4MeanT',()=>`
+    <section class="panel"><h3>度数分布表から</h3>${rul('x̄＝（階級値 × 度数）の合計 ÷ 度数の合計')}${ex('階級値 60，70，80 で度数 2，3，5<br>(60×2＋70×3＋80×5)÷10＝73')}</section>`),
+  L('3-1','3　中央値，最頻値','中央値と最頻値','真ん中・いちばん多い','d4Med',()=>`
+    <section class="panel"><h3>中央値（メジアン）</h3>${rul('小さい順に並べた真ん中の値<br>個数が偶数 → 真ん中2つの平均')}${ex('3，2，0，1，3，1，1，2 → 0，1，1，1，2，2，3，3<br>中央値＝(1＋2)÷2＝1.5')}</section>
+    <section class="panel"><h3>最頻値（モード）</h3><p>データの中でいちばん多く出てくる値。上の例では 1（3回）。</p>${tip('平均値・中央値・最頻値をまとめて<b>代表値</b>といいます。')}</section>`),
+  T(['d4Freq','d4Freq','d4Freq','d4Mean','d4Mean','d4MeanT','d4MeanT','d4Med','d4Med','d4Med'],'データの整理と代表値の10問'),
+];
+const C2 = [
+  L('4-1','4　範囲，四分位数，四分位範囲，四分位偏差','範囲と四分位数','4つに分ける','d4Quart',()=>`
+    <section class="panel"><h3>四分位数</h3>${rul('① 小さい順に並べる<br>② 中央値（Q2）で前半・後半に分ける（奇数個なら中央値は除く）<br>③ 前半の中央値 Q1、後半の中央値 Q3')}
+    <table class="dtab"><tr><td><b>範囲</b></td><td>最大値 − 最小値</td></tr><tr><td><b>四分位範囲</b></td><td>Q3 − Q1</td></tr><tr><td><b>四分位偏差</b></td><td>(Q3 − Q1) ÷ 2</td></tr></table>
+    ${ex('460，470，470，480，490，490，500，520，530，540，550<br>Q2＝490　Q1＝470　Q3＝530<br>範囲 90、四分位範囲 60、四分位偏差 30')}</section>`),
+  L('5-1','5　箱ひげ図','箱ひげ図','5つの値で表す','d4Box',()=>`
+    <section class="panel"><h3>箱ひげ図</h3>${box([['',[460,470,490,530,550]]],440,560,20)}${rul('ひげ：最小値〜Q1、Q3〜最大値<br>箱：Q1〜Q3（中の線が中央値）')}${tip('箱の長さ（四分位範囲）が長いほど、データの散らばりが大きいといえます。')}</section>`),
+  L('6-1','6　外れ値','外れ値','1.5 × 四分位範囲','d4Out',()=>`
+    <section class="panel"><h3>外れ値の目安</h3>${rul('Q1 − 1.5×(Q3−Q1) 以下<br>Q3 ＋ 1.5×(Q3−Q1) 以上')}${ex('Q1＝410、Q3＝550、四分位範囲 140<br>410−210＝200、550＋210＝760<br>1500 は 760 以上なので外れ値')}${box([['',[350,410,510,550,600,1500]]],300,1600,200)}<p class="small">外れ値は ○ で表し、ひげはそれ以外の最大値まで引きます。</p></section>`),
+  L('7-1','7　分散','分散','偏差の2乗の平均','d4Var',()=>`
+    <section class="panel"><h3>分散</h3>${rul('偏差＝データの値 − 平均値<br>分散 s²＝（偏差）² の平均')}${ex('10，8，4，6，9，5，7（平均 7）<br>偏差：3，1，−3，−1，2，−2，0<br>偏差²の合計 28　s²＝28÷7＝4')}</section>`),
+  L('7-2',null,'分散のもう1つの求め方','x² の平均 − (x̄)²','d4Var2',()=>`
+    <section class="panel"><h3>公式</h3>${rul('s²＝（x² の平均値）−（x の平均値）²')}${ex('x̄＝7、x² の平均値＝53 → s²＝53−49＝4')}</section>`),
+  L('8-1','8　標準偏差','標準偏差','√分散','d4Sd',()=>`
+    <section class="panel"><h3>標準偏差</h3>${rul('s＝√（分散）')}${ex('4，2，1，1，4，2，0（平均 2）<br>偏差²：4，0，1，1，4，0，4　合計 14<br>s²＝2　s＝√2≒1.4')}${tip('標準偏差は、もとのデータと同じ単位で散らばりを表します。')}</section>`),
+  T(['d4Quart','d4Quart','d4Box','d4Box','d4Out','d4Var','d4Var','d4Var2','d4Sd','d4Sd'],'データの散らばりの10問'),
+];
+const C4 = [
+  L('9-1','9　散布図','散布図','正・負・相関なし','d4Scat',()=>`
+    <section class="panel"><h3>散布図と相関</h3><div class="sc3">${scat(mkScat(.9,20))}${scat(mkScat(-.9,20))}${scat(mkScat(0,20))}</div><p class="small" style="display:flex;justify-content:space-around"><span>正の相関</span><span>負の相関</span><span>相関なし</span></p>${tip('一方が増えると他方も増える傾向 → 正の相関。減る傾向 → 負の相関。')}</section>`),
+  L('10-1','10　相関係数','相関係数','r＝共分散 ÷ (sx・sy)','d4R',()=>`
+    <section class="panel"><h3>相関係数</h3>${rul('r＝（x と y の共分散）÷（x の標準偏差 × y の標準偏差）<br>−1≦r≦1')}${ex('sx＝2、sy＝4、共分散 6 → r＝6÷8＝0.75')}</section>`),
+  L('10-2',null,'相関係数の読み取り','1 に近い・−1 に近い','d4RJ',()=>`
+    <section class="panel"><h3>r の値と相関</h3><table class="dtab"><tr><td>r が 1 に近い</td><td>強い正の相関</td></tr><tr><td>r が 0 に近い</td><td>相関はほとんどない</td></tr><tr><td>r が −1 に近い</td><td>強い負の相関</td></tr></table>${tip('相関があっても、原因と結果の関係（因果関係）があるとは限りません。')}</section>`),
+  L('10-3',null,'共分散','偏差の積の平均','d4Cov',()=>`
+    <section class="panel"><h3>共分散</h3>${rul('共分散 sxy＝（x の偏差 × y の偏差）の平均')}${ex('x：2，4，6　y：1，5，6（x̄＝4、ȳ＝4）<br>偏差の積：(−2)(−3)，0・1，2・2 → 6，0，4<br>sxy＝10÷3')}${tip('共分散が正なら正の相関、負なら負の相関の傾向があります。')}</section>`),
+  T(['d4Scat','d4Scat','d4Scat','d4R','d4R','d4R','d4RJ','d4RJ','d4Cov','d4Cov'],'相関の10問'),
+];
+const C5 = [
+  L('11-1','11　仮説検定の考え方','仮説検定','コイン投げで確かめる','d4Hyp',()=>`
+    <section class="panel"><h3>仮説検定の手順</h3>${rul('① 主張に<b>反する</b>仮説を立てる<br>② 仮説のもとで、その結果が起こる確率を調べる<br>③ 基準の確率（0.05 など）とくらべる')}
+    <table class="dtab"><tr><td>確率 ＜ 基準</td><td>仮説は正しくなかったと考える</td></tr><tr><td>確率 ≧ 基準</td><td>仮説が正しくないとは判断できない</td></tr></table>
+    ${ex('15 回中 12 勝。五分五分なら、コイン15枚で表が12枚以上になる確率と同じ。<br>実験では 18/1000＝0.018＜0.05<br>→ 五分五分ではなかった → 速くなったと判断してよい')}${tip('「判断できない」は「仮説が正しい」という意味ではありません。')}</section>`),
+  L('11-2',null,'仮説検定の考え方','ことばと結論','d4HypC',()=>`<section class="panel"><h3>ふりかえり</h3><p>仮説検定の考え方を、ことばで確かめます。</p></section>`),
+];
+const TM=[
+  [['度数分布表','データを階級に分けて、度数をまとめた表。'],['相対度数','度数 ÷ 度数の合計'],['平均値','合計 ÷ 個数'],['中央値','小さい順に並べた真ん中の値。'],['最頻値','いちばん多く出てくる値。']],
+  [['四分位数','データを4等分する値。Q1、Q2（中央値）、Q3。'],['四分位範囲','Q3−Q1'],['箱ひげ図','最小値・Q1・中央値・Q3・最大値で表す図。'],['外れ値','Q1−1.5×四分位範囲 以下、Q3＋1.5×四分位範囲 以上の値。'],['分散','偏差の2乗の平均。'],['標準偏差','分散の正の平方根。']],
+  [],
+  [['散布図','2つの変量を点で表した図。'],['相関係数','共分散 ÷ (x の標準偏差 × y の標準偏差)。−1〜1。'],['共分散','x の偏差 × y の偏差 の平均。']],
+  [['仮説検定','仮説を立て、確率をもとに正しいかどうかを判断する方法。'],['基準となる確率','0.05 や 0.01 など。これより小さい確率のことは「めったに起こらない」と考える。']],
+];
+return { G, CH:[C1,C2,null,C4,C5], TM };
+})();
+
 /* ===== 波（1つ約5分） ===== */
 const MQ_LESSONS = [
   { id:'1-1', t:'式の展開', sub:'乗法公式', plan:['exp','exp','exp','exp','exp'], body:()=>`
@@ -2345,6 +2554,7 @@ const TERMS = {
   m1:M1.TERMS,
   m3:M3.TERMS.slice(0,8),
   m4:M3.TERMS.slice(8),
+  d1:M7.TM[0], d2:M7.TM[1], d4:M7.TM[3], d5:M7.TM[4],
   z1:M6.TM[0], z2:M6.TM[1], z3:M6.TM[2], z4:M6.TM[3], z5:M6.TM[4],
   q1:M5.TM[0], q2:M5.TM[1], q3:M5.TM[2], q4:M5.TM[3], q5:M5.TM[4], q6:M5.TM[5],
   mq:[['展開','かっこのついた式を、かけ算して足し算の形にすること。'],['因数分解','足し算の式を、かけ算の形にすること。展開の逆。'],['乗法公式','(a＋b)² ＝ a²＋2ab＋b² など。'],['一次不等式','負の数をかける・割ると、不等号の向きが逆になる。']],
@@ -2378,6 +2588,10 @@ const UNITS = {
   z3:{ no:'図形と計量 3章', title:'正弦定理・余弦定理', subject:'数学', course:'math', subj:3, lessons:M6.CH[2], cards:'z3', drill:'z3' },
   z4:{ no:'図形と計量 4章', title:'図形の面積', subject:'数学', course:'math', subj:3, lessons:M6.CH[3], cards:'z4', drill:'z4' },
   z5:{ no:'図形と計量 5章', title:'空間図形', subject:'数学', course:'math', subj:3, lessons:M6.CH[4], cards:'z5', drill:'z5' },
+  d1:{ no:'データの分析 1章', title:'データの整理と代表値', subject:'数学', course:'math', subj:4, lessons:M7.CH[0], cards:'d1', drill:'d1' },
+  d2:{ no:'データの分析 2章', title:'データの散らばり', subject:'数学', course:'math', subj:4, lessons:M7.CH[1], cards:'d2', drill:'d2' },
+  d4:{ no:'データの分析 4章', title:'相関', subject:'数学', course:'math', subj:4, lessons:M7.CH[3], cards:'d4', drill:'d4' },
+  d5:{ no:'データの分析 5章', title:'仮説検定', subject:'数学', course:'math', subj:4, lessons:M7.CH[4], cards:'d5', drill:'d5' },
   m1:{ no:'数と式 1章', title:'式の展開と因数分解', subject:'数学', course:'math', subj:0, lessons:M1.LESSONS.filter(l=>!l.soon), show:M1.LESSONS, cards:'m1', drill:'m1' },
   bc:{ no:'生1', title:'細胞と体', subject:'生物', course:'bio', subj:0, lessons:BC_LESSONS, cards:'bc', drill:'bc' },
 };
@@ -2389,7 +2603,7 @@ const CATALOG = [
     { id:'jpn', name:'国語', k:'国', note:'現代文・古文・漢文', subjects:[
       K('現代文','現',{ t:'現代文基礎', go:'海月時間 ▶ 国語 ▶ 読解' },{ t:'論説『科学との向き合い方』', ready:'rk' },{ t:'論説『AI時代に考える力とは』', ready:'ai' },{ t:'論説『音楽はなぜ人の心を動かすのか』', ready:'mu' },{ t:'小説『各駅停車』', ready:'nv' },{ t:'小説『2番目の走者』', ready:'nw' },{ t:'小説『普通の教室』', ready:'nf' },{ t:'会話文『多数決は本当に公平か』', ready:'mj' },{ t:'会話文『便利な社会は幸せな社会か』', ready:'bs' },{ t:'資料問題『睡眠と現代社会』', ready:'sl' }), K('古文','古',{ t:'古文基礎', go:'海月時間 ▶ 国語 ▶ 古文' },'古典単語','古典文法','古文読解','『更級日記』','『？？？』','『？？？』'), K('漢文','漢',{ t:'漢文基礎', go:'海月時間 ▶ 国語 ▶ 漢文' },'句法','漢文読解','『？？？』','『？？？』','『？？？』'), K('漢字・語句','字',{ t:'基礎漢字', go:'海月時間 ▶ 国語 ▶ 漢字' },{ t:'漢字高校レベル', ready:'hk' },{ t:'言葉の基礎', go:'海月時間 ▶ 国語 ▶ 言葉' },{ t:'語句高校レベル', ready:'gk' }), K('文法','法',{ t:'接続語', ready:'cj' }), KAKO ] },
     { id:'math', name:'数学', k:'数', note:'数学Ⅰ', subjects:[
-      K('数と式','式',{ t:'式の展開と因数分解', ready:'m1' },'実数','平方根','1次不等式'), K('集合と論理','論',{ t:'集合', ready:'m3' },{ t:'命題と論理', ready:'m4' }), K('2次関数','関',{ t:'関数とグラフ', ready:'q1' },{ t:'2次関数の最大・最小', ready:'q2' },{ t:'2次関数の決定', ready:'q3' },{ t:'2次方程式', ready:'q4' },{ t:'グラフと x軸・直線', ready:'q5' },{ t:'2次不等式', ready:'q6' }), K('図形と計量','図',{ t:'三角比', ready:'z1' },{ t:'三角比の拡張', ready:'z2' },{ t:'正弦定理・余弦定理', ready:'z3' },{ t:'図形の面積', ready:'z4' },{ t:'空間図形', ready:'z5' }), K('データの分析','デ','データの整理と代表値','データの散らばり','変量変換','相関','仮説検定'), KAKO ] },
+      K('数と式','式',{ t:'式の展開と因数分解', ready:'m1' },'実数','平方根','1次不等式'), K('集合と論理','論',{ t:'集合', ready:'m3' },{ t:'命題と論理', ready:'m4' }), K('2次関数','関',{ t:'関数とグラフ', ready:'q1' },{ t:'2次関数の最大・最小', ready:'q2' },{ t:'2次関数の決定', ready:'q3' },{ t:'2次方程式', ready:'q4' },{ t:'グラフと x軸・直線', ready:'q5' },{ t:'2次不等式', ready:'q6' }), K('図形と計量','図',{ t:'三角比', ready:'z1' },{ t:'三角比の拡張', ready:'z2' },{ t:'正弦定理・余弦定理', ready:'z3' },{ t:'図形の面積', ready:'z4' },{ t:'空間図形', ready:'z5' }), K('データの分析','デ',{ t:'データの整理と代表値', ready:'d1' },{ t:'データの散らばり', ready:'d2' },'変量変換',{ t:'相関', ready:'d4' },{ t:'仮説検定', ready:'d5' }), KAKO ] },
     { id:'eng', name:'英語', k:'英', note:'文法・読解', subjects:[
       { name:'文法', k:'文', go:'海月時間 ▶ 英語 ▶ 文法', units:[] }, K('語い・会話文','語','単語・熟語','会話文'), K('読解','読','短い英文','長文読解'), KAKO ] },
     { id:'geo', name:'地理', k:'理', note:'地理総合', subjects:[
