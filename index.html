@@ -112,6 +112,12 @@ p{margin:0}
 .pfig .pc{fill:none;stroke:var(--teal);stroke-width:2.5}.pfig .pl2{fill:none;stroke:var(--accent);stroke-width:2.5}
 .pfig .pp{fill:var(--ink)}.pfig .pl{font-size:12px;fill:var(--ink);font-weight:700}
 .dtab{width:100%;border-collapse:collapse;font-size:.92rem;margin:6px 0}.dtab th,.dtab td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}.dtab th{background:var(--sunk);font-weight:700}
+.tfig{display:block;width:100%;max-width:260px;margin:8px auto}
+.tfig .tf{fill:var(--teal-soft);stroke:var(--ink);stroke-width:1.8;stroke-linejoin:round}.tfig .tr{fill:none;stroke:var(--ink);stroke-width:1.3}
+.tfig .tv{font-family:"Times New Roman",serif;font-style:italic;font-weight:700;font-size:17px;fill:var(--ink)}
+.tfig .ts{font-family:"Times New Roman","Hiragino Mincho ProN",serif;font-weight:700;font-size:15px;fill:var(--accent-ink);text-anchor:middle}
+.tfig .tsm{font-family:"Times New Roman","Hiragino Mincho ProN",serif;font-size:13px;fill:var(--ink);text-anchor:middle}
+.tfig .ax{stroke:var(--muted);stroke-width:1.2}.tfig .ucc{fill:none;stroke:var(--teal);stroke-width:2}.tfig .ucr{stroke:var(--accent);stroke-width:2.2}.tfig .ucd{stroke:var(--muted);stroke-dasharray:4 3}.tfig .pp{fill:var(--ink)}
 .secrow{font-family:var(--f-display);font-weight:900;color:var(--teal);font-size:.95rem;padding:14px 4px 2px;letter-spacing:.04em}
 .secrow:first-child{padding-top:2px}
 .mth{font-family:"Times New Roman","Hiragino Mincho ProN","Yu Mincho",serif;font-variant-numeric:normal;letter-spacing:.02em}
@@ -903,7 +909,7 @@ const RK_LESSONS = [['科学の説明は変わる','本文の前半　問1',['rk
 const NF_LESSONS = novelLessons('nf','7',[['「普通」という言葉','本文のはじめ　問1'],['文化祭の絵','本文の前半　問2'],['図書館へ','本文の中ほど　問3'],['先生との会話と文化祭','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
 const NV_LESSONS = novelLessons('nv','5',[['駅での再会','本文の前半　問1'],['無人駅','本文の中ほど　問2'],['「簡単に言うなよ」','本文の中ほど　問3'],['特急に抜かされる','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
 const NW_LESSONS = novelLessons('nw','6',[['二番目という場所','本文のはじめ　問1'],['航平の欠場','本文の前半　問2'],['決勝のスタート','本文の中ほど　問3'],['リレーの前に','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
-const makeQs = plan => { const used={}; return plan.map(k=>{ { const m=/^(nv|nw|rk|nf|ai|mu|mj|bs|sl)(\d+)$/.exec(k); if(m) return nq2(m[1],+m[2]); } if(/^m1[A-Z]/.test(k)) return M1.G[k](); if(/^s[1-5][A-Z]/.test(k)) return M3.G[k](); if(/^f2[A-Z]/.test(k)) return M5.G[k](); if(k.startsWith('gm')) return mq(GM[+k.slice(2)]); if(k.startsWith('gk')) return gq(GQ[+k.slice(2)]); if(k.startsWith('cj')) return cq(CJ[+k.slice(2)]); if(k.startsWith('kj')) return kq(KJ[+k.slice(2)]); const P=POOL[k]; used[k]=used[k]||shuffle(P.map((_,i)=>i)); if(!used[k].length) used[k]=shuffle(P.map((_,i)=>i)); return fq(P[used[k].pop()]); }); };
+const makeQs = plan => { const used={}; return plan.map(k=>{ { const m=/^(nv|nw|rk|nf|ai|mu|mj|bs|sl)(\d+)$/.exec(k); if(m) return nq2(m[1],+m[2]); } if(/^m1[A-Z]/.test(k)) return M1.G[k](); if(/^s[1-5][A-Z]/.test(k)) return M3.G[k](); if(/^f2[A-Z]/.test(k)) return M5.G[k](); if(/^t3[A-Z]/.test(k)) return M6.G[k](); if(k.startsWith('gm')) return mq(GM[+k.slice(2)]); if(k.startsWith('gk')) return gq(GQ[+k.slice(2)]); if(k.startsWith('cj')) return cq(CJ[+k.slice(2)]); if(k.startsWith('kj')) return kq(KJ[+k.slice(2)]); const P=POOL[k]; used[k]=used[k]||shuffle(P.map((_,i)=>i)); if(!used[k].length) used[k]=shuffle(P.map((_,i)=>i)); return fq(P[used[k].pop()]); }); };
 
 /* ===== 説明ページの部品 ===== */
 const rule = s => `<div class="rule">${s}</div>`;
@@ -2049,6 +2055,263 @@ const TM = [
 return { G, CH:[C1,C2,C3,C4,C5,C6], TM };
 })();
 
+/* ===== 数学Ⅰ 図形と計量（問題は毎回つくりかわります） ===== */
+const M6 = (() => {
+const nz = (a,b) => { let n=0; while(n===0) n=ri(a,b); return n; };
+const uniq = a => a.filter((v,i,s)=>s.indexOf(v)===i);
+const mi = t => typeof t==='string' ? t.replace(/-(?=\d)/g,'−') : t;
+function Q(prompt, expr, ans, wrongs, hint, explain, extra){
+  ans=mi(ans); const ch=uniq([ans, ...wrongs.filter(w=>w!=null&&w!=='').map(mi).filter(w=>w!==ans)]).slice(0,4);
+  return Object.assign({ raw:true, math:true, prompt:mi(prompt), expr:mi(expr), answer:ans, choices:shuffle(ch), words:ch.some(c=>c.replace(/<[^>]+>/g,'').length>9), hint:mi(hint), explain:mi(explain), long:true }, extra||{}); }
+const gcd = (a,b) => { a=Math.abs(a); b=Math.abs(b); while(b){ [a,b]=[b,a%b]; } return a||1; };
+const N = n => n<0 ? '−'+(-n) : String(n);
+/* --- 正確な数 n√r / d --- */
+function E(n,r=1,d=1){ if(!n) return {n:0,r:1,d:1}; let o=1; for(let k=2;k*k<=r;k++) while(r%(k*k)===0){ r/=k*k; o*=k; } n*=o; if(d<0){ n=-n; d=-d; } const g=gcd(n,d); return { n:n/g, r, d:d/g }; }
+const mul = (a,b) => E(a.n*b.n, a.r*b.r, a.d*b.d);
+const div = (a,b) => E(a.n*b.d, a.r*b.r, a.d*b.n*b.r);
+const neg = a => E(-a.n, a.r, a.d);
+const sq = (p,q=1) => E(1, p*q, q);              // √(p/q)
+const val = a => a.n*Math.sqrt(a.r)/a.d;
+function F(a, sp){ if(!a.n) return '0'; const s=a.n<0?'−':'', c=Math.abs(a.n);
+  if(sp && c===1 && a.r>1 && a.d===a.r) return `${s}1/√${a.r}`;
+  const body = a.r===1 ? String(c) : `${c===1?'':c}√${a.r}`; return s + (a.d===1 ? body : `${body}/${a.d}`); }
+const SIN={0:E(0),30:E(1,1,2),45:E(1,2,2),60:E(1,3,2),90:E(1),120:E(1,3,2),135:E(1,2,2),150:E(1,1,2),180:E(0)};
+const COS={0:E(1),30:E(1,3,2),45:E(1,2,2),60:E(1,1,2),90:E(0),120:E(-1,1,2),135:E(-1,2,2),150:E(-1,3,2),180:E(-1)};
+const TAN={0:E(0),30:E(1,3,3),45:E(1),60:E(1,3),120:E(-1,3),135:E(-1),150:E(-1,3,3),180:E(0)};
+const TB={sin:SIN,cos:COS,tan:TAN}, ANG=[0,30,45,60,90,120,135,150,180];
+const SPV=['0','1','−1','1/2','−1/2','1/√2','−1/√2','√3/2','−√3/2','1/√3','−1/√3','√3','−√3'];
+const ex = s => `<p class="ex mth">${s}</p>`;
+const tip = s => `<p class="small muted">${s}</p>`;
+const rul = s => `<div class="rule">${s}</div>`;
+const sum = arr => `<div class="signs mth">${arr.map(s=>`<div>${s}</div>`).join('')}</div>`;
+const r1 = x => (Math.round(x*10)/10).toFixed(1);
+
+/* --- 図 --- */
+function rtri(o={}){ // 直角三角形 A（左下）・C（右下・直角）・B（右上）
+  const l=o.labels||{};
+  return `<svg class="tfig" viewBox="0 0 240 170" role="img" aria-label="直角三角形ABC"><path d="M30 140 L200 140 L200 36 Z" class="tf"/><path d="M188 140 V128 H200" class="tr"/>
+  <text x="18" y="152" class="tv">A</text><text x="208" y="152" class="tv">C</text><text x="208" y="32" class="tv">B</text>
+  ${l.c?`<text x="104" y="80" class="ts">${mi(l.c)}</text>`:''}${l.a?`<text x="210" y="92" class="ts" text-anchor="start">${mi(l.a)}</text>`:''}${l.b?`<text x="115" y="160" class="ts">${mi(l.b)}</text>`:''}
+  <path d="M52 140 A22 22 0 0 0 49 129" class="tr"/>${l.A?`<text x="62" y="134" class="tsm">${mi(l.A)}</text>`:''}</svg>`; }
+function tri(o={}){ // 一般の三角形
+  const l=o.labels||{};
+  return `<svg class="tfig" viewBox="0 0 240 170" role="img" aria-label="三角形ABC"><path d="M70 30 L20 140 L220 140 Z" class="tf"/>
+  <text x="64" y="22" class="tv">A</text><text x="8" y="154" class="tv">B</text><text x="224" y="154" class="tv">C</text>
+  ${l.c?`<text x="28" y="84" class="ts">${mi(l.c)}</text>`:''}${l.b?`<text x="156" y="80" class="ts">${mi(l.b)}</text>`:''}${l.a?`<text x="120" y="160" class="ts">${mi(l.a)}</text>`:''}
+  ${l.A?`<text x="72" y="56" class="tsm">${mi(l.A)}</text>`:''}${l.B?`<text x="40" y="132" class="tsm">${mi(l.B)}</text>`:''}${l.C?`<text x="186" y="132" class="tsm">${mi(l.C)}</text>`:''}</svg>`; }
+function uc(th){ // 単位円（半円）
+  const R=90, cx=130, cy=120, t=th*Math.PI/180, px=cx+R*Math.cos(t), py=cy-R*Math.sin(t);
+  return `<svg class="tfig" viewBox="0 0 260 150" role="img" aria-label="半径1の半円"><line x1="20" y1="${cy}" x2="240" y2="${cy}" class="ax"/><line x1="${cx}" y1="14" x2="${cx}" y2="${cy+14}" class="ax"/>
+  <path d="M${cx+R} ${cy} A${R} ${R} 0 0 0 ${cx-R} ${cy}" class="ucc"/><line x1="${cx}" y1="${cy}" x2="${px}" y2="${py}" class="ucr"/><line x1="${px}" y1="${py}" x2="${px}" y2="${cy}" class="ucd"/>
+  <circle cx="${px}" cy="${py}" r="4" class="pp"/><path d="M${cx+22} ${cy} A22 22 0 0 0 ${cx+22*Math.cos(t)} ${cy-22*Math.sin(t)}" class="tr"/>
+  <text x="${cx+40*Math.cos(t/2)}" y="${cy-40*Math.sin(t/2)+4}" class="tsm" text-anchor="start">${th}°</text><text x="${px+(px<cx?-8:8)}" y="${py-8}" class="tsm" text-anchor="${px<cx?'end':'start'}">P(cos, sin)</text>
+  <text x="${cx+R}" y="${cy+14}" class="tsm">1</text><text x="${cx-R}" y="${cy+14}" class="tsm">−1</text><text x="${cx-6}" y="${cy+14}" class="tsm">O</text></svg>`; }
+
+/* --- 探索しておく三角形など --- */
+const HERON=[]; for(let a=2;a<=9;a++) for(let b=a;b<=9;b++) for(let c=b;c<=9;c++){ if(a+b<=c) continue; const P=(a+b+c)*(-a+b+c)*(a-b+c)*(a+b-c), S=E(1,P,4); if(S.r<=15&&S.r>1) HERON.push([a,b,c,P]); }
+const COS60=[]; for(let b=2;b<=9;b++) for(let c=2;c<=9;c++) for(const A of [60,120]){ const a2=b*b+c*c+(A===60?-b*c:b*c), a=Math.round(Math.sqrt(a2)); if(a*a===a2&&b!==c) COS60.push([a,b,c,A]); }
+const CYC=[]; for(let p=2;p<=8;p++) for(let q=2;q<=8;q++) for(let r=2;r<=8;r++) for(let s=2;s<=8;s++){ const num=p*p+q*q-r*r-s*s, den=2*(p*q+r*s), g=gcd(num,den), cn=num/g, cd=den/g; if(Math.abs(cn)>=cd||cd>9||!num) continue;
+  const S=E((p*q+r*s)*1, cd*cd-cn*cn, 2*cd), AC=E(1,(p*p+q*q)*cd-2*p*q*cn,cd), AC2=E(1,((p*p+q*q)*cd-2*p*q*cn)*cd,cd); if(S.r<=40&&AC2.r<=40&&p+q+r+s<=26) CYC.push([p,q,r,s,cn,cd,S,AC2]); }
+
+const G = {
+  /* 1 直角三角形の三角比 */
+  t3Right(){ let a,b; do { a=ri(1,8); b=ri(1,8); } while(a===b); const c2=a*a+b*b, C=sq(c2), cs=F(C), mode=ri(0,2);
+    const fn=pick(['sin','cos','tan']), A={sin:div(E(a),C), cos:div(E(b),C), tan:E(a,1,b)};
+    const lab = mode===0 ? {a:N(a),b:N(b)} : mode===1 ? {a:N(a),c:cs} : {b:N(b),c:cs};
+    const H = cs.includes('√') ? `(${cs})²` : `${cs}²`, miss = mode===0 ? `AB＝√(${a}²＋${b}²)＝${cs}` : mode===1 ? `AC＝√(${H}−${a}²)＝${b}` : `BC＝√(${H}−${b}²)＝${a}`;
+    return Q(`${fn} A の値は？`, rtri({labels:lab}), F(A[fn]), ['sin','cos','tan'].filter(x=>x!==fn).map(x=>F(A[x])).concat([F(div(E(1),A[fn])), F(E(b,1,a))]),
+      'sin A＝対辺/斜辺　cos A＝底辺/斜辺　tan A＝対辺/底辺（A から見て）。分母に √ が残るときは有理化します。',
+      `三平方の定理で ${miss}<br>sin A＝${a}/${cs}、cos A＝${b}/${cs}、tan A＝${a}/${b}<br>${fn} A＝<b>${F(A[fn])}</b>`); },
+  t3Special(){ const t=pick([30,45,60]), fn=pick(['sin','cos','tan']), ans=F(TB[fn][t],true);
+    return Q(`${fn} ${t}° の値は？`, `${fn} ${t}°`, ans, ['1/2','1/√2','√3/2','1/√3','√3','1'].filter(x=>x!==ans).sort(()=>Math.random()-.5),
+      '30°・60°・90° の三角形は 1：2：√3、45°・45°・90° の三角形は 1：1：√2。', `${t===45?'1：1：√2 の三角形':'1：2：√3 の三角形'}で考えると ${fn} ${t}°＝<b>${ans}</b>`); },
+  /* 2 三角比の表 */
+  t3Table(){ const th=ri(15,70), H=10, opp=Math.round(H*Math.sin(th*Math.PI/180)*10)/10, angs=[th-2,th-1,th,th+1,th+2];
+    const tb=`<table class="dtab mth"><tr><th>θ</th><th>sin θ</th></tr>${angs.map(x=>`<tr><td>${x}°</td><td>${Math.sin(x*Math.PI/180).toFixed(4)}</td></tr>`).join('')}</table>`;
+    return Q('表を使うと、A はおよそ何度？', `${rtri({labels:{a:String(opp),c:String(H)}})}${tb}`, `${th}°`, [`${th-1}°`,`${th+1}°`,`${90-th}°`,`${th+2}°`],
+      `sin A＝BC/AB＝${opp}/${H} を計算して、表でいちばん近い値をさがします。`, `sin A＝${opp}/${H}＝${(opp/H).toFixed(2)}<br>表でいちばん近いのは sin ${th}°＝${Math.sin(th*Math.PI/180).toFixed(4)}<br>よって A≒<b>${th}°</b>`); },
+  /* 3 三角比の利用 */
+  t3Use(){ const th=ri(20,50), d=pick([10,15,20,25,30]), t=Math.tan(th*Math.PI/180), tv=Number(t.toFixed(4)), h=1.5, H=d*tv+h;
+    return Q('木の高さはおよそ何 m？（小数第1位まで）', `木から ${d} m はなれた地点で、木の先端を見上げた角（仰角）が ${th}°。目の高さは 1.5 m。<br><span class="small">tan ${th}°＝${tv.toFixed(4)}、sin ${th}°＝${Math.sin(th*Math.PI/180).toFixed(4)} とする。</span>`, `${r1(H)} m`,
+      [`${r1(d*tv)} m`, `${r1(d*Math.sin(th*Math.PI/180)+h)} m`, `${r1(d/tv+h)} m`, `${r1(H+1)} m`],
+      '目の高さより上の部分は、水平距離 × tan（仰角）。最後に目の高さをたします。', `目の高さより上の部分：${d}×tan ${th}°＝${d}×${tv.toFixed(4)}≒${(d*tv).toFixed(2)}<br>目の高さ 1.5 m をたして <b>${r1(H)} m</b>`); },
+  /* 4 相互関係（鋭角） */
+  t3Rel(){ const t=ri(0,2);
+    if(t<2){ let b,c; do { c=ri(2,9); b=ri(1,c-1); } while(gcd(b,c)!==1); const o=sq(c*c-b*b), given=t===0?'cos':'sin', other=t===0?'sin':'cos', ask=pick([other,'tan']);
+      const vOther=E(1,c*c-b*b,c), vTan= t===0 ? E(1,c*c-b*b,b) : div(E(b),sq(c*c-b*b));
+      const ans=F(ask==='tan'?vTan:vOther);
+      return Q(`θ は鋭角。${given} θ＝${b}/${c} のとき、${ask} θ の値は？`, `${given} θ＝${b}/${c}`, ans, [F(E(c*c-b*b,1,c)), F(ask==='tan'?vOther:vTan), F(div(E(1),ask==='tan'?vTan:vOther)), F(E(1,c*c+b*b,c))],
+        'sin²θ＋cos²θ＝1、tan θ＝sin θ/cos θ。鋭角なので sin、cos、tan はすべて正。',
+        `${other}²θ＝1−(${b}/${c})²＝${c*c-b*b}/${c*c}<br>${other} θ＞0 より ${other} θ＝${F(vOther)}<br>tan θ＝${t===0?`${F(vOther)}÷${b}/${c}`:`${b}/${c}÷${F(vOther)}`}＝${F(vTan)}<br>${ask} θ＝<b>${ans}</b>`); }
+    const k=ri(2,4), cosv=div(E(1),sq(1+k*k)), sinv=mul(E(k),cosv), ask=pick(['cos','sin']), ans=F(ask==='cos'?cosv:sinv);
+    return Q(`θ は鋭角。tan θ＝${k} のとき、${ask} θ の値は？`, `tan θ＝${k}`, ans, [F(ask==='cos'?sinv:cosv), F(E(1,1,1+k*k)), F(E(k,1,1+k*k)), F(sq(1+k*k))],
+      '1＋tan²θ＝1/cos²θ を使います。', `1/cos²θ＝1＋${k}²＝${1+k*k}　cos θ＞0 より cos θ＝1/√${1+k*k}＝${F(cosv)}<br>sin θ＝tan θ × cos θ＝${F(sinv)}<br>${ask} θ＝<b>${ans}</b>`); },
+  /* 5 90°−θ */
+  t3Comp(){ const th=ri(46,89), fn=pick(['sin','cos','tan']), c=90-th;
+    const A={sin:`cos ${c}°`, cos:`sin ${c}°`, tan:`1/tan ${c}°`}[fn];
+    return Q('45° より小さい角の三角比で表すと？', `${fn} ${th}°`, A, [fn==='tan'?`tan ${c}°`:`${fn} ${c}°`, fn==='tan'?`−tan ${c}°`:`−${A}`, fn==='tan'?`1/tan ${th}°`:`${A.split(' ')[0]} ${th}°`],
+      'sin(90°−θ)＝cos θ　cos(90°−θ)＝sin θ　tan(90°−θ)＝1/tan θ', `${th}°＝90°−${c}° なので<br>${fn} ${th}°＝${fn}(90°−${c}°)＝<b>${A}</b>`); },
+  /* 6 鈍角の三角比 */
+  t3Obtuse(){ let t,fn; do { t=pick([0,90,120,135,150,180,120,135,150]); fn=pick(['sin','cos','tan']); } while(fn==='tan'&&t===90);
+    const ans=F(TB[fn][t],true), ac=180-t;
+    return Q(`${fn} ${t}° の値は？`, `${fn} ${t}°`, ans, [ac>=0&&TB[fn][ac]?F(neg(TB[fn][ac]),true):null, ...SPV.filter(x=>x!==ans).sort(()=>Math.random()-.5)].filter(x=>x&&x!==ans),
+      '半径 1 の半円で、角 θ の点 P(x, y) をとると cos θ＝x、sin θ＝y、tan θ＝y/x。', `${uc(t)}点 P の座標は (${F(COS[t],true)}, ${F(SIN[t],true)})<br>${fn} ${t}°＝<b>${ans}</b>`); },
+  /* 7 180°−θ */
+  t3Supp(){ const th=ri(91,179), c=180-th, fn=pick(['sin','cos','tan']); const A={sin:`sin ${c}°`, cos:`−cos ${c}°`, tan:`−tan ${c}°`}[fn];
+    return Q('90° より小さい角の三角比で表すと？', `${fn} ${th}°`, A, fn==='sin'?[`−sin ${c}°`,`cos ${c}°`,`sin ${th-90}°`]:fn==='cos'?[`cos ${c}°`,`−sin ${c}°`,`sin ${th-90}°`]:[`tan ${c}°`,`1/tan ${c}°`,`−1/tan ${c}°`],
+      'sin(180°−θ)＝sin θ　cos(180°−θ)＝−cos θ　tan(180°−θ)＝−tan θ', `${th}°＝180°−${c}° なので<br>${fn} ${th}°＝<b>${A}</b>`); },
+  /* 8 三角比を含む方程式 */
+  t3Eq(){ const fn=pick(['sin','cos','tan']), cand=uniq(ANG.filter(a=>TB[fn][a]).map(a=>F(TB[fn][a],true))).filter(v=>!(fn==='sin'&&v==='0')||Math.random()<.2), v=pick(cand);
+    const sol=ANG.filter(a=>TB[fn][a]&&F(TB[fn][a],true)===v), ans=`θ＝${sol.map(a=>a+'°').join(', ')}`;
+    const other=ANG.filter(a=>TB[fn][a]&&F(TB[fn][a],true)===(v.startsWith('−')?v.slice(1):'−'+v)), alt=[`θ＝${sol[0]}°`, other.length?`θ＝${other.map(a=>a+'°').join(', ')}`:null, fn==='sin'?`θ＝${sol.map(a=>(90-a+180)%180+'°').join(', ')}`:`θ＝${sol.map(a=>(180-a)+'°').join(', ')}`, `θ＝${(sol[0]+30)%180}°`, ...shuffle(ANG.filter(a=>!sol.includes(a))).slice(0,3).map(a=>`θ＝${a}°`)];
+    return Q(`0°≦θ≦180° のとき、方程式を満たす θ は？`, `${fn} θ＝${v}`, ans, alt,
+      '半円をかいて、条件に合う点 P をさがします。sin θ＝y、cos θ＝x、tan θ＝y/x。sin は答えが2つになることが多いので注意。', `${uc(sol[sol.length-1])}${fn} θ＝${v} を満たすのは <b>${ans}</b>`); },
+  /* 9 鈍角をふくむ相互関係 */
+  t3Rel2(){ let b,c; do { c=ri(2,9); b=ri(1,c-1); } while(gcd(b,c)!==1); const r=c*c-b*b, t=pick(['s','c']);
+    if(t==='s'){ const cosv=E(-1,r,c), tanv=div(E(b),neg(sq(r))), ask=pick(['cos','tan']), ans=F(ask==='cos'?cosv:tanv);
+      return Q(`θ は鈍角。sin θ＝${b}/${c} のとき、${ask} θ の値は？`, `sin θ＝${b}/${c}　(90°＜θ＜180°)`, ans, [F(ask==='cos'?neg(cosv):neg(tanv)), F(ask==='cos'?tanv:cosv), F(E(-(r),1,c))],
+        '鈍角では cos θ＜0、tan θ＜0。sin²θ＋cos²θ＝1 から求めて、符号に気をつけます。', `cos²θ＝1−(${b}/${c})²＝${r}/${c*c}<br>鈍角なので cos θ＜0、cos θ＝${F(cosv)}<br>tan θ＝sin θ/cos θ＝${F(tanv)}<br>${ask} θ＝<b>${ans}</b>`); }
+    const sinv=E(1,r,c), tanv=div(sq(r),E(-b)), ask=pick(['sin','tan']), ans=F(ask==='sin'?sinv:tanv);
+    return Q(`cos θ＝−${b}/${c} のとき、${ask} θ の値は？（0°≦θ≦180°）`, `cos θ＝−${b}/${c}`, ans, [F(ask==='sin'?neg(sinv):neg(tanv)), F(ask==='sin'?tanv:sinv), F(E(r,1,c))],
+      '0°≦θ≦180° では sin θ≧0。cos θ が負なので θ は鈍角で、tan θ＜0。', `sin²θ＝1−(${b}/${c})²＝${r}/${c*c}　sin θ≧0 より sin θ＝${F(sinv)}<br>tan θ＝${F(tanv)}<br>${ask} θ＝<b>${ans}</b>`); },
+  /* 10 正弦定理・余弦定理 */
+  t3Sine(){ if(Math.random()<.65){ let A,B; do { A=pick([30,45,60,90,120,135]); B=pick([30,45,60,90,120,135]); } while(A===B||A+B>=180);
+      const a=ri(2,8), b=div(mul(E(a),SIN[B]),SIN[A]);
+      return Q('b の長さは？', `${tri({labels:{a:String(a),A:A+'°',B:B+'°'}})}a＝${a}、A＝${A}°、B＝${B}°`, F(b), [F(div(mul(E(a),SIN[A]),SIN[B])), F(mul(E(a),SIN[B])), F(div(E(a),SIN[B])), F(mul(b,E(2))), F(div(b,E(2))), F(E(a))],
+        '正弦定理 a/sin A＝b/sin B を使います。', `a/sin A＝b/sin B より<br>b＝a × sin B ÷ sin A＝${a}×${F(SIN[B],true)}÷${F(SIN[A],true)}＝<b>${F(b)}</b>`); }
+    const A=pick([30,45,60,120,135,150]), a=ri(2,9), R=div(E(a),mul(E(2),SIN[A]));
+    return Q('外接円の半径 R は？', `${tri({labels:{a:String(a),A:A+'°'}})}a＝${a}、A＝${A}°`, F(R), [F(mul(R,E(2))), F(mul(E(a),SIN[A])), F(div(R,E(2))), F(E(a,1,2)), F(E(a)), F(mul(R,E(3)))],
+      '正弦定理 a/sin A＝2R', `2R＝a/sin A＝${a}÷${F(SIN[A],true)}＝${F(mul(R,E(2)))}<br>R＝<b>${F(R)}</b>`); },
+  t3Cos(){ const [a,b,c,A]=pick(COS60), sg=A===60?'−':'＋';
+    if(Math.random()<.5) return Q('a の長さは？', `${tri({labels:{b:String(b),c:String(c),A:A+'°'}})}b＝${b}、c＝${c}、A＝${A}°`, String(a), [F(sq(b*b+c*c+(A===60?b*c:-b*c))), F(sq(b*c)), String(a*a), F(sq(b*b+c*c))],
+      `余弦定理 a²＝b²＋c²−2bc cos A。cos ${A}°＝${A===60?'1/2':'−1/2'}`, `a²＝${b}²＋${c}²−2・${b}・${c}・cos ${A}°<br>＝${b*b}＋${c*c}${sg}${b*c}＝${a*a}<br>a＞0 より a＝<b>${a}</b>`);
+    return Q('角 A の大きさは？', `${tri({labels:{a:String(a),b:String(b),c:String(c)}})}a＝${a}、b＝${b}、c＝${c}`, `${A}°`, [`${180-A}°`, '30°', '150°', '45°', '135°'],
+      '余弦定理を変形した cos A＝(b²＋c²−a²)/2bc を使います。', `cos A＝(${b*b}＋${c*c}−${a*a})/(2・${b}・${c})＝${b*b+c*c-a*a}/${2*b*c}＝${A===60?'1/2':'−1/2'}<br>よって A＝<b>${A}°</b>`); },
+  t3CosV(){ let a,b,c; do { a=ri(2,9); b=ri(2,9); c=ri(2,9); } while(a+b<=c||b+c<=a||a+c<=b||a===b&&b===c);
+    const num=b*b+c*c-a*a, den=2*b*c, ans=F(E(num,1,den));
+    return Q('cos A の値は？', `${tri({labels:{a:String(a),b:String(b),c:String(c)}})}a＝${a}、b＝${b}、c＝${c}`, ans, [F(E(a*a+b*b-c*c,1,2*a*b)), F(E(-num,1,den)), F(E(num,1,b*c)), F(E(b*b+c*c+a*a,1,den)), F(E(num+1,1,den)), F(E(a*a,1,den))],
+      'cos A＝(b²＋c²−a²)/2bc。A の向かいの辺 a の2乗をひきます。', `cos A＝(${b}²＋${c}²−${a}²)/(2・${b}・${c})＝${num}/${den}＝<b>${ans}</b><br><span class="small">${num>0?'cos A＞0 なので A は鋭角':num<0?'cos A＜0 なので A は鈍角':'cos A＝0 なので A＝90°'}。</span>`); },
+  /* 11 三角形の形状 */
+  t3Shape(){ const P=pick([['A','B','C','a','b','c'],['B','C','A','b','c','a'],['C','A','B','c','a','b']]), [A,B,C,a,b,c]=P;
+    const it=pick([
+      [`sin ${A}＝2cos ${B} sin ${C}`, `${b}＝${c} の二等辺三角形`, `${a}＝${c}・(${a}²＋${c}²−${b}²)/(${a}${c}) を整理すると ${b}²＝${c}²`],
+      [`${a} cos ${B}＝${b} cos ${A}`, `${a}＝${b} の二等辺三角形`, `${a}・(${a}²＋${c}²−${b}²)/2${a}${c}＝${b}・(${b}²＋${c}²−${a}²)/2${b}${c} を整理すると ${a}²＝${b}²`],
+      [`sin²${A}＝sin²${B}＋sin²${C}`, `${A}＝90° の直角三角形`, `正弦定理で sin を辺におきかえると ${a}²＝${b}²＋${c}²（三平方の定理）`],
+      [`${a} cos ${A}＝${b} cos ${B}`, `${a}＝${b} の二等辺三角形 または ${C}＝90° の直角三角形`, `余弦定理でおきかえて整理すると (${a}²−${b}²)(${a}²＋${b}²−${c}²)＝0`],
+    ]);
+    const all=[`${b}＝${c} の二等辺三角形`, `${a}＝${b} の二等辺三角形`, `${A}＝90° の直角三角形`, `${a}＝${b} の二等辺三角形 または ${C}＝90° の直角三角形`, '正三角形'];
+    return Q('△ABC はどんな三角形？', it[0], it[1], all.filter(x=>x!==it[1]),
+      '正弦定理（sin A＝a/2R）や余弦定理（cos A＝(b²＋c²−a²)/2bc）で、角を<b>辺だけの式</b>にします。', `${it[2]}。<br>よって <b>${it[1]}</b>`, { words:true }); },
+  /* 12 面積 */
+  t3Area(){ const A=pick([30,45,60,90,120,135,150]), b=ri(2,9), c=ri(2,9), S=mul(E(b*c,1,2),SIN[A]);
+    return Q('△ABC の面積は？', `${tri({labels:{b:String(b),c:String(c),A:A+'°'}})}AB＝${c}、AC＝${b}、A＝${A}°`, F(S), [F(mul(E(b*c),SIN[A])), F(mul(E(b*c,1,2),COS[A].n?E(Math.abs(COS[A].n),COS[A].r,COS[A].d):E(1))), F(E(b*c,1,2)), F(mul(S,E(1,1,2))), F(mul(S,E(2))), F(E(b*c,1,4)), F(E(b+c,1,2))],
+      'S＝(1/2)bc sin A（2辺とその間の角）', `S＝(1/2)×${c}×${b}×sin ${A}°＝(1/2)×${b*c}×${F(SIN[A],true)}＝<b>${F(S)}</b>`); },
+  t3Heron(){ const [a,b,c,P]=pick(HERON), S=E(1,P,4), cosA=E(b*b+c*c-a*a,1,2*b*c);
+    return Q('△ABC の面積は？', `${tri({labels:{a:String(a),b:String(b),c:String(c)}})}a＝${a}、b＝${b}、c＝${c}`, F(S), [F(E(1,P,2)), F(E(1,P,8)), F(E(2,P,4)), F(E(b*c,1,2))],
+      '① 余弦定理で cos A　② sin²A＋cos²A＝1 で sin A　③ S＝(1/2)bc sin A', `cos A＝${F(cosA)}<br>sin A＝√(1−cos²A)＝${F(div(mul(E(4),S),E(b*c)))}<br>S＝(1/2)×${b}×${c}×sin A＝<b>${F(S)}</b>`); },
+  t3Bis(){ const A=pick([60,90,120]); let b,c; do { b=ri(2,9); c=ri(2,9); } while(b===c);
+    const k=A===60?E(1,3,2):A===90?E(1,2,2):E(1,1,2), x=mul(E(2*b*c,1,b+c),k);
+    return Q('∠A の二等分線 AD の長さは？', `${tri({labels:{b:String(b),c:String(c),A:A+'°'}})}AB＝${c}、AC＝${b}、A＝${A}°`, F(x), [F(mul(E(b*c,1,b+c),k)), F(E(b*c,1,b+c)), F(mul(E(2*b*c,1,b+c),SIN[A])), F(E(b+c,1,2))],
+      '△ABD＋△ADC＝△ABC。AD＝x とおいて、面積の式を立てます。', `(1/2)・${c}・x・sin ${A/2}°＋(1/2)・${b}・x・sin ${A/2}°＝(1/2)・${c}・${b}・sin ${A}°<br>これを解いて x＝<b>${F(x)}</b>`); },
+  t3In(){ const [a,b,c,P]=pick(HERON), S=E(1,P,4), r=E(1,P,2*(a+b+c));
+    return Q('内接円の半径 r は？', `${tri({labels:{a:String(a),b:String(b),c:String(c)}})}a＝${a}、b＝${b}、c＝${c}`, F(r), [F(E(1,P,a+b+c)), F(E(1,P,4*(a+b+c))), F(S), F(mul(r,E(3)))],
+      'S＝(1/2)r(a＋b＋c)。先に面積 S を求めます。', `面積 S＝${F(S)}（3辺から求める）<br>S＝(1/2)r(${a}＋${b}＋${c}) より<br>${F(S)}＝${(a+b+c)/2}r　→　r＝<b>${F(r)}</b>`); },
+  t3Cyc(){ const [p,q,r,s,cn,cd,S,AC]=pick(CYC), ask=pick(['AC','S']);
+    return Q(ask==='AC'?'対角線 AC の長さは？':'四角形 ABCD の面積 S は？', `円に内接する四角形 ABCD<br>AB＝${p}、BC＝${q}、CD＝${r}、DA＝${s}`, F(ask==='AC'?AC:S), ask==='AC'?[F(sq(p*p+q*q)), F(sq(r*r+s*s)), F(mul(AC,E(2))), F(sq(p*q+r*s))]:[F(mul(S,E(2))), F(E(p*q+r*s,1,2)), F(div(S,E(2))), F(E(1,(cd*cd-cn*cn)*1,cd))],
+      '円に内接する四角形では B＋D＝180° なので cos D＝−cos B。AC² を2通りに表して cos B を求めます。',
+      `AC²＝${p}²＋${q}²−2・${p}・${q} cos B<br>AC²＝${r}²＋${s}²＋2・${r}・${s} cos B<br>これより cos B＝${F(E(cn,1,cd))}<br>${ask==='AC'?`AC＝<b>${F(AC)}</b>`:`sin B＝${F(E(1,cd*cd-cn*cn,cd))}<br>S＝(1/2)・${p}・${q} sin B＋(1/2)・${r}・${s} sin B＝<b>${F(S)}</b>`}`); },
+  t3Gold(){ const it=pick([
+      ['AB＝x とおくと、△ABC∽△BCD から成り立つ式は？','x²−x−1＝0',['x²＋x−1＝0','x²−2x−1＝0','x²−x＋1＝0'],'AB：BC＝BC：CD、つまり x：1＝1：(x−1) から x(x−1)＝1。'],
+      ['AB の長さは？','(1＋√5)/2',['(1−√5)/2','(−1＋√5)/2','1＋√5'],'x²−x−1＝0 を解くと x＝(1±√5)/2。x＞0 なので (1＋√5)/2。'],
+      ['cos 36° の値は？','(1＋√5)/4',['(√5−1)/4','(1＋√5)/2','√5/4'],'余弦定理 1²＝x²＋x²−2x²cos 36° を解くと cos 36°＝(1＋√5)/4。'],
+      ['BC＝BD＝AD になる理由は？','△BCD と △ABD が二等辺三角形だから',['△ABC が正三角形だから','BD が中線だから','AC＝AB だから'],'∠BCD＝∠BDC＝72° で △BCD は二等辺。∠DAB＝∠DBA＝36° で △ABD も二等辺。'],
+      ['CD の長さ（AB＝x）は？','x−1',['x＋1','1−x','x/2'],'AC＝AB＝x、AD＝1 なので CD＝x−1。'],
+    ]);
+    return Q(it[0], 'A＝36°、B＝C＝72°、BC＝1 の △ABC。∠B の二等分線と AC の交点を D とする。', it[1], it[2], '△ABC∽△BCD（角が 36°・72°・72°）を使います。', `${it[3]}<br>答えは <b>${it[1]}</b>`, { words:true }); },
+  /* 研究2 正四面体 */
+  t3Tet(){ const a=pick([2,3,4,6]), it=pick([
+      ['底面 △BCD の面積は？', E(a*a,3,4), [E(a*a,3,2), E(a*a,1,2), E(a*a,2,4)], `1辺 ${a} の正三角形の面積＝(1/2)×${a}×${a}×sin 60°`],
+      ['A から底面に下ろした垂線を AH とする。BH の長さは？', E(a,3,3), [E(a,3,2), E(a,3,6), E(a,2,2)], `H は △BCD の外心。正弦定理 ${a}/sin 60°＝2BH より`],
+      ['高さ AH は？', E(a,6,3), [E(a,3,2), E(a,6,2), E(a,2,3)], `AH²＝AB²−BH²＝${a*a}−${F(E(a*a,1,3))}`],
+      ['体積 V は？', E(a**3,2,12), [E(a**3,2,4), E(a**3,3,12), E(a**3,6,12)], `V＝(1/3)×底面積×高さ＝(1/3)×${F(E(a*a,3,4))}×${F(E(a,6,3))}`],
+    ]);
+    return Q(it[0], `1辺の長さが ${a} の正四面体 ABCD`, F(it[1]), it[2].map(x=>F(x)), '体積＝(1/3)×底面積×高さ。高さは三平方の定理で求めます。', `${it[3]}<br>＝<b>${F(it[1])}</b>`); },
+};
+
+const L = (id,sec,t,sub,key,body,extra) => Object.assign({ id, sec, t, sub, plan:Array.isArray(key)?key:Array(5).fill(key), body }, extra||{});
+const T = (plan,desc) => L('まとめ','章末テスト','章末テスト',desc,plan[0],()=>`<section class="panel"><h3>章末テスト</h3><p>この章の内容から10問出題します。問題の順番は毎回かわります。</p></section>`, { test:true, plan });
+const C1 = [
+  L('1-1','1　直角三角形の三角比','三角比の定義','sin・cos・tan','t3Right',()=>`
+    <section class="panel"><h3>三角比</h3>${rtri({labels:{a:'対辺',b:'底辺',c:'斜辺',A:'A'}})}${rul('sin A＝対辺/斜辺　cos A＝底辺/斜辺<br>tan A＝対辺/底辺')}
+    ${ex('BC＝3、AB＝5 のとき AC＝4<br>sin A＝3/5、cos A＝4/5、tan A＝3/4')}${tip('A を左下、直角を右下において見ると、まちがえにくくなります。')}</section>`),
+  L('1-2',null,'30°・45°・60° の三角比','覚えておきたい値','t3Special',()=>`
+    <section class="panel"><h3>2つの三角定規</h3><table class="dtab mth"><tr><th></th><th>30°</th><th>45°</th><th>60°</th></tr><tr><td>sin</td><td>1/2</td><td>1/√2</td><td>√3/2</td></tr><tr><td>cos</td><td>√3/2</td><td>1/√2</td><td>1/2</td></tr><tr><td>tan</td><td>1/√3</td><td>1</td><td>√3</td></tr></table>
+    ${tip('30°・60°・90° → 辺の比 1：2：√3　45°・45°・90° → 1：1：√2')}</section>`),
+  L('2-1','2　三角比の表','三角比の表','およその角を求める','t3Table',()=>`
+    <section class="panel"><h3>三角比の表</h3><p>三角比の表には、1° ごとの sin、cos、tan の値（小数第4位まで）がのっています。</p>${ex('sin A＝0.53 → 表で 0.5299（32°）がいちばん近い → A≒32°')}</section>`),
+  L('3-1','3　三角比の利用','三角比の利用','仰角と高さ','t3Use',()=>`
+    <section class="panel"><h3>仰角</h3><p>見上げたときの視線と水平面のなす角を<b>仰角</b>、見下ろすときの角を<b>俯角</b>といいます。</p>${rul('高さ＝水平距離 × tan（仰角）＋目の高さ')}
+    ${ex('20 m はなれて仰角 30°、目の高さ 1.5 m<br>20×tan 30°＋1.5≒20×0.5774＋1.5≒13.0 m')}</section>`),
+  L('4-1','4　鋭角の三角比の相互関係','三角比の相互関係','1つから残りを求める','t3Rel',()=>`
+    <section class="panel"><h3>相互関係</h3>${rul('tan θ＝sin θ/cos θ<br>sin²θ＋cos²θ＝1<br>1＋tan²θ＝1/cos²θ')}${ex('cos θ＝2/3（鋭角）<br>sin²θ＝1−4/9＝5/9　sin θ＝√5/3<br>tan θ＝(√5/3)÷(2/3)＝√5/2')}</section>`),
+  L('5-1','5　90°−θ の三角比','90°−θ の三角比','sin と cos が入れかわる','t3Comp',()=>`
+    <section class="panel"><h3>公式</h3>${rul('sin(90°−θ)＝cos θ<br>cos(90°−θ)＝sin θ<br>tan(90°−θ)＝1/tan θ')}${ex('sin 70°＝sin(90°−20°)＝cos 20°')}</section>`),
+  T(['t3Right','t3Right','t3Special','t3Special','t3Table','t3Use','t3Rel','t3Rel','t3Comp','t3Comp'],'三角比の10問'),
+];
+const C2 = [
+  L('6-1','6　鈍角の三角比','鈍角の三角比','半円で考える','t3Obtuse',()=>`
+    <section class="panel"><h3>座標で定義</h3>${uc(120)}${rul('半径 1 の半円上の点 P(x, y)<br>cos θ＝x　sin θ＝y　tan θ＝y/x')}
+    <table class="dtab mth"><tr><th></th><th>0°</th><th>90°</th><th>120°</th><th>135°</th><th>150°</th><th>180°</th></tr><tr><td>sin</td><td>0</td><td>1</td><td>√3/2</td><td>1/√2</td><td>1/2</td><td>0</td></tr><tr><td>cos</td><td>1</td><td>0</td><td>−1/2</td><td>−1/√2</td><td>−√3/2</td><td>−1</td></tr><tr><td>tan</td><td>0</td><td>なし</td><td>−√3</td><td>−1</td><td>−1/√3</td><td>0</td></tr></table>
+    ${tip('鈍角では cos と tan が負になります。')}</section>`),
+  L('7-1','7　180°−θ の三角比','180°−θ の三角比','鈍角を鋭角で表す','t3Supp',()=>`
+    <section class="panel"><h3>公式</h3>${rul('sin(180°−θ)＝sin θ<br>cos(180°−θ)＝−cos θ<br>tan(180°−θ)＝−tan θ')}${ex('cos 165°＝cos(180°−15°)＝−cos 15°')}</section>`),
+  L('8-1','8　三角比を含む方程式','三角比を含む方程式','半円で角をさがす','t3Eq',()=>`
+    <section class="panel"><h3>解き方</h3>${rul('sin θ＝a → 高さ a の点（2つあることが多い）<br>cos θ＝a → 横の座標 a の点<br>tan θ＝a → 傾き a の直線')}${ex('sin θ＝1/√2 → θ＝45°, 135°')}${ex('cos θ＝−1/2 → θ＝120°')}${ex('tan θ＝−1/√3 → θ＝150°')}</section>`),
+  L('9-1','9　鋭角・鈍角の三角比の相互関係','鈍角をふくむ相互関係','符号に注意','t3Rel2',()=>`
+    <section class="panel"><h3>符号</h3>${rul('0°≦θ≦180° では sin θ≧0<br>鈍角では cos θ＜0、tan θ＜0')}${ex('sin θ＝1/3、θ が鈍角<br>cos²θ＝8/9　cos θ＝−2√2/3<br>tan θ＝(1/3)÷(−2√2/3)＝−√2/4')}${tip('sin θ がわかっていても、鋭角か鈍角かで cos θ の符号が変わります。')}</section>`),
+  T(['t3Obtuse','t3Obtuse','t3Obtuse','t3Supp','t3Supp','t3Eq','t3Eq','t3Eq','t3Rel2','t3Rel2'],'三角比の拡張の10問'),
+];
+const C3 = [
+  L('10-1','10　正弦定理・余弦定理','正弦定理','a/sin A＝2R','t3Sine',()=>`
+    <section class="panel"><h3>正弦定理</h3>${tri({labels:{a:'a',b:'b',c:'c'}})}${rul('a/sin A＝b/sin B＝c/sin C＝2R<br>（R は外接円の半径）')}${ex('a＝4、A＝45°、B＝60° のとき<br>b＝4×sin 60°÷sin 45°＝4×(√3/2)÷(1/√2)＝2√6')}${tip('「向かい合う辺と角」の組が2つわかるときに使います。')}</section>`),
+  L('10-2',null,'余弦定理','2辺とその間の角','t3Cos',()=>`
+    <section class="panel"><h3>余弦定理</h3>${rul('a²＝b²＋c²−2bc cos A')}${ex('b＝5、c＝3、A＝120°<br>a²＝25＋9−2・5・3・(−1/2)＝49　a＝7')}${tip('3辺がわかるとき、cos A＝(b²＋c²−a²)/2bc で角が求まります。')}</section>`),
+  L('10-3',null,'3辺から角を求める','cos A の値','t3CosV',()=>`
+    <section class="panel"><h3>変形した余弦定理</h3>${rul('cos A＝(b²＋c²−a²)/2bc')}${ex('a＝7、b＝5、c＝8<br>cos A＝(25＋64−49)/80＝1/2　A＝60°')}${tip('cos A の符号で、A が鋭角（＋）か鈍角（−）かがわかります。')}</section>`),
+  L('11-1','11　三角形の形状','三角形の形状','辺だけの式にする','t3Shape',()=>`
+    <section class="panel"><h3>考え方</h3>${rul('sin A＝a/2R（正弦定理）<br>cos A＝(b²＋c²−a²)/2bc（余弦定理）<br>でおきかえて、辺だけの式にする')}${ex('sin A＝2cos B sin C<br>a/2R＝2・(a²＋c²−b²)/2ac・c/2R<br>a²＝a²＋c²−b²　→　b²＝c²<br>b＝c の二等辺三角形')}</section>`),
+  T(['t3Sine','t3Sine','t3Sine','t3Cos','t3Cos','t3Cos','t3CosV','t3CosV','t3Shape','t3Shape'],'正弦定理・余弦定理の10問'),
+];
+const C4 = [
+  L('12-1','12　三角形の面積','2辺とその間の角','S＝(1/2)bc sin A','t3Area',()=>`
+    <section class="panel"><h3>面積の公式</h3>${tri({labels:{b:'b',c:'c',A:'A'}})}${rul('S＝(1/2)bc sin A')}${ex('AB＝2、AC＝3、A＝60°<br>S＝(1/2)・2・3・(√3/2)＝3√3/2')}</section>`),
+  L('12-2',null,'3辺から面積','cos → sin → S','t3Heron',()=>`
+    <section class="panel"><h3>手順</h3>${rul('① cos A＝(b²＋c²−a²)/2bc<br>② sin A＝√(1−cos²A)<br>③ S＝(1/2)bc sin A')}${ex('AB＝6、AC＝5、BC＝7<br>cos A＝(36＋25−49)/60＝1/5<br>sin A＝2√6/5　S＝(1/2)・6・5・2√6/5＝6√6')}</section>`),
+  L('13-1','13　三角形の内角の二等分線の長さ','角の二等分線の長さ','面積で式を立てる','t3Bis',()=>`
+    <section class="panel"><h3>考え方</h3>${rul('△ABD＋△ADC＝△ABC')}${ex('AB＝5、AC＝3、A＝60°、AD＝x<br>(1/2)・5x・sin 30°＋(1/2)・3x・sin 30°＝(1/2)・5・3・sin 60°<br>2x＝15√3/4　x＝15√3/8')}</section>`),
+  L('14-1','14　内接円の半径','内接円の半径','S＝(1/2)r(a＋b＋c)','t3In',()=>`
+    <section class="panel"><h3>公式</h3>${rul('S＝(1/2)r(a＋b＋c)')}<p>内接円の中心と3つの頂点を結ぶと、高さ r の三角形3つに分かれます。</p>${ex('a＝7、b＝9、c＝10　S＝12√5<br>12√5＝(1/2)・r・26　r＝12√5/13')}</section>`),
+  L('研1-1','研究1　円に内接する四角形の面積','円に内接する四角形','B＋D＝180°','t3Cyc',()=>`
+    <section class="panel"><h3>考え方</h3>${rul('円に内接する四角形：B＋D＝180°<br>cos D＝−cos B、sin D＝sin B')}<p>対角線 AC² を △ABC と △ACD の2通りに表して、cos B を求めます。</p>${ex('AB＝6、BC＝8、CD＝6、DA＝5<br>36＋64−96cos B＝36＋25＋60cos B<br>cos B＝1/4')}</section>`),
+  L('研3-1','研究3　36° の三角比','36° の三角比','黄金比が出てくる','t3Gold',()=>`
+    <section class="panel"><h3>相似を使う</h3><p>A＝36°、B＝C＝72°、BC＝1 の二等辺三角形で、∠B の二等分線と AC の交点を D とすると △ABC∽△BCD。</p>${ex('AB＝x　x：1＝1：(x−1)<br>x²−x−1＝0　x＝(1＋√5)/2')}${ex('余弦定理　1＝2x²−2x²cos 36°<br>cos 36°＝(1＋√5)/4')}</section>`),
+  T(['t3Area','t3Area','t3Area','t3Heron','t3Heron','t3Bis','t3Bis','t3In','t3In','t3Cyc'],'図形の面積の10問'),
+];
+const C5 = [
+  L('研2-1','研究2　正四面体の体積','正四面体の高さ','三平方の定理','t3Tet',()=>`
+    <section class="panel"><h3>手順</h3>${rul('① 底面の正三角形の外接円の半径 BH（正弦定理）<br>② 高さ AH＝√(AB²−BH²)<br>③ 体積 V＝(1/3)×底面積×AH')}${ex('1辺 2 の正四面体<br>BH＝2√3/3　AH＝√(4−4/3)＝2√6/3<br>V＝(1/3)×√3×2√6/3＝2√2/3')}${tip('1辺 a の正四面体の体積は (√2/12)a³ になります。')}</section>`),
+  L('研2-2',null,'正四面体の練習','いろいろな大きさ','t3Tet',()=>`<section class="panel"><h3>練習</h3><p>1辺の長さを変えて、底面積・BH・高さ・体積を求めます。</p></section>`),
+];
+const TM=[
+  [['sin A','対辺/斜辺'],['cos A','底辺/斜辺'],['tan A','対辺/底辺'],['仰角','見上げたときの視線と水平面のなす角。'],['相互関係','sin²θ＋cos²θ＝1、tan θ＝sin θ/cos θ、1＋tan²θ＝1/cos²θ']],
+  [['鈍角の三角比','半径1の半円上の点 P(x, y) で cos θ＝x、sin θ＝y。'],['180°−θ','sin は同じ、cos と tan は符号が逆。']],
+  [['正弦定理','a/sin A＝b/sin B＝c/sin C＝2R'],['余弦定理','a²＝b²＋c²−2bc cos A'],['外接円','三角形の3つの頂点を通る円。']],
+  [['三角形の面積','S＝(1/2)bc sin A'],['内接円の半径','S＝(1/2)r(a＋b＋c)'],['円に内接する四角形','向かい合う角の和が 180°。']],
+  [['正四面体','4つの面がすべて正三角形の立体。'],['錐体の体積','(1/3)×底面積×高さ']],
+];
+return { G, CH:[C1,C2,C3,C4,C5], TM };
+})();
+
 /* ===== 波（1つ約5分） ===== */
 const MQ_LESSONS = [
   { id:'1-1', t:'式の展開', sub:'乗法公式', plan:['exp','exp','exp','exp','exp'], body:()=>`
@@ -2082,6 +2345,7 @@ const TERMS = {
   m1:M1.TERMS,
   m3:M3.TERMS.slice(0,8),
   m4:M3.TERMS.slice(8),
+  z1:M6.TM[0], z2:M6.TM[1], z3:M6.TM[2], z4:M6.TM[3], z5:M6.TM[4],
   q1:M5.TM[0], q2:M5.TM[1], q3:M5.TM[2], q4:M5.TM[3], q5:M5.TM[4], q6:M5.TM[5],
   mq:[['展開','かっこのついた式を、かけ算して足し算の形にすること。'],['因数分解','足し算の式を、かけ算の形にすること。展開の逆。'],['乗法公式','(a＋b)² ＝ a²＋2ab＋b² など。'],['一次不等式','負の数をかける・割ると、不等号の向きが逆になる。']],
   bc:[['原核生物','核膜をもたない生物。大腸菌など。'],['転写','DNAの情報からRNAをつくること。'],['翻訳','RNAの情報からタンパク質をつくること。'],['インスリン','血糖値を下げるホルモン。']],
@@ -2109,6 +2373,11 @@ const UNITS = {
   q4:{ no:'2次関数 4章', title:'2次方程式', subject:'数学', course:'math', subj:2, lessons:M5.CH[3], cards:'q4', drill:'q4' },
   q5:{ no:'2次関数 5章', title:'グラフと x軸・直線', subject:'数学', course:'math', subj:2, lessons:M5.CH[4], cards:'q5', drill:'q5' },
   q6:{ no:'2次関数 6章', title:'2次不等式', subject:'数学', course:'math', subj:2, lessons:M5.CH[5], cards:'q6', drill:'q6' },
+  z1:{ no:'図形と計量 1章', title:'三角比', subject:'数学', course:'math', subj:3, lessons:M6.CH[0], cards:'z1', drill:'z1' },
+  z2:{ no:'図形と計量 2章', title:'三角比の拡張', subject:'数学', course:'math', subj:3, lessons:M6.CH[1], cards:'z2', drill:'z2' },
+  z3:{ no:'図形と計量 3章', title:'正弦定理・余弦定理', subject:'数学', course:'math', subj:3, lessons:M6.CH[2], cards:'z3', drill:'z3' },
+  z4:{ no:'図形と計量 4章', title:'図形の面積', subject:'数学', course:'math', subj:3, lessons:M6.CH[3], cards:'z4', drill:'z4' },
+  z5:{ no:'図形と計量 5章', title:'空間図形', subject:'数学', course:'math', subj:3, lessons:M6.CH[4], cards:'z5', drill:'z5' },
   m1:{ no:'数と式 1章', title:'式の展開と因数分解', subject:'数学', course:'math', subj:0, lessons:M1.LESSONS.filter(l=>!l.soon), show:M1.LESSONS, cards:'m1', drill:'m1' },
   bc:{ no:'生1', title:'細胞と体', subject:'生物', course:'bio', subj:0, lessons:BC_LESSONS, cards:'bc', drill:'bc' },
 };
@@ -2120,7 +2389,7 @@ const CATALOG = [
     { id:'jpn', name:'国語', k:'国', note:'現代文・古文・漢文', subjects:[
       K('現代文','現',{ t:'現代文基礎', go:'海月時間 ▶ 国語 ▶ 読解' },{ t:'論説『科学との向き合い方』', ready:'rk' },{ t:'論説『AI時代に考える力とは』', ready:'ai' },{ t:'論説『音楽はなぜ人の心を動かすのか』', ready:'mu' },{ t:'小説『各駅停車』', ready:'nv' },{ t:'小説『2番目の走者』', ready:'nw' },{ t:'小説『普通の教室』', ready:'nf' },{ t:'会話文『多数決は本当に公平か』', ready:'mj' },{ t:'会話文『便利な社会は幸せな社会か』', ready:'bs' },{ t:'資料問題『睡眠と現代社会』', ready:'sl' }), K('古文','古',{ t:'古文基礎', go:'海月時間 ▶ 国語 ▶ 古文' },'古典単語','古典文法','古文読解','『更級日記』','『？？？』','『？？？』'), K('漢文','漢',{ t:'漢文基礎', go:'海月時間 ▶ 国語 ▶ 漢文' },'句法','漢文読解','『？？？』','『？？？』','『？？？』'), K('漢字・語句','字',{ t:'基礎漢字', go:'海月時間 ▶ 国語 ▶ 漢字' },{ t:'漢字高校レベル', ready:'hk' },{ t:'言葉の基礎', go:'海月時間 ▶ 国語 ▶ 言葉' },{ t:'語句高校レベル', ready:'gk' }), K('文法','法',{ t:'接続語', ready:'cj' }), KAKO ] },
     { id:'math', name:'数学', k:'数', note:'数学Ⅰ', subjects:[
-      K('数と式','式',{ t:'式の展開と因数分解', ready:'m1' },'実数','平方根','1次不等式'), K('集合と論理','論',{ t:'集合', ready:'m3' },{ t:'命題と論理', ready:'m4' }), K('2次関数','関',{ t:'関数とグラフ', ready:'q1' },{ t:'2次関数の最大・最小', ready:'q2' },{ t:'2次関数の決定', ready:'q3' },{ t:'2次方程式', ready:'q4' },{ t:'グラフと x軸・直線', ready:'q5' },{ t:'2次不等式', ready:'q6' }), K('図形と計量','図','三角比','三角比の拡張','正弦定理・余弦定理','図形の面積','空間図形'), K('データの分析','デ','データの整理と代表値','データの散らばり','変量変換','相関','仮説検定'), KAKO ] },
+      K('数と式','式',{ t:'式の展開と因数分解', ready:'m1' },'実数','平方根','1次不等式'), K('集合と論理','論',{ t:'集合', ready:'m3' },{ t:'命題と論理', ready:'m4' }), K('2次関数','関',{ t:'関数とグラフ', ready:'q1' },{ t:'2次関数の最大・最小', ready:'q2' },{ t:'2次関数の決定', ready:'q3' },{ t:'2次方程式', ready:'q4' },{ t:'グラフと x軸・直線', ready:'q5' },{ t:'2次不等式', ready:'q6' }), K('図形と計量','図',{ t:'三角比', ready:'z1' },{ t:'三角比の拡張', ready:'z2' },{ t:'正弦定理・余弦定理', ready:'z3' },{ t:'図形の面積', ready:'z4' },{ t:'空間図形', ready:'z5' }), K('データの分析','デ','データの整理と代表値','データの散らばり','変量変換','相関','仮説検定'), KAKO ] },
     { id:'eng', name:'英語', k:'英', note:'文法・読解', subjects:[
       { name:'文法', k:'文', go:'海月時間 ▶ 英語 ▶ 文法', units:[] }, K('語い・会話文','語','単語・熟語','会話文'), K('読解','読','短い英文','長文読解'), KAKO ] },
     { id:'geo', name:'地理', k:'理', note:'地理総合', subjects:[
