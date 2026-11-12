@@ -126,6 +126,7 @@ p{margin:0}
 .dfig.sc{max-width:220px}.sc3{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}.sc3 .dfig{margin:0}
 .ctab td,.ctab th{padding:3px 5px;text-align:center;font-size:.85rem}
 .ua,.ub{text-decoration-line:underline;text-decoration-thickness:2.5px;text-underline-offset:5px;text-decoration-skip-ink:none}.ua{text-decoration-color:var(--teal)}.ub{text-decoration-color:var(--accent);text-decoration-style:double}
+.exq{border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;margin-top:6px;line-height:1.8}.exq p{margin:4px 0 0;font-weight:700}.exq-t{display:inline-block;font-size:.78rem;font-weight:700;color:var(--surface);background:var(--teal);border-radius:99px;padding:1px 10px}
 .secrow{font-family:var(--f-display);font-weight:900;color:var(--teal);font-size:.95rem;padding:14px 4px 2px;letter-spacing:.04em}
 .secrow:first-child{padding-top:2px}
 .mth{font-family:"Times New Roman","Hiragino Mincho ProN","Yu Mincho",serif;font-variant-numeric:normal;letter-spacing:.02em}
@@ -1390,7 +1391,7 @@ const LESSONS = [
     ${ex('x について降べきの順に整理<br>x²＋y²＋2xy＋2x＋2y＋1<br>＝x²＋(2y＋2)x＋(y²＋2y＋1)<br>＝x²＋2(y＋1)x＋y²＋2y＋1')}${tip('x について整理するときは、x をふくむ項を x でくくって、係数をまとめます。')}</section>`),
   L('1-4',null,'整式の加法・減法','A、B を代入する','m1AddSub',()=>`
     <section class="panel"><h3>代入して計算</h3>${rule('A、B を<b>かっこごと</b>代入して、同類項をまとめる')}
-    ${ex('A＝x²−xy＋y²、B＝3x²＋3xy−y² のとき<br>A−B＝(x²−xy＋y²)−(3x²＋3xy−y²)<br>＝x²−xy＋y²−3x²−3xy＋y²<br>＝−2x²−4xy＋2y²')}${tip('ひき算では、ひく式の<b>すべての項</b>の符号が変わります。いちばん多いまちがいです。')}</section>`),
+    ${'<div class="exq"><span class="exq-t">例題</span><p>A＝x²−xy＋y²、B＝3x²＋3xy−y² のとき、A−B を計算しなさい。</p></div>'+ex('A−B＝(x²−xy＋y²)−(3x²＋3xy−y²)<br>＝x²−xy＋y²−3x²−3xy＋y²<br>＝−2x²−4xy＋2y²')}${tip('ひき算では、ひく式の<b>すべての項</b>の符号が変わります。いちばん多いまちがいです。')}</section>`),
   L('1-5',null,'A、B のまま整理する','計算をへらす工夫','m1Nest',()=>`
     <section class="panel"><h3>先に整理してから代入</h3>${rule('① A、B のまま、内側のかっこから順にはずす<br>② すっきりしてから代入する')}
     ${ex('4B−{3A−2(A−2B)}<br>＝4B−{3A−2A＋4B}<br>＝4B−(A＋4B)<br>＝−A')}<p>ここで A を代入すれば完成です。最初から代入するより、計算がずっと少なくなります。</p>${tip('かっこは ( ) → { } の順に、内側からはずします。')}</section>`),
