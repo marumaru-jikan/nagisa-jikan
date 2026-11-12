@@ -106,6 +106,12 @@ p{margin:0}
 .feedback .venn .vbg,.hint .venn .vbg{fill:var(--surface)}
 .nline{display:block;width:100%;max-width:320px;margin:8px auto}.nline .nl{stroke:var(--ink);stroke-width:1.5}
 .nline .nt{font-family:"Times New Roman",serif;font-size:13px;text-anchor:middle;fill:var(--ink)}
+.pfig{display:block;width:100%;max-width:300px;margin:8px auto;overflow:hidden}
+.pfig .ax{stroke:var(--muted);stroke-width:1.2}.pfig .al{font-size:12px;fill:var(--muted);font-style:italic;font-family:"Times New Roman",serif}
+.pfig .axs{stroke:var(--accent);stroke-width:1.2;stroke-dasharray:4 4}.pfig .band{fill:var(--accent-soft);opacity:.7}
+.pfig .pc{fill:none;stroke:var(--teal);stroke-width:2.5}.pfig .pl2{fill:none;stroke:var(--accent);stroke-width:2.5}
+.pfig .pp{fill:var(--ink)}.pfig .pl{font-size:12px;fill:var(--ink);font-weight:700}
+.dtab{width:100%;border-collapse:collapse;font-size:.92rem;margin:6px 0}.dtab th,.dtab td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}.dtab th{background:var(--sunk);font-weight:700}
 .secrow{font-family:var(--f-display);font-weight:900;color:var(--teal);font-size:.95rem;padding:14px 4px 2px;letter-spacing:.04em}
 .secrow:first-child{padding-top:2px}
 .mth{font-family:"Times New Roman","Hiragino Mincho ProN","Yu Mincho",serif;font-variant-numeric:normal;letter-spacing:.02em}
@@ -897,7 +903,7 @@ const RK_LESSONS = [['科学の説明は変わる','本文の前半　問1',['rk
 const NF_LESSONS = novelLessons('nf','7',[['「普通」という言葉','本文のはじめ　問1'],['文化祭の絵','本文の前半　問2'],['図書館へ','本文の中ほど　問3'],['先生との会話と文化祭','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
 const NV_LESSONS = novelLessons('nv','5',[['駅での再会','本文の前半　問1'],['無人駅','本文の中ほど　問2'],['「簡単に言うなよ」','本文の中ほど　問3'],['特急に抜かされる','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
 const NW_LESSONS = novelLessons('nw','6',[['二番目という場所','本文のはじめ　問1'],['航平の欠場','本文の前半　問2'],['決勝のスタート','本文の中ほど　問3'],['リレーの前に','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
-const makeQs = plan => { const used={}; return plan.map(k=>{ { const m=/^(nv|nw|rk|nf|ai|mu|mj|bs|sl)(\d+)$/.exec(k); if(m) return nq2(m[1],+m[2]); } if(/^m1[A-Z]/.test(k)) return M1.G[k](); if(/^s[1-5][A-Z]/.test(k)) return M3.G[k](); if(k.startsWith('gm')) return mq(GM[+k.slice(2)]); if(k.startsWith('gk')) return gq(GQ[+k.slice(2)]); if(k.startsWith('cj')) return cq(CJ[+k.slice(2)]); if(k.startsWith('kj')) return kq(KJ[+k.slice(2)]); const P=POOL[k]; used[k]=used[k]||shuffle(P.map((_,i)=>i)); if(!used[k].length) used[k]=shuffle(P.map((_,i)=>i)); return fq(P[used[k].pop()]); }); };
+const makeQs = plan => { const used={}; return plan.map(k=>{ { const m=/^(nv|nw|rk|nf|ai|mu|mj|bs|sl)(\d+)$/.exec(k); if(m) return nq2(m[1],+m[2]); } if(/^m1[A-Z]/.test(k)) return M1.G[k](); if(/^s[1-5][A-Z]/.test(k)) return M3.G[k](); if(/^f2[A-Z]/.test(k)) return M5.G[k](); if(k.startsWith('gm')) return mq(GM[+k.slice(2)]); if(k.startsWith('gk')) return gq(GQ[+k.slice(2)]); if(k.startsWith('cj')) return cq(CJ[+k.slice(2)]); if(k.startsWith('kj')) return kq(KJ[+k.slice(2)]); const P=POOL[k]; used[k]=used[k]||shuffle(P.map((_,i)=>i)); if(!used[k].length) used[k]=shuffle(P.map((_,i)=>i)); return fq(P[used[k].pop()]); }); };
 
 /* ===== 説明ページの部品 ===== */
 const rule = s => `<div class="rule">${s}</div>`;
@@ -1744,6 +1750,305 @@ return { G, LESSONS, TERMS:[
   ['命題','正しいか正しくないかがはっきり決まる式や文。'],['反例','仮定は満たすが結論は満たさない例。命題が偽であることを示す。'],['必要条件・十分条件','p⇒q が真のとき、p は q の十分条件、q は p の必要条件。'],['対偶','p⇒q に対する「q でない ⇒ p でない」。真偽はもとの命題と一致。'],['背理法','命題が成り立たないと仮定して矛盾を導く証明法。'] ] };
 })();
 
+/* ===== 数学Ⅰ 2次関数（問題は毎回つくりかわります） ===== */
+const M5 = (() => {
+const nz = (a,b) => { let n=0; while(n===0) n=ri(a,b); return n; };
+const uniq = a => a.filter((v,i,s)=>s.indexOf(v)===i);
+const mi = t => typeof t==='string' ? t.replace(/-(?=\d)/g,'−') : t;
+function Q(prompt, expr, ans, wrongs, hint, explain, extra){
+  ans=mi(ans); const ch=uniq([ans, ...wrongs.filter(w=>w!=null&&w!=='').map(mi).filter(w=>w!==ans)]).slice(0,4);
+  return Object.assign({ raw:true, math:true, prompt:mi(prompt), expr:mi(expr), answer:ans, choices:shuffle(ch), words:ch.some(c=>c.replace(/<[^>]+>/g,'').length>9), hint:mi(hint), explain:mi(explain), long:true }, extra||{}); }
+const gcd = (a,b) => { a=Math.abs(a); b=Math.abs(b); while(b){ [a,b]=[b,a%b]; } return a||1; };
+const N = n => n<0 ? '−'+(-n) : String(n);
+const P = n => n<0 ? '('+N(n)+')' : String(n);               // かっこつき
+const fr = (n,d) => { if(d<0){ n=-n; d=-d; } const g=gcd(n,d); n/=g; d/=g; return d===1 ? N(n) : `${n<0?'−':''}${Math.abs(n)}/${d}`; };
+const sgn = (n,first) => n<0 ? '−' : (first?'':'＋');
+const co = (c,v,first) => { if(!c) return ''; const a=Math.abs(c); return sgn(c,first)+((a===1&&v)?'':a)+v; };
+function poly(a,b,c,v='x'){ let s=co(a,v+'²',true); s+=co(b,v,!s); s+=co(c,'',!s); return s||'0'; }
+const lin = (m,n,v='x') => { let s=co(m,v,true); s+=co(n,'',!s); return s||'0'; };
+const xp = (p,v='x') => p===0 ? v : `(${v}${p>0?'−'+p:'＋'+(-p)})`;
+function vf(a,p,q,v='x'){ const A=a===1?'':a===-1?'−':N(a); const sq=p===0?`${v}²`:`${xp(p,v)}²`; return `${A}${sq}${q?co(q,'',false):''}`; }
+const simp = D => { let o=1, i=D; for(let k=2;k*k<=i;k++) while(i%(k*k)===0){ i/=k*k; o*=k; } return [o,i]; };
+const rt = (o,i) => i===1 ? String(o) : `${o===1?'':o}√${i}`;
+function quadRoots(A,B,C){ // (−B±√D)/2A を最も簡単な形で
+  const D=B*B-4*A*C, [o,i]=simp(D); let p=-B, d=2*A; const g=gcd(gcd(p,o),d); p/=g; const oo=o/g; d/=g; if(d<0){ p=-p; d=-d; }
+  const core = `${p?N(p):''}±${rt(oo,i)}`; return d===1 ? core : `(${core})/${d}`; }
+const pt = (x,y) => `(${N(x)}, ${N(y)})`;
+const pick2 = (a,b) => { let x=ri(a,b), y; do { y=ri(a,b); } while(y===x); return [x,y]; };
+const ex = s => `<p class="ex mth">${s}</p>`;
+const tip = s => `<p class="small muted">${s}</p>`;
+const rul = s => `<div class="rule">${s}</div>`;
+const sum = arr => `<div class="signs mth">${arr.map(s=>`<div>${s}</div>`).join('')}</div>`;
+
+/* --- グラフ（放物線・直線） --- */
+function plot(fns, x0, x1, o={}){ // fns: [{f, c, lo, hi}]
+  const W=280, H=200, pad=16; let ys=[0];
+  fns.forEach(F=>{ for(let i=0;i<=40;i++){ const x=(F.lo??x0)+((F.hi??x1)-(F.lo??x0))*i/40; ys.push(F.f(x)); } });
+  (o.pts||[]).forEach(p=>ys.push(p[1]));
+  let y0=Math.min(...ys), y1=Math.max(...ys); if(y1-y0<4){ y0-=2; y1+=2; } const my=(y1-y0)*.12; y0-=my; y1+=my;
+  if(o.ymin!=null) y0=Math.max(y0,o.ymin); if(o.ymax!=null) y1=Math.min(y1,o.ymax);
+  const X=x=>pad+(x-x0)/(x1-x0)*(W-2*pad), Y=y=>H-pad-(y-y0)/(y1-y0)*(H-2*pad);
+  let g='';
+  if(y0<0&&y1>0) g+=`<line x1="4" y1="${Y(0)}" x2="${W-4}" y2="${Y(0)}" class="ax"/><text x="${W-8}" y="${Y(0)-5}" class="al">x</text>`;
+  if(x0<0&&x1>0) g+=`<line x1="${X(0)}" y1="4" x2="${X(0)}" y2="${H-4}" class="ax"/><text x="${X(0)+6}" y="12" class="al">y</text>`;
+  if(o.band) g+=`<rect x="${X(o.band[0])}" y="4" width="${X(o.band[1])-X(o.band[0])}" height="${H-8}" class="band"/>`;
+  if(o.axis!=null) g+=`<line x1="${X(o.axis)}" y1="4" x2="${X(o.axis)}" y2="${H-4}" class="axs"/>`;
+  fns.forEach(F=>{ const lo=F.lo??x0, hi=F.hi??x1; let d=''; for(let i=0;i<=60;i++){ const x=lo+(hi-lo)*i/60, y=F.f(x); d+=(i?'L':'M')+X(x).toFixed(1)+' '+Y(Math.max(y0-50,Math.min(y1+50,y))).toFixed(1); }
+    g+=`<path d="${d}" class="${F.c||'pc'}"/>`; });
+  (o.pts||[]).forEach(([x,y,l])=>{ g+=`<circle cx="${X(x)}" cy="${Y(y)}" r="4" class="pp"/>${l?`<text x="${X(x)+6}" y="${Y(y)-6}" class="pl">${mi(l)}</text>`:''}`; });
+  return `<svg class="pfig" viewBox="0 0 ${W} ${H}" role="img" aria-label="グラフ">${g}</svg>`; }
+const parab = (a,p,q,o={}) => plot([{ f:x=>a*(x-p)**2+q, lo:o.lo, hi:o.hi }], o.x0??Math.min(p-3, o.lo??p, 0)-0.5, o.x1??Math.max(p+3, o.hi??p, 0)+0.5, Object.assign({ axis:p, pts:[[p,q,'頂点']] }, o));
+
+const G = {
+  /* 1 関数の値 */
+  f2Val(){ if(Math.random()<.65){ const a=nz(-2,2), b=nz(-4,4), c=nz(-5,5), k=nz(-3,3), v=a*k*k+b*k+c;
+      const wr=[a*(-(k*k))+b*k+c, a*k*k-b*k+c, a*2*k+b*k+c, v+(b>0?1:-1), v-a, v+2, v-3, v+5];
+      return Q(`f(x)＝${poly(a,b,c)} のとき、f(${N(k)}) の値は？`, `f(${N(k)})`, N(v), wr.map(N),
+        `x に ${N(k)} を<b>かっこをつけて</b>代入します。${k<0?`(${N(k)})²＝${k*k} です。`:''}`,
+        `f(${N(k)})＝${a===1?'':a===-1?'−':a}${P(k)}²${b<0?'−':'＋'}${Math.abs(b)===1?'':Math.abs(b)+'・'}${P(k)}${co(c,'',false)}<br>＝${N(a*k*k)}${co(b*k,'',false)}${co(c,'',false)}＝<b>${N(v)}</b>`); }
+    const m=nz(-4,4), n=nz(-5,5), s=pick([1,2]), t=s===1?nz(-3,3):0;
+    const arg = s===1 ? lin(1,t,'a') : '2a', ans = s===1 ? lin(m,m*t+n,'a') : lin(2*m,n,'a');
+    const wr = s===1 ? [lin(m,t+n,'a'), lin(m,m*t,'a'), lin(m,n,'a')+co(t,'',false), lin(m,-m*t+n,'a'), lin(-m,m*t+n,'a'), lin(m,m*t+n+1,'a')] : [lin(m,n,'a'), lin(2*m,2*n,'a'), lin(m,2*n,'a')];
+    return Q(`f(x)＝${lin(m,n)} のとき、f(${arg}) は？`, `f(${arg})`, ans, wr,
+      `x を <b>(${arg})</b> におきかえます。かっこをつけて、分配法則で展開します。`, `f(${arg})＝${m===1?'':m===-1?'−':m}(${arg})${co(n,'',false)}＝<b>${ans}</b>`); },
+  f2Range(){ const m=nz(-3,3), n=nz(-4,5); let lo,hi; do { lo=ri(-3,1); hi=lo+ri(2,4); } while(false);
+    const A=m*lo+n, B=m*hi+n, mn=Math.min(A,B), mx=Math.max(A,B), ok=`${N(mn)}≦y≦${N(mx)}`;
+    return Q('この関数の値域は？', `y＝${lin(m,n)}　(${N(lo)}≦x≦${N(hi)})`, ok, [A>B?`${N(A)}≦y≦${N(B)}`:null, `${N(lo)}≦y≦${N(hi)}`, `${N(mn)}＜y＜${N(mx)}`, `${N(mn)}≦y≦${N(mx+Math.abs(m))}`, `${N(mn-Math.abs(m))}≦y≦${N(mx)}`],
+      '定義域の両はしの x を代入して、y の値を求めます。小さいほうから順に書きます。',
+      `${plot([{f:x=>m*x+n, lo, hi}], Math.min(lo,0)-1, Math.max(hi,0)+1, { pts:[[lo,A,`(${N(lo)}, ${N(A)})`],[hi,B,`(${N(hi)}, ${N(B)})`]] })}x＝${N(lo)} のとき y＝${N(A)}、x＝${N(hi)} のとき y＝${N(B)}<br>${m<0?'傾きが負なので、x が大きいほど y は小さくなります。<br>':''}値域は <b>${ok}</b>`); },
+  /* 3 グラフ */
+  f2Shape(){ const a=nz(-3,3), t=pick(['q','p','pq','pq']), p=t==='q'?0:nz(-4,4), q=t==='p'?0:nz(-5,5), k=pick(['頂点','頂点','軸','凸']);
+    const e=`y＝${vf(a,p,q)}`, how=`y＝${vf(a,0,0)} のグラフを x 軸方向に ${N(p)}、y 軸方向に ${N(q)} だけ平行移動した放物線`;
+    if(k==='頂点') return Q('このグラフの頂点は？', e, pt(p,q), [pt(-p,q), pt(p,-q), pt(q,p), pt(-p,-q), pt(p+1,q), pt(p,q+1), pt(a,q)],
+      'y＝a(x−p)²＋q の頂点は (p, q)。(x−p) の p は<b>符号が逆</b>に見えるので注意。', `${parab(a,p,q)}${how}。<br>頂点は <b>${pt(p,q)}</b>、軸は 直線 x＝${N(p)}`);
+    if(k==='軸') return Q('このグラフの軸は？', e, `直線 x＝${N(p)}`, [`直線 x＝${N(-p)}`, `直線 y＝${N(q)}`, `直線 x＝${N(q)}`, `直線 y＝${N(p)}`, `直線 x＝${N(p+1)}`, `直線 x＝${N(a)}`],
+      'y＝a(x−p)²＋q の軸は 直線 x＝p。', `${parab(a,p,q)}軸は <b>直線 x＝${N(p)}</b>（頂点 ${pt(p,q)} を通る縦の線）`);
+    return Q('このグラフは？', e, a>0?'下に凸':'上に凸', [a>0?'上に凸':'下に凸'], 'x² の係数 a が正なら下に凸（∪）、負なら上に凸（∩）。', `${parab(a,p,q)}x² の係数は ${N(a)}。${a>0?'正':'負'}なので <b>${a>0?'下に凸':'上に凸'}</b>`, { choices:['下に凸','上に凸'], words:false }); },
+  /* 4 平方完成 */
+  f2Comp(){ const a=pick([1,1,1,-1,2,2,-2,3]), p=nz(-4,4), q=nz(-6,6), b=-2*a*p, c=a*p*p+q, e=poly(a,b,c);
+    const wr=[vf(a,-p,q), vf(a,p,c), vf(a,p,q+2*a*p*p), vf(a,p,c-p*p), vf(a,-p,c-a*p*p)];
+    const steps = a===1 ? `${e}<br>＝(x²${co(b,'x',false)})${co(c,'',false)}<br>＝${xp(p)}²−${N(p*p)}${co(c,'',false)}<br>＝<b>${vf(a,p,q)}</b>`
+      : `${e}<br>＝${a===-1?'−':a}(x²${co(-2*p,'x',false)})${co(c,'',false)}<br>＝${a===-1?'−':a}{${xp(p)}²−${N(p*p)}}${co(c,'',false)}<br>＝${vf(a,p,0)}${co(-a*p*p,'',false)}${co(c,'',false)}<br>＝<b>${vf(a,p,q)}</b>`;
+    return Q('平方完成すると？', `y＝${e}`, `y＝${vf(a,p,q)}`, wr.map(w=>'y＝'+w),
+      `${a!==1?`① x² の係数 ${N(a)} で、x の項までをくくる　`:''}② x の係数の半分 ${N(-p)} を使って (x${co(-p,'',false)})² を作る　③ よけいに足した ${p*p} をひく`,
+      `${steps}<br><span class="small">ひき忘れ・${a!==1?`くくった ${N(a)} のかけ忘れ・`:''}符号に注意。</span>`); },
+  f2Vtx(){ const a=pick([1,1,-1,2,-2]), p=nz(-4,4), q=nz(-6,6), b=-2*a*p, c=a*p*p+q;
+    return Q('このグラフの頂点は？', `y＝${poly(a,b,c)}`, pt(p,q), [pt(-p,q), pt(p,c), pt(-p,-q), pt(p,-q)],
+      'まず平方完成して y＝a(x−p)²＋q の形にします。', `${parab(a,p,q)}平方完成すると y＝${vf(a,p,q)}<br>頂点は <b>${pt(p,q)}</b>、軸は 直線 x＝${N(p)}`); },
+  /* 5 平行移動・対称移動 */
+  f2Move(){ const a=pick([1,-1,2]), p=nz(-3,3), q=nz(-4,4), h=nz(-3,3), k=nz(-3,3), b=-2*a*p, c=a*p*p+q;
+    return Q(`x 軸方向に ${N(h)}、y 軸方向に ${N(k)} だけ平行移動した放物線は？`, `y＝${poly(a,b,c)}`, `y＝${vf(a,p+h,q+k)}`, [vf(a,p-h,q+k), vf(a,p+h,q-k), vf(a,p-h,q-k), vf(-a,p+h,q+k)].map(w=>'y＝'+w),
+      '頂点がどこへ動くかを考えます。頂点 (p, q) → (p＋x方向, q＋y方向)。', `平方完成すると y＝${vf(a,p,q)}、頂点 ${pt(p,q)}<br>移動後の頂点は ${pt(p+h,q+k)}（形は同じ）<br>よって <b>y＝${vf(a,p+h,q+k)}</b>`); },
+  f2Sym(){ const a=pick([1,-1,2]), b=nz(-4,4), c=nz(-5,5), k=pick(['x 軸','y 軸','原点']);
+    const F={ 'x 軸':poly(-a,-b,-c), 'y 軸':poly(a,-b,c), '原点':poly(-a,b,-c) }, wr=[...Object.keys(F).filter(z=>z!==k).map(z=>F[z]), poly(-a,-b,c)];
+    return Q(`${k}に関して対称移動した放物線は？`, `y＝${poly(a,b,c)}`, `y＝${F[k]}`, wr.map(w=>'y＝'+w),
+      'x 軸対称：y → −y　y 軸対称：x → −x　原点対称：x → −x、y → −y', `${k}対称なので ${k==='x 軸'?'y を −y に':k==='y 軸'?'x を −x に':'x を −x、y を −y に'}おきかえます。<br>よって <b>y＝${F[k]}</b>`); },
+  /* 6 最大・最小 */
+  f2MM(){ const a=pick([1,-1,2,-2,3]), p=nz(-4,4), q=nz(-6,6), b=-2*a*p, c=a*p*p+q;
+    const ok = a>0 ? `x＝${N(p)} で最小値 ${N(q)}、最大値はない` : `x＝${N(p)} で最大値 ${N(q)}、最小値はない`;
+    return Q('最大値・最小値は？', `y＝${poly(a,b,c)}`, ok, [a>0?`x＝${N(p)} で最大値 ${N(q)}、最小値はない`:`x＝${N(p)} で最小値 ${N(q)}、最大値はない`, a>0?`x＝${N(-p)} で最小値 ${N(q)}、最大値はない`:`x＝${N(-p)} で最大値 ${N(q)}、最小値はない`, a>0?`x＝${N(p)} で最小値 ${N(c)}、最大値はない`:`x＝${N(p)} で最大値 ${N(c)}、最小値はない`],
+      '平方完成して頂点を求めます。下に凸なら頂点で最小、上に凸なら頂点で最大。', `${parab(a,p,q)}y＝${vf(a,p,q)}<br>${a>0?'下に凸なので、頂点で最小。どこまでも大きくなるので最大値はない。':'上に凸なので、頂点で最大。どこまでも小さくなるので最小値はない。'}<br><b>${ok}</b>`, { words:true }); },
+  f2MMd(){ const a=pick([1,-1,2,-2]), p=nz(-3,3), q=nz(-5,5), b=-2*a*p, c=a*p*p+q; let lo,hi;
+    do { lo=ri(-4,2); hi=lo+ri(2,4); } while(lo===p||hi===p);
+    const f=x=>a*(x-p)**2+q, vals=[[lo,f(lo)],[hi,f(hi)]]; if(lo<p&&p<hi) vals.push([p,q]);
+    const ask=pick(['最大','最小']), best=vals.reduce((m,v)=>(ask==='最大'?v[1]>m[1]:v[1]<m[1])?v:m);
+    const others=[q, f(lo), f(hi), ask==='最大'?Math.min(f(lo),f(hi)):Math.max(f(lo),f(hi))].filter(v=>v!==best[1]);
+    return Q(`${ask}値は？`, `y＝${poly(a,b,c)}　(${N(lo)}≦x≦${N(hi)})`, N(best[1]), [...uniq(others).map(N), N(best[1]+1), N(best[1]-a), N(best[1]+2), N(best[1]-2)],
+      '平方完成して頂点を求め、グラフをかきます。定義域の両はしと頂点のうち、いちばん高い・低いところを見ます。',
+      `${parab(a,p,q,{lo,hi,band:[lo,hi],pts:[[p,q,'頂点'],[lo,f(lo)],[hi,f(hi)]]})}y＝${vf(a,p,q)}　頂点 ${pt(p,q)}${lo<p&&p<hi?'（定義域の中）':'（定義域の外）'}<br>x＝${N(lo)} のとき ${N(f(lo))}、x＝${N(hi)} のとき ${N(f(hi))}<br>${ask}値は x＝${N(best[0])} のとき <b>${N(best[1])}</b>`); },
+  f2MMa(){ const L=pick([1,2,3]), up=Math.random()<.5, c=ri(0,2);
+    // up: y＝−x²＋2ax の最大（上に凸）／ down: y＝x²−2ax の最小（下に凸）
+    const e = up ? `y＝−x²＋2ax　(0≦x≦${L})` : `y＝x²−2ax　(0≦x≦${L})`, w=up?'最大値':'最小値';
+    const R = up ? ['0', 'a²', lin(2*L,-L*L,'a')] : ['0', '−a²', lin(-2*L,L*L,'a')];
+    const cases=[`a＜0`, `0≦a≦${L}`, `${L}＜a`], why=[`軸 x＝a が定義域より左なので、x＝0 で${w}`, `軸 x＝a が定義域の中なので、頂点 x＝a で${w}`, `軸 x＝a が定義域より右なので、x＝${L} で${w}`];
+    return Q(`a は定数とする。<b>${cases[c]}</b> のときの${w}は？`, e, R[c], [...R.filter((_,i)=>i!==c), up?'2a':'a'],
+      `平方完成すると ${up?'y＝−(x−a)²＋a²':'y＝(x−a)²−a²'}。軸 x＝a が定義域 0≦x≦${L} の左・中・右のどこにあるかで場合分けします。`,
+      `${up?'y＝−(x−a)²＋a²':'y＝(x−a)²−a²'}　軸は x＝a<br>${cases[c]} のとき：${why[c]}<br>${w}は <b>${R[c]}</b>`); },
+  /* 7 2次関数の決定 */
+  f2Det(){ const t=ri(0,2);
+    if(t===0){ const a=pick([1,-1,2,-2]), p=nz(-3,3), q=nz(-4,4), d=pick([1,-1,2]), x1=p+d, y1=a*d*d+q;
+      return Q('この条件を満たす2次関数は？', `頂点が ${pt(p,q)} で、点 ${pt(x1,y1)} を通る`, `y＝${vf(a,p,q)}`, [vf(-a,p,q), vf(a,-p,q), vf(a,p,-q), vf(a*2,p,q), vf(-a,-p,q)].map(w=>'y＝'+w),
+        '頂点 (p, q) がわかっている → y＝a(x−p)²＋q とおいて、通る点を代入して a を求めます。',
+        `y＝a${xp(p)}²${co(q,'',false)} とおく。点 ${pt(x1,y1)} を通るので<br>${N(y1)}＝a(${N(x1)}${p>0?'−'+p:'＋'+(-p)})²${co(q,'',false)}　→　${N(y1-q)}＝${d*d===1?'':d*d}a　→　a＝${N(a)}<br>よって <b>y＝${vf(a,p,q)}</b>`); }
+    if(t===1){ const a=pick([1,-1,2,-2]); let [al,be]=pick2(-4,4); if(al>be) [al,be]=[be,al]; if(al*be===0) return G.f2Det();
+      const c=a*al*be, ans=poly(a,-a*(al+be),c);
+      return Q('この条件を満たす2次関数は？', `x 軸と 2 点 (${N(al)}, 0)、(${N(be)}, 0) で交わり、y 切片が ${N(c)}`, `y＝${ans}`, [poly(a,a*(al+be),c), poly(-a,a*(al+be),-c), poly(a,-a*(al+be),-c), poly(1,-(al+be),al*be), poly(a,-a*(al+be)+1,c), poly(2*a,-a*(al+be),c)].map(w=>'y＝'+w),
+        'x 軸との交点 α、β がわかっている → y＝a(x−α)(x−β) とおきます。',
+        `y＝a${xp(al)}${xp(be)} とおく。y 切片（x＝0 のときの y）が ${N(c)} なので<br>a×${P(-al)}×${P(-be)}＝${N(c)}　→　a＝${N(a)}<br>よって y＝${a===1?'':a===-1?'−':a}${xp(al)}${xp(be)}＝<b>${ans}</b>`); }
+    const a=nz(-2,2), b=nz(-4,4), c=nz(-4,5), xs=shuffle([-2,-1,1,2,3]).slice(0,3).sort((x,y)=>x-y), f=x=>a*x*x+b*x+c, pts=xs.map(x=>pt(x,f(x))).join('、');
+    return Q('3 点を通る2次関数は？', `3 点 ${pts} を通る`, `y＝${poly(a,b,c)}`, [poly(a,-b,c), poly(a,b,-c), poly(-a,b,c), poly(a,b+1,c-1)].map(w=>'y＝'+w),
+      '3 点がわかっている → y＝ax²＋bx＋c とおいて、3 点を代入した連立方程式を解きます。',
+      `y＝ax²＋bx＋c に代入して<br>${xs.map(x=>`${N(f(x))}＝${x*x===1?'':x*x}a${x<0?'−':'＋'}${Math.abs(x)===1?'':Math.abs(x)}b＋c`).join('<br>')}<br>これを解いて a＝${N(a)}、b＝${N(b)}、c＝${N(c)}<br>よって <b>y＝${poly(a,b,c)}</b><br><span class="small">選択肢に代入して、3 点を全部通るか確かめても OK。</span>`); },
+  /* 8 2次方程式 */
+  f2Fac(){ if(Math.random()<.6){ let [r,s]=pick2(-7,7); if(!r||!s) return G.f2Fac(); if(r>s) [r,s]=[s,r]; const e=poly(1,-(r+s),r*s);
+      return Q('2次方程式を解くと？', `${e}＝0`, `x＝${N(r)}, ${N(s)}`, [`x＝${N(-r)}, ${N(-s)}`, `x＝${N(-r)}, ${N(s)}`, `x＝${N(r)}, ${N(-s)}`, `x＝${N(r-1)}, ${N(s+1)}`, `x＝${N(r+s)}, ${N(r*s)}`],
+        'かけて 定数項、たして x の係数 になる2数で因数分解します。AB＝0 なら A＝0 または B＝0。', `${e}＝0<br>${xp(r)}${xp(s)}＝0<br>よって <b>x＝${N(r)}, ${N(s)}</b>`); }
+    let p=pick([2,3,5]), q=nz(-5,5), s=nz(-5,5); while(gcd(p,q)!==1) q=nz(-5,5);
+    const e=poly(p,q-p*s,-q*s), r1=fr(-q,p), ans=[r1,N(s)];
+    return Q('2次方程式を解くと？', `${e}＝0`, `x＝${ans.join(', ')}`, [`x＝${fr(q,p)}, ${N(-s)}`, `x＝${fr(-p,q)}, ${N(s)}`, `x＝${N(-q)}, ${N(s)}`, `x＝${fr(-q,p)}, ${N(-s)}`, `x＝${fr(q,p)}, ${N(s)}`],
+      'たすき掛けで因数分解します。', `${tskNum(1,-s,p,q)}${e}＝0<br>(x${co(-s,'',false)})(${p}x${co(q,'',false)})＝0<br>よって <b>x＝${ans.join(', ')}</b>`); },
+  f2Form(){ if(Math.random()<.5){ const k=nz(-4,4); let c; do { c=nz(-8,8); } while(k*k-c<=1||Number.isInteger(Math.sqrt(k*k-c)));
+      const D=k*k-c, [o,i]=simp(D), R=rt(o,i), e=poly(1,-2*k,c), ok=`x＝${N(k)}±${R}`, D2=k*k+c;
+      return Q('2次方程式を解くと？', `${e}＝0`, ok, [`x＝${N(-k)}±${R}`, D2>0?`x＝${N(k)}±${rt(...simp(D2))}`:`x＝${N(k)}±${rt(o*2,i)}`, `x＝${N(2*k)}±${R}`, `x＝${N(k)}±√${D}`.replace(`√${D}`,o>1?`${o*o}√${i}`:`√${D*2}`)],
+        'x の係数が偶数 2b′ のときは x＝(−b′±√(b′²−ac))/a が便利です。', `解の公式（b′＝${N(-k)}）より<br>x＝${N(k)}±√(${P(-k)}²−${P(c)})＝${N(k)}±√${D}＝<b>${ok}</b>${o>1?`<br><span class="small">√${D}＝${R} と簡単にします。</span>`:''}`); }
+    const a=pick([2,3]), b=pick([-5,-3,-1,1,3,5]); let c; do { c=nz(-4,4); } while(b*b-4*a*c<=1||Number.isInteger(Math.sqrt(b*b-4*a*c)));
+    const D=b*b-4*a*c, ok='x＝'+quadRoots(a,b,c), D2=b*b+4*a*c;
+    return Q('2次方程式を解くと？', `${poly(a,b,c)}＝0`, ok, ['x＝'+quadRoots(a,-b,c), D2>0?'x＝'+quadRoots(a,b,-c):null, `x＝(${N(-b)}±√${D})/${a}`, `x＝(${N(-b)}±√${D})/${2*a+1}`],
+      '解の公式 x＝(−b±√(b²−4ac))/2a', `a＝${a}、b＝${N(b)}、c＝${N(c)}<br>x＝(${N(-b)}±√(${P(b)}²−4・${a}・${P(c)}))/(2・${a})<br>＝(${N(-b)}±√${D})/${2*a}<br>＝<b>${ok}</b>`); },
+  f2Disc(){ const t=pick([1,0,-1]); let a,b,c,D;
+    do { a=pick([1,1,2,-1,3]); b=nz(-6,6); c=nz(-6,6); D=b*b-4*a*c; } while(Math.sign(D)!==t);
+    const ok = D>0?'2個':D===0?'1個':'0個';
+    return Q('実数解の個数は？', `${poly(a,b,c)}＝0`, ok, ['2個','1個','0個'].filter(x=>x!==ok),
+      '判別式 D＝b²−4ac の符号を調べます。D＞0 → 2個、D＝0 → 1個（重解）、D＜0 → 0個', `D＝${P(b)}²−4・${P(a)}・${P(c)}＝${N(b*b)}${co(-4*a*c,'',false)}＝${N(D)}<br>D${D>0?'＞':D===0?'＝':'＜'}0 なので <b>${ok}</b>`, { words:false }); },
+  f2Dbl(){ const k=ri(1,6), K=k*k;
+    return Q('重解をもつときの m の値は？', `x²＋mx＋${K}＝0`, `m＝${2*k}, −${2*k}`, [`m＝${2*k}`, `m＝${k}, −${k}`, `m＝${4*K}, −${4*K}`],
+      '重解をもつ ⇔ 判別式 D＝0', `D＝m²−4・1・${K}＝m²−${4*K}＝0<br>m²＝${4*K} より <b>m＝±${2*k}</b><br><span class="small">m＝${2*k} のとき (x＋${k})²＝0 で重解 x＝−${k}、m＝−${2*k} のとき 重解 x＝${k}</span>`); },
+  /* 10 x 軸との共有点 */
+  f2X(){ let [r,s]=pick2(-6,6); if(r>s) [r,s]=[s,r]; const a=pick([1,1,-1]), e=poly(a,-a*(r+s),a*r*s);
+    return Q('x 軸との共有点の座標は？', `y＝${e}`, `(${N(r)}, 0), (${N(s)}, 0)`, [`(${N(-r)}, 0), (${N(-s)}, 0)`, `(0, ${N(r)}), (0, ${N(s)})`, `(${N(-r)}, 0), (${N(s)}, 0)`, `(${N(r)}, 0), (${N(-s)}, 0)`, `(${N(r-1)}, 0), (${N(s+1)}, 0)`],
+      'x 軸との共有点は y＝0。2次方程式 ' + e + '＝0 を解きます。', `${plot([{f:x=>a*(x-r)*(x-s)}], Math.min(r,0)-1.5, Math.max(s,0)+1.5, { pts:[[r,0,`(${N(r)}, 0)`],[s,0,`(${N(s)}, 0)`]] })}${e}＝0 を解くと x＝${N(r)}, ${N(s)}<br>共有点は <b>(${N(r)}, 0), (${N(s)}, 0)</b>`); },
+  f2Cnt(){ const b=nz(-4,4), B=b*b, ask=pick(['2個','1個','0個']);
+    const A={ '2個':`k＜${B}`, '1個':`k＝${B}`, '0個':`${B}＜k` };
+    return Q(`共有点が ${ask} になる k の範囲（値）は？`, `y＝x²${co(2*b,'x',false)}＋k のグラフと x 軸`, A[ask], [...Object.values(A).filter(v=>v!==A[ask]), `k＜${Math.abs(b)}`, `k＞${2*B}`],
+      '共有点の個数 ＝ 2次方程式の実数解の個数。判別式 D の符号で決まります。', `D/4＝${P(b)}²−k＝${B}−k<br>D＞0（k＜${B}）→ 2個　D＝0（k＝${B}）→ 1個　D＜0（${B}＜k）→ 0個<br>答えは <b>${A[ask]}</b>`); },
+  f2Line(){ let [r,s]=pick2(-4,4); if(r>s) [r,s]=[s,r]; const m=nz(-3,3), n=nz(-4,4), b=m-(r+s), c=n+r*s, f=x=>x*x+b*x+c, g=x=>m*x+n;
+    return Q('放物線と直線の共有点の座標は？', `放物線 y＝${poly(1,b,c)}<br>直線 y＝${lin(m,n)}`, `${pt(r,g(r))}, ${pt(s,g(s))}`, [`${pt(r,0)}, ${pt(s,0)}`, `${pt(-r,g(-r))}, ${pt(-s,g(-s))}`, `${pt(r,g(s))}, ${pt(s,g(r))}`],
+      'y を消去した2次方程式を解いて x を求め、直線の式に代入して y を求めます。',
+      `${plot([{f},{f:g,c:'pl2'}], r-2, s+2, { pts:[[r,g(r)],[s,g(s)]] })}${poly(1,b,c)}＝${lin(m,n)}<br>${poly(1,b-m,c-n)}＝0　→　${xp(r)}${xp(s)}＝0<br>x＝${N(r)}, ${N(s)}　→　y＝${N(g(r))}, ${N(g(s))}<br>共有点は <b>${pt(r,g(r))}, ${pt(s,g(s))}</b>`); },
+  f2LineD(){ const m=nz(-3,3), b=nz(-4,4), c=nz(-3,4), B=b-m, Dk=B*B-4*c; // D＝B²−4(c−n)＝Dk＋4n
+    const rhs=-Dk, ok=`n＞${fr(rhs,4)}`;
+    return Q('異なる 2 点で交わる n の範囲は？', `放物線 y＝${poly(1,b,c)}<br>直線 y＝${lin(m,0)}＋n`, ok, [`n＜${fr(rhs,4)}`, `n＞${fr(-rhs,4)}`, `n≧${fr(rhs,4)}`, `n＞${fr(rhs,2)}`, `n＞${fr(rhs+4,4)}`],
+      'y を消去した2次方程式の判別式 D＞0 なら、異なる 2 点で交わります。', `${poly(1,b,c)}＝${lin(m,0)}＋n<br>${poly(1,B,0)}${co(c,'',false)}−n＝0<br>D＝${P(B)}²−4(${N(c)}−n)＝${N(Dk)}＋4n＞0<br>よって <b>${ok}</b>`); },
+  /* 11 2次不等式 */
+  f2Ineq(){ let [r,s]=pick2(-6,6); if(r>s) [r,s]=[s,r]; const op=pick(['＞','≧','＜','≦']), e=poly(1,-(r+s),r*s), out=op==='＞'||op==='≧', eq=op.length&&/[≧≦]/.test(op);
+    const l=eq?'≦':'＜', g=eq?'≧':'＞';
+    const ok = out ? `x${l}${N(r)}, ${N(s)}${l}x` : `${N(r)}${l}x${l}${N(s)}`;
+    const o2 = out ? `${N(r)}${l}x${l}${N(s)}` : `x${l}${N(r)}, ${N(s)}${l}x`;
+    const o3 = out ? `x${eq?'＜':'≦'}${N(r)}, ${N(s)}${eq?'＜':'≦'}x` : `${N(r)}${eq?'＜':'≦'}x${eq?'＜':'≦'}${N(s)}`;
+    return Q('2次不等式を解くと？', `${e}${op}0`, ok, [o2, o3, out?`x${l}${N(-s)}, ${N(-r)}${l}x`:`${N(-s)}${l}x${l}${N(-r)}`, out?`x${l}${N(r-1)}, ${N(s+1)}${l}x`:`${N(r-1)}${l}x${l}${N(s+1)}`],
+      '① ＝0 の解 α、β を求める　② グラフ（下に凸）をかく　③ x 軸より上（＞0）か下（＜0）の部分を読む',
+      `${plot([{f:x=>(x-r)*(x-s)}], r-2, s+2, { pts:[[r,0,N(r)],[s,0,N(s)]] })}${e}＝0 の解は x＝${N(r)}, ${N(s)}<br>${out?`グラフが x 軸より上${eq?'（x 軸上もふくむ）':''}の部分 → 外側`:`グラフが x 軸より下${eq?'（x 軸上もふくむ）':''}の部分 → 内側`}<br>よって <b>${ok}</b>`); },
+  f2Ineq2(){ const p=nz(-4,4), t=Math.random()<.55, op=pick(['＞','≧','＜','≦']);
+    if(t){ const e=poly(1,-2*p,p*p), A={'＞':`${N(p)} 以外のすべての実数`,'≧':'すべての実数','＜':'解なし','≦':`x＝${N(p)}`}[op];
+      return Q('2次不等式を解くと？', `${e}${op}0`, A, ['すべての実数','解なし',`x＝${N(p)}`,`${N(p)} 以外のすべての実数`].filter(x=>x!==A),
+        `左辺は ${xp(p)}² と表せます。2乗はいつも 0 以上で、x＝${N(p)} のときだけ 0。`, `${e}＝${xp(p)}²<br>グラフは x＝${N(p)} で x 軸に接する<br>${e}${op}0 の解は <b>${A}</b>`); }
+    const q=ri(1,4), e=poly(1,-2*p,p*p+q), A=/[＞≧]/.test(op)?'すべての実数':'解なし';
+    return Q('2次不等式を解くと？', `${e}${op}0`, A, [A==='解なし'?'すべての実数':'解なし', `x＝${N(p)}`, `${N(p)} 以外のすべての実数`],
+      'D＜0 のとき、グラフ（下に凸）は x 軸より<b>つねに上</b>にあります。', `${parab(1,p,q)}${e}＝${vf(1,p,q)}＞0（つねに正）<br>よって ${e}${op}0 の解は <b>${A}</b>`); },
+  f2Sys(){ let [r,s]=pick2(-5,5); if(r>s) [r,s]=[s,r]; if(s-r<2) return G.f2Sys(); const g=ri(r+1,s-1), up=Math.random()<.5;
+    const ok = up ? `${N(g)}＜x≦${N(s)}` : `${N(r)}≦x＜${N(g)}`;
+    return Q('連立不等式を解くと？', `${poly(1,-(r+s),r*s)}≦0<br>x${up?'＞':'＜'}${N(g)}`, ok, [up?`${N(g)}≦x≦${N(s)}`:`${N(r)}≦x≦${N(g)}`, `${N(r)}≦x≦${N(s)}`, up?`${N(r)}≦x＜${N(g)}`:`${N(g)}＜x≦${N(s)}`],
+      'それぞれの不等式を解いて、数直線で<b>共通部分</b>を求めます。', `1つめ：${xp(r)}${xp(s)}≦0 より ${N(r)}≦x≦${N(s)}<br>2つめ：x${up?'＞':'＜'}${N(g)}<br>共通部分は <b>${ok}</b>`); },
+  /* 12 つねに成り立つ不等式 */
+  f2Abs(){ let s,t; do { s=ri(-3,4); t=ri(-3,5); } while(s>=t||(s+t)%2!==0); const r1=2*s, r2=2*t, u=(s+t)/2, v=-s*t, eq=Math.random()<.3;
+    const e=`x²＋kx${co(u,'k',false)}${co(v,'',false)}`, ok = eq?`${N(r1)}≦k≦${N(r2)}`:`${N(r1)}＜k＜${N(r2)}`;
+    return Q('すべての実数 x で成り立つ k の範囲は？', `${e}${eq?'≧':'＞'}0`, ok, [`k＜${N(r1)}, ${N(r2)}＜k`, eq?`${N(r1)}＜k＜${N(r2)}`:`${N(r1)}≦k≦${N(r2)}`, `${N(-r2)}＜k＜${N(-r1)}`, `${N(r1/2)}＜k＜${N(r2/2)}`, `k＞${N(r2)}`],
+      `グラフ（下に凸）が x 軸より${eq?'下に出ない':'つねに上'} ⇔ 判別式 D${eq?'≦':'＜'}0`, `D＝k²−4(${lin(u,v,'k')})＝${poly(1,-4*u,-4*v,'k')}＝(k${co(-r1,'',false)})(k${co(-r2,'',false)})<br>D${eq?'≦':'＜'}0 より <b>${ok}</b>`); },
+  /* 13 解の配置 */
+  f2Pos(){ const [K,r1,r2]=pick([[3,-2,6],[8,-4,8],[15,-6,10],[5,-2.47,6.47]].slice(0,3)), t=ri(0,2);
+    const A=[`${N(-K)}＜m＜${N(r1)}`, `${N(r2)}＜m`, `m＜${N(-K)}`], L=['x 軸の正の部分で異なる 2 点','x 軸の負の部分で異なる 2 点','x 軸の正の部分と負の部分'];
+    const why=[`D＞0（m＜${N(r1)}, ${N(r2)}＜m）、軸 −m/2＞0（m＜0）、f(0)＝m＋${K}＞0（m＞${N(-K)}）の共通部分`, `D＞0（m＜${N(r1)}, ${N(r2)}＜m）、軸 −m/2＜0（m＞0）、f(0)＞0（m＞${N(-K)}）の共通部分`, `f(0)＝m＋${K}＜0 だけでよい（下に凸で y 切片が負なら、必ず正と負で交わる）`];
+    return Q(`${L[t]}で共有点をもつ m の範囲は？`, `y＝x²＋mx＋m＋${K}`, A[t], [...A.filter((_,i)=>i!==t), `m＜${N(r1)}, ${N(r2)}＜m`],
+      '① 判別式 D　② 軸の位置　③ f(0) の符号　の3つで考えます。', `f(x)＝x²＋mx＋m＋${K}、D＝m²−4m−${4*K}＝(m${co(-r1,'',false)})(m${co(-r2,'',false)})<br>${why[t]}<br>よって <b>${A[t]}</b>`); },
+};
+function tskNum(a,b,c,d){ const t=n=>N(n); return `<div class="tsk mth"><span>${a}</span><span>${t(b)}</span><span class="t-r">${t(b*c)}</span><span>${c}</span><span>${t(d)}</span><span class="t-r">${t(a*d)}</span><span></span><span></span><span class="t-s">${t(a*d+b*c)}</span></div>`; }
+
+const L = (id,sec,t,sub,key,body,extra) => Object.assign({ id, sec, t, sub, plan:Array.isArray(key)?key:Array(5).fill(key), body }, extra||{});
+const T = (id,plan,desc) => L(id,'章末テスト','章末テスト',desc,plan[0],()=>`<section class="panel"><h3>章末テスト</h3><p>この章の内容から10問出題します。問題の順番は毎回かわります。</p></section>`, { test:true, plan });
+const C1 = [
+  L('1-1','1　関数の値','関数の値 f(a)','x に数や式を代入','f2Val',()=>`
+    <section class="panel"><h3>関数</h3><p>x の値を決めると y の値がただ1つ決まるとき、y は x の<b>関数</b>であるといい、y＝f(x) と書きます。</p>${rul('f(a)：x＝a のときの f(x) の値')}
+    ${ex('f(x)＝−x²＋3x＋4 のとき<br>f(−2)＝−(−2)²＋3・(−2)＋4<br>＝−4−6＋4＝−6')}${tip('負の数や式は、かならず<b>かっこをつけて</b>代入しよう。−(−2)² は −4 です。')}</section>`),
+  L('2-1','2　1次関数の値域','定義域と値域','y の変わる範囲','f2Range',()=>`
+    <section class="panel"><h3>定義域と値域</h3>${rul('定義域：x のとり得る値の範囲<br>値域：y のとり得る値の範囲')}
+    ${plot([{f:x=>x-2, lo:-1, hi:2}], -2, 3, { pts:[[-1,-3,'(−1, −3)'],[2,0,'(2, 0)']] })}${ex('y＝x−2　(−1≦x≦2)<br>x＝−1 のとき y＝−3、x＝2 のとき y＝0<br>値域は −3≦y≦0')}${tip('傾きが負のときは、x が大きいほど y は小さくなります。')}</section>`),
+  L('3-1','3　2次関数のグラフをかく','y＝a(x−p)²＋q のグラフ','頂点と軸','f2Shape',()=>`
+    <section class="panel"><h3>y＝ax² のグラフ</h3><p>2次関数 y＝ax² のグラフを<b>放物線</b>といいます。軸は y 軸、頂点は原点です。</p>${rul('a＞0 → 下に凸　a＜0 → 上に凸')}</section>
+    <section class="panel"><h3>平行移動</h3>${rul('y＝a(x−p)²＋q は y＝ax² を<br>x 軸方向に p、y 軸方向に q だけ平行移動<br>頂点 (p, q)、軸 x＝p')}${parab(1,2,3)}${ex('y＝(x−2)²＋3<br>頂点 (2, 3)、軸 x＝2')}${tip('y＝(x＋1)² の頂点は (−1, 0)。かっこの中と符号が逆になります。')}</section>`),
+  L('4-1','4　平方完成と2次関数のグラフ','平方完成','y＝ax²＋bx＋c → a(x−p)²＋q','f2Comp',()=>`
+    <section class="panel"><h3>平方完成のしかた</h3>${rul('x²＋bx＝(x＋b/2)²−(b/2)²')}
+    ${ex('y＝x²−4x＋1<br>＝(x−2)²−4＋1<br>＝(x−2)²−3')}${ex('y＝2x²＋8x＋5<br>＝2(x²＋4x)＋5<br>＝2{(x＋2)²−4}＋5<br>＝2(x＋2)²−3')}${tip('x² の係数が 1 でないときは、まず x の項までをその係数でくくります。')}</section>`),
+  L('4-2',null,'頂点と軸を求める','平方完成してから','f2Vtx',()=>`
+    <section class="panel"><h3>手順</h3>${rul('① 平方完成して y＝a(x−p)²＋q<br>② 頂点 (p, q)、軸 x＝p')}${parab(2,-2,-3)}${ex('y＝2x²＋8x＋5＝2(x＋2)²−3<br>頂点 (−2, −3)、軸 x＝−2')}</section>`),
+  L('5-1','5　平行移動・対称移動','平行移動','頂点の移動で考える','f2Move',()=>`
+    <section class="panel"><h3>平行移動</h3>${rul('頂点 (p, q) を x 軸方向に h、y 軸方向に k 動かす<br>→ 頂点 (p＋h, q＋k)、形（a）はそのまま')}
+    ${ex('y＝x²−2x＋3＝(x−1)²＋2　頂点 (1, 2)<br>x 軸方向に 2、y 軸方向に −3 → 頂点 (3, −1)<br>y＝(x−3)²−1')}${tip('式で考えるなら x を x−h に、y を y−k におきかえます。')}</section>`),
+  L('5-2',null,'対称移動','x 軸・y 軸・原点','f2Sym',()=>`
+    <section class="panel"><h3>対称移動</h3><table class="dtab"><tr><th>対称</th><th>おきかえ</th></tr><tr><td>x 軸</td><td>y → −y</td></tr><tr><td>y 軸</td><td>x → −x</td></tr><tr><td>原点</td><td>x → −x、y → −y</td></tr></table>
+    ${ex('y＝x²−2x＋3 を<br>x 軸対称：y＝−x²＋2x−3<br>y 軸対称：y＝x²＋2x＋3<br>原点対称：y＝−x²−2x−3')}</section>`),
+  T('まとめ',['f2Val','f2Range','f2Shape','f2Shape','f2Comp','f2Comp','f2Vtx','f2Move','f2Sym','f2Vtx'],'関数とグラフの10問'),
+];
+const C2 = [
+  L('6-1','6　2次関数の最大・最小','最大・最小','頂点で決まる','f2MM',()=>`
+    <section class="panel"><h3>定義域が実数全体</h3>${rul('y＝a(x−p)²＋q<br>a＞0 → x＝p で最小値 q、最大値なし<br>a＜0 → x＝p で最大値 q、最小値なし')}${parab(1,-2,-4)}${ex('y＝x²＋4x＝(x＋2)²−4<br>x＝−2 で最小値 −4、最大値はない')}</section>`),
+  L('6-2',null,'定義域がある場合','両はしと頂点を比べる','f2MMd',()=>`
+    <section class="panel"><h3>手順</h3>${rul('① 平方完成して頂点を求める<br>② 定義域の部分だけグラフをかく<br>③ いちばん高い点・低い点を読む')}
+    ${parab(1,1,-2,{lo:0,hi:3,band:[0,3],pts:[[1,-2,'頂点'],[0,-1],[3,2]]})}${ex('y＝x²−2x−1＝(x−1)²−2　(0≦x≦3)<br>x＝3 で最大値 2、x＝1 で最小値 −2')}${tip('頂点が定義域の外にあるときは、両はしで最大・最小になります。')}</section>`),
+  L('6-3',null,'文字を含む最大・最小','軸の位置で場合分け','f2MMa',()=>`
+    <section class="panel"><h3>場合分け</h3><p>y＝−x²＋2ax　(0≦x≦2) は y＝−(x−a)²＋a²。軸 x＝a が定義域のどこにあるかで分けます。</p>
+    <table class="dtab"><tr><th>a の範囲</th><th>軸の位置</th><th>最大値</th></tr><tr><td>a＜0</td><td>左の外</td><td>x＝0 で 0</td></tr><tr><td>0≦a≦2</td><td>中</td><td>x＝a で a²</td></tr><tr><td>2＜a</td><td>右の外</td><td>x＝2 で 4a−4</td></tr></table>
+    ${tip('上に凸のグラフは、軸に近いほど高くなります。')}</section>`),
+  T('まとめ',['f2MM','f2MM','f2MM','f2MMd','f2MMd','f2MMd','f2MMd','f2MMa','f2MMa','f2MMa'],'最大・最小の10問'),
+];
+const C3 = [
+  L('7-1','7　2次関数の決定','2次関数の決定','3つのパターン','f2Det',()=>`
+    <section class="panel"><h3>どの形からスタートするか</h3><table class="dtab"><tr><th>わかっていること</th><th>おく式</th></tr><tr><td>頂点 (p, q)</td><td>y＝a(x−p)²＋q</td></tr><tr><td>x 軸との交点 α、β</td><td>y＝a(x−α)(x−β)</td></tr><tr><td>3 点</td><td>y＝ax²＋bx＋c</td></tr></table>
+    ${ex('頂点 (2, 1)、点 (3, −1) を通る<br>y＝a(x−2)²＋1 に代入　−1＝a＋1　a＝−2<br>y＝−2(x−2)²＋1')}${tip('マーク式なら、選択肢に条件の点を代入して確かめる方法も使えます。')}</section>`),
+  L('7-2',null,'2次関数の決定 練習','いろいろな条件','f2Det',()=>`<section class="panel"><h3>練習</h3><p>3つのパターンをまぜて出題します。どの形でおくかを最初に決めよう。</p></section>`),
+  T('まとめ',Array(10).fill('f2Det'),'2次関数の決定の10問'),
+];
+const C4 = [
+  L('8-1','8　2次方程式','因数分解で解く','AB＝0 なら A＝0 または B＝0','f2Fac',()=>`
+    <section class="panel"><h3>因数分解で解く</h3>${rul('AB＝0 ⇔ A＝0 または B＝0')}${ex('x²−5x−6＝0<br>(x＋1)(x−6)＝0<br>x＝−1, 6')}${ex('10x²−13x−3＝0<br>(2x−3)(5x＋1)＝0<br>x＝3/2, −1/5')}</section>`),
+  L('8-2',null,'解の公式','因数分解できないとき','f2Form',()=>`
+    <section class="panel"><h3>解の公式</h3>${rul('ax²＋bx＋c＝0 の解<br>x＝(−b±√(b²−4ac))/2a')}${ex('2x²−3x−1＝0<br>x＝(3±√(9＋8))/4＝(3±√17)/4')}
+    <p>x の係数が偶数（b＝2b′）のときは</p>${rul('x＝(−b′±√(b′²−ac))/a')}${ex('x²−6x＋7＝0<br>x＝3±√(9−7)＝3±√2')}</section>`),
+  L('9-1','9　2次方程式の実数解の個数','判別式','D＝b²−4ac','f2Disc',()=>`
+    <section class="panel"><h3>判別式</h3>${rul('D＝b²−4ac<br>D＞0 → 異なる2つの実数解<br>D＝0 → 重解（1個）<br>D＜0 → 実数解なし')}${ex('x²＋x−1＝0　D＝1＋4＝5＞0 → 2個')}${ex('x²＋x＋1＝0　D＝1−4＝−3＜0 → 0個')}</section>`),
+  L('9-2',null,'重解をもつ条件','D＝0','f2Dbl',()=>`
+    <section class="panel"><h3>重解</h3>${rul('重解をもつ ⇔ D＝0<br>重解は x＝−b/2a')}${ex('x²＋mx＋4＝0<br>D＝m²−16＝0 より m＝±4<br>m＝4 のとき (x＋2)²＝0　重解 x＝−2')}</section>`),
+  T('まとめ',['f2Fac','f2Fac','f2Fac','f2Form','f2Form','f2Disc','f2Disc','f2Disc','f2Dbl','f2Dbl'],'2次方程式の10問'),
+];
+const C5 = [
+  L('10-1','10　2次関数のグラフと x 軸の共有点','x 軸との共有点','y＝0 とおいて解く','f2X',()=>`
+    <section class="panel"><h3>共有点の座標</h3>${rul('y＝ax²＋bx＋c と x 軸の共有点の x 座標<br>＝ ax²＋bx＋c＝0 の実数解')}${plot([{f:x=>(x+1)*(x-3)}], -2.5, 4.5, { pts:[[-1,0,'(−1, 0)'],[3,0,'(3, 0)']] })}${ex('y＝x²−2x−3<br>x²−2x−3＝0 → (x＋1)(x−3)＝0<br>共有点 (−1, 0)、(3, 0)')}</section>`),
+  L('10-2',null,'共有点の個数','判別式で調べる','f2Cnt',()=>`
+    <section class="panel"><h3>共有点の個数</h3><table class="dtab"><tr><th>D の符号</th><th>D＞0</th><th>D＝0</th><th>D＜0</th></tr><tr><td>共有点</td><td>2個</td><td>1個（接する）</td><td>0個</td></tr></table>
+    ${ex('y＝x²＋6x＋k<br>D/4＝9−k<br>k＜9 → 2個、k＝9 → 1個、9＜k → 0個')}</section>`),
+  L('研-1','研究　放物線と直線','放物線と直線の共有点','y を消去する','f2Line',()=>`
+    <section class="panel"><h3>考え方</h3>${rul('y を消去した2次方程式の実数解<br>＝ 共有点の x 座標')}${ex('y＝−x²＋2x＋3 と y＝−2x−2<br>−2x−2＝−x²＋2x＋3<br>x²−4x−5＝0 → x＝−1, 5<br>共有点 (−1, 0)、(5, −12)')}</section>`),
+  L('研-2',null,'異なる2点で交わる条件','判別式 D＞0','f2LineD',()=>`
+    <section class="panel"><h3>共有点の個数</h3>${rul('y を消去した2次方程式の判別式 D<br>D＞0 → 2点で交わる　D＝0 → 接する　D＜0 → 共有点なし')}${ex('y＝x²−3x＋1 と y＝2x＋b<br>x²−5x＋1−b＝0<br>D＝25−4(1−b)＝21＋4b＞0<br>b＞−21/4')}</section>`),
+  T('まとめ',['f2X','f2X','f2X','f2Cnt','f2Cnt','f2Cnt','f2Line','f2Line','f2LineD','f2LineD'],'グラフと x 軸・直線の10問'),
+];
+const C6 = [
+  L('11-1','11　2次不等式','2次不等式','グラフで解く','f2Ineq',()=>`
+    <section class="panel"><h3>パターン1　x 軸と2点で交わる（α＜β）</h3>${plot([{f:x=>(x+4)*(x-3)}], -6, 5, { pts:[[-4,0,'α'],[3,0,'β']] })}
+    <table class="dtab"><tr><th>不等式</th><th>解</th></tr><tr><td>(x−α)(x−β)＞0</td><td>x＜α, β＜x</td></tr><tr><td>(x−α)(x−β)＜0</td><td>α＜x＜β</td></tr></table>
+    ${ex('x²＋x−12＞0<br>(x＋4)(x−3)＞0<br>x＜−4, 3＜x')}${tip('x² の係数が負のときは、両辺に −1 をかけて正にしてから（不等号の向きが逆になる）。')}</section>`),
+  L('11-2',null,'接する・交わらないとき','D＝0、D＜0','f2Ineq2',()=>`
+    <section class="panel"><h3>パターン2　x 軸に接する（D＝0）</h3>${ex('x²＋4x＋4＝(x＋2)²<br>(x＋2)²＞0 → −2 以外のすべての実数<br>(x＋2)²≧0 → すべての実数<br>(x＋2)²＜0 → 解なし<br>(x＋2)²≦0 → x＝−2')}</section>
+    <section class="panel"><h3>パターン3　x 軸と交わらない（D＜0）</h3>${parab(1,1,1)}${ex('x²−2x＋2＝(x−1)²＋1 はつねに正<br>x²−2x＋2＞0 → すべての実数<br>x²−2x＋2＜0 → 解なし')}</section>`),
+  L('11-3',null,'連立不等式','共通部分','f2Sys',()=>`
+    <section class="panel"><h3>連立不等式</h3>${rul('それぞれ解いて、数直線で共通部分')}${ex('2x²−7x＋6≦0 → 3/2≦x≦2<br>x＞3/2 と合わせて<br>3/2＜x≦2')}${tip('等号がつくか・つかないか（≦ と ＜）に注意しよう。')}</section>`),
+  L('12-1','12　つねに成り立つ不等式','つねに成り立つ不等式','D＜0','f2Abs',()=>`
+    <section class="panel"><h3>考え方</h3>${rul('すべての実数 x で ax²＋bx＋c＞0（a＞0）<br>⇔ グラフが x 軸よりつねに上<br>⇔ D＜0')}${ex('x²＋kx＋2k−3＞0<br>D＝k²−4(2k−3)＝(k−2)(k−6)＜0<br>2＜k＜6')}${tip('≧0 のときは D≦0（接してもよい）になります。')}</section>`),
+  L('13-1','13　放物線と x 軸との共有点','解の配置','D・軸・f(0)','f2Pos',()=>`
+    <section class="panel"><h3>3つの条件</h3>${rul('正の部分で2点：D＞0、軸＞0、f(0)＞0<br>負の部分で2点：D＞0、軸＜0、f(0)＞0<br>正と負で1点ずつ：f(0)＜0')}
+    ${ex('y＝x²＋mx＋m＋8<br>正と負で交わる：f(0)＝m＋8＜0 → m＜−8')}${tip('グラフをかいて、どうなっていればよいかを考えるのがコツです。')}</section>`),
+  T('まとめ',['f2Ineq','f2Ineq','f2Ineq','f2Ineq2','f2Ineq2','f2Sys','f2Sys','f2Abs','f2Abs','f2Pos'],'2次不等式の10問'),
+];
+const TM = [
+  [['関数','x の値を決めると y の値がただ1つ決まるとき、y は x の関数。'],['定義域','x のとり得る値の範囲。'],['値域','y のとり得る値の範囲。'],['放物線','2次関数のグラフ。'],['頂点・軸','放物線と対称の軸の交点が頂点。y＝a(x−p)²＋q の頂点は (p, q)、軸は x＝p。'],['平方完成','ax²＋bx＋c を a(x−p)²＋q の形に変形すること。']],
+  [['最大値・最小値','関数の値のうち、いちばん大きい値・小さい値。'],['下に凸','a＞0。頂点で最小になる。'],['上に凸','a＜0。頂点で最大になる。']],
+  [['頂点がわかる','y＝a(x−p)²＋q とおく。'],['x 軸との交点がわかる','y＝a(x−α)(x−β) とおく。'],['3 点がわかる','y＝ax²＋bx＋c とおく。']],
+  [['解の公式','x＝(−b±√(b²−4ac))/2a'],['判別式','D＝b²−4ac。実数解の個数がわかる。'],['重解','D＝0 のときの、ただ1つの解。']],
+  [['共有点','グラフと x 軸（直線）が交わる・接する点。'],['接する','共有点が1個。D＝0。']],
+  [['2次不等式','グラフの x 軸より上・下の部分で解く。'],['連立不等式','それぞれの解の共通部分。'],['絶対不等式','すべての実数で成り立つ不等式。D＜0 などで考える。']],
+];
+return { G, CH:[C1,C2,C3,C4,C5,C6], TM };
+})();
+
 /* ===== 波（1つ約5分） ===== */
 const MQ_LESSONS = [
   { id:'1-1', t:'式の展開', sub:'乗法公式', plan:['exp','exp','exp','exp','exp'], body:()=>`
@@ -1777,6 +2082,7 @@ const TERMS = {
   m1:M1.TERMS,
   m3:M3.TERMS.slice(0,8),
   m4:M3.TERMS.slice(8),
+  q1:M5.TM[0], q2:M5.TM[1], q3:M5.TM[2], q4:M5.TM[3], q5:M5.TM[4], q6:M5.TM[5],
   mq:[['展開','かっこのついた式を、かけ算して足し算の形にすること。'],['因数分解','足し算の式を、かけ算の形にすること。展開の逆。'],['乗法公式','(a＋b)² ＝ a²＋2ab＋b² など。'],['一次不等式','負の数をかける・割ると、不等号の向きが逆になる。']],
   bc:[['原核生物','核膜をもたない生物。大腸菌など。'],['転写','DNAの情報からRNAをつくること。'],['翻訳','RNAの情報からタンパク質をつくること。'],['インスリン','血糖値を下げるホルモン。']],
 };
@@ -1797,6 +2103,12 @@ const UNITS = {
   hk:{ no:'国', title:'漢字高校レベル', subject:'国語', course:'jpn', subj:3, lessons:KJ_LESSONS, cards:'hk', drill:'hk' },
   m3:{ no:'集合と論理 1章', title:'集合', subject:'数学', course:'math', subj:1, lessons:M3.LESSONS.filter(l=>/^1-/.test(l.id)), cards:'m3', drill:'m3' },
   m4:{ no:'集合と論理 2章', title:'命題と論理', subject:'数学', course:'math', subj:1, lessons:M3.LESSONS.filter(l=>!/^1-/.test(l.id)), cards:'m4', drill:'m4' },
+  q1:{ no:'2次関数 1章', title:'関数とグラフ', subject:'数学', course:'math', subj:2, lessons:M5.CH[0], cards:'q1', drill:'q1' },
+  q2:{ no:'2次関数 2章', title:'2次関数の最大・最小', subject:'数学', course:'math', subj:2, lessons:M5.CH[1], cards:'q2', drill:'q2' },
+  q3:{ no:'2次関数 3章', title:'2次関数の決定', subject:'数学', course:'math', subj:2, lessons:M5.CH[2], cards:'q3', drill:'q3' },
+  q4:{ no:'2次関数 4章', title:'2次方程式', subject:'数学', course:'math', subj:2, lessons:M5.CH[3], cards:'q4', drill:'q4' },
+  q5:{ no:'2次関数 5章', title:'グラフと x軸・直線', subject:'数学', course:'math', subj:2, lessons:M5.CH[4], cards:'q5', drill:'q5' },
+  q6:{ no:'2次関数 6章', title:'2次不等式', subject:'数学', course:'math', subj:2, lessons:M5.CH[5], cards:'q6', drill:'q6' },
   m1:{ no:'数と式 1章', title:'式の展開と因数分解', subject:'数学', course:'math', subj:0, lessons:M1.LESSONS.filter(l=>!l.soon), show:M1.LESSONS, cards:'m1', drill:'m1' },
   bc:{ no:'生1', title:'細胞と体', subject:'生物', course:'bio', subj:0, lessons:BC_LESSONS, cards:'bc', drill:'bc' },
 };
@@ -1808,7 +2120,7 @@ const CATALOG = [
     { id:'jpn', name:'国語', k:'国', note:'現代文・古文・漢文', subjects:[
       K('現代文','現',{ t:'現代文基礎', go:'海月時間 ▶ 国語 ▶ 読解' },{ t:'論説『科学との向き合い方』', ready:'rk' },{ t:'論説『AI時代に考える力とは』', ready:'ai' },{ t:'論説『音楽はなぜ人の心を動かすのか』', ready:'mu' },{ t:'小説『各駅停車』', ready:'nv' },{ t:'小説『2番目の走者』', ready:'nw' },{ t:'小説『普通の教室』', ready:'nf' },{ t:'会話文『多数決は本当に公平か』', ready:'mj' },{ t:'会話文『便利な社会は幸せな社会か』', ready:'bs' },{ t:'資料問題『睡眠と現代社会』', ready:'sl' }), K('古文','古',{ t:'古文基礎', go:'海月時間 ▶ 国語 ▶ 古文' },'古典単語','古典文法','古文読解','『更級日記』','『？？？』','『？？？』'), K('漢文','漢',{ t:'漢文基礎', go:'海月時間 ▶ 国語 ▶ 漢文' },'句法','漢文読解','『？？？』','『？？？』','『？？？』'), K('漢字・語句','字',{ t:'基礎漢字', go:'海月時間 ▶ 国語 ▶ 漢字' },{ t:'漢字高校レベル', ready:'hk' },{ t:'言葉の基礎', go:'海月時間 ▶ 国語 ▶ 言葉' },{ t:'語句高校レベル', ready:'gk' }), K('文法','法',{ t:'接続語', ready:'cj' }), KAKO ] },
     { id:'math', name:'数学', k:'数', note:'数学Ⅰ', subjects:[
-      K('数と式','式',{ t:'式の展開と因数分解', ready:'m1' },'実数','平方根','1次不等式'), K('集合と論理','論',{ t:'集合', ready:'m3' },{ t:'命題と論理', ready:'m4' }), K('2次関数','関','関数とグラフ','2次関数の最大・最小','2次関数の決定','2次方程式','グラフと x軸・直線','2次不等式'), K('図形と計量','図','三角比','三角比の拡張','正弦定理・余弦定理','図形の面積','空間図形'), K('データの分析','デ','データの整理と代表値','データの散らばり','変量変換','相関','仮説検定'), KAKO ] },
+      K('数と式','式',{ t:'式の展開と因数分解', ready:'m1' },'実数','平方根','1次不等式'), K('集合と論理','論',{ t:'集合', ready:'m3' },{ t:'命題と論理', ready:'m4' }), K('2次関数','関',{ t:'関数とグラフ', ready:'q1' },{ t:'2次関数の最大・最小', ready:'q2' },{ t:'2次関数の決定', ready:'q3' },{ t:'2次方程式', ready:'q4' },{ t:'グラフと x軸・直線', ready:'q5' },{ t:'2次不等式', ready:'q6' }), K('図形と計量','図','三角比','三角比の拡張','正弦定理・余弦定理','図形の面積','空間図形'), K('データの分析','デ','データの整理と代表値','データの散らばり','変量変換','相関','仮説検定'), KAKO ] },
     { id:'eng', name:'英語', k:'英', note:'文法・読解', subjects:[
       { name:'文法', k:'文', go:'海月時間 ▶ 英語 ▶ 文法', units:[] }, K('語い・会話文','語','単語・熟語','会話文'), K('読解','読','短い英文','長文読解'), KAKO ] },
     { id:'geo', name:'地理', k:'理', note:'地理総合', subjects:[
