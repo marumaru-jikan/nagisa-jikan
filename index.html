@@ -1734,7 +1734,7 @@ const LESSONS = [
   L('研-1','研究　√2 が無理数であることの証明','√2 が無理数であることの証明','背理法の代表例','s5Root',()=>`
     <section class="panel"><h3>証明の流れ</h3>${ex('√2 が有理数と仮定すると<br>√2＝a/b（a、b は 1 以外に正の公約数をもたない自然数）<br>a＝√2b　両辺を2乗して a²＝2b² …①<br>a² は偶数 → a も偶数　a＝2c とおく<br>①に代入　4c²＝2b²　すなわち b²＝2c²<br>b² は偶数 → b も偶数')}
     <p>a も b も偶数になり、公約数 2 をもつ。これは「1 以外に正の公約数をもたない」ことに矛盾。よって √2 は無理数です。</p>${tip('「n² が偶数ならば n は偶数」は、対偶「n が奇数ならば n² は奇数」で証明できます。')}</section>`),
-  L('まとめ','章末テスト','章末テスト','集合と命題の総まとめ','s1Cap',()=>`
+  L('まとめ','章末テスト','章末テスト','集合と論理の総まとめ','s1Cap',()=>`
     <section class="panel"><h3>総まとめ</h3><p>集合・命題・必要十分・対偶・背理法から10問出題します。</p>${sum(['A∩B：どちらにも<br>A∪B：少なくとも一方','p⇒q が真<br>⇔ P⊂Q','p は十分条件<br>q は必要条件','もとの命題と対偶<br>真偽が一致'])}</section>`,
     { test:true, plan:['s1Cap','s1Comp','s1DeM','s2TF','s2Ce','s3NS','s3Range','s4Neg','s4Rev','s5Step'] }),
 ];
@@ -1775,7 +1775,8 @@ const BC_LESSONS = [
 /* ===== 用語カード ===== */
 const TERMS = {
   m1:M1.TERMS,
-  m3:M3.TERMS,
+  m3:M3.TERMS.slice(0,8),
+  m4:M3.TERMS.slice(8),
   mq:[['展開','かっこのついた式を、かけ算して足し算の形にすること。'],['因数分解','足し算の式を、かけ算の形にすること。展開の逆。'],['乗法公式','(a＋b)² ＝ a²＋2ab＋b² など。'],['一次不等式','負の数をかける・割ると、不等号の向きが逆になる。']],
   bc:[['原核生物','核膜をもたない生物。大腸菌など。'],['転写','DNAの情報からRNAをつくること。'],['翻訳','RNAの情報からタンパク質をつくること。'],['インスリン','血糖値を下げるホルモン。']],
 };
@@ -1794,8 +1795,9 @@ const UNITS = {
   gk:{ no:'国', title:'語句高校レベル', subject:'国語', course:'jpn', subj:3, lessons:GK_LESSONS, cards:'gk', drill:'gk' },
   cj:{ no:'国', title:'接続語', subject:'国語', course:'jpn', subj:4, lessons:CJ_LESSONS, cards:'cj', drill:'cj' },
   hk:{ no:'国', title:'漢字高校レベル', subject:'国語', course:'jpn', subj:3, lessons:KJ_LESSONS, cards:'hk', drill:'hk' },
-  m3:{ no:'数Ⅰ 3章', title:'集合と命題', subject:'数学', course:'math', subj:0, lessons:M3.LESSONS, cards:'m3', drill:'m3' },
-  m1:{ no:'数Ⅰ 1章', title:'式の展開と因数分解', subject:'数学', course:'math', subj:0, lessons:M1.LESSONS.filter(l=>!l.soon), show:M1.LESSONS, cards:'m1', drill:'m1' },
+  m3:{ no:'集合と論理 1章', title:'集合', subject:'数学', course:'math', subj:1, lessons:M3.LESSONS.filter(l=>/^1-/.test(l.id)), cards:'m3', drill:'m3' },
+  m4:{ no:'集合と論理 2章', title:'命題と論理', subject:'数学', course:'math', subj:1, lessons:M3.LESSONS.filter(l=>!/^1-/.test(l.id)), cards:'m4', drill:'m4' },
+  m1:{ no:'数と式 1章', title:'式の展開と因数分解', subject:'数学', course:'math', subj:0, lessons:M1.LESSONS.filter(l=>!l.soon), show:M1.LESSONS, cards:'m1', drill:'m1' },
   bc:{ no:'生1', title:'細胞と体', subject:'生物', course:'bio', subj:0, lessons:BC_LESSONS, cards:'bc', drill:'bc' },
 };
 const U = (...t) => t.map(x => typeof x === 'string' ? { t:x } : x);
@@ -1806,7 +1808,7 @@ const CATALOG = [
     { id:'jpn', name:'国語', k:'国', note:'現代文・古文・漢文', subjects:[
       K('現代文','現',{ t:'現代文基礎', go:'海月時間 ▶ 国語 ▶ 読解' },{ t:'論説『科学との向き合い方』', ready:'rk' },{ t:'論説『AI時代に考える力とは』', ready:'ai' },{ t:'論説『音楽はなぜ人の心を動かすのか』', ready:'mu' },{ t:'小説『各駅停車』', ready:'nv' },{ t:'小説『2番目の走者』', ready:'nw' },{ t:'小説『普通の教室』', ready:'nf' },{ t:'会話文『多数決は本当に公平か』', ready:'mj' },{ t:'会話文『便利な社会は幸せな社会か』', ready:'bs' },{ t:'資料問題『睡眠と現代社会』', ready:'sl' }), K('古文','古',{ t:'古文基礎', go:'海月時間 ▶ 国語 ▶ 古文' },'古典単語','古典文法','古文読解','『更級日記』','『？？？』','『？？？』'), K('漢文','漢',{ t:'漢文基礎', go:'海月時間 ▶ 国語 ▶ 漢文' },'句法','漢文読解','『？？？』','『？？？』','『？？？』'), K('漢字・語句','字',{ t:'基礎漢字', go:'海月時間 ▶ 国語 ▶ 漢字' },{ t:'漢字高校レベル', ready:'hk' },{ t:'言葉の基礎', go:'海月時間 ▶ 国語 ▶ 言葉' },{ t:'語句高校レベル', ready:'gk' }), K('文法','法',{ t:'接続語', ready:'cj' }), KAKO ] },
     { id:'math', name:'数学', k:'数', note:'数学Ⅰ', subjects:[
-      K('数と式','式',{ t:'式の展開と因数分解', ready:'m1' },'実数と平方根',{ t:'集合と命題', ready:'m3' }), K('二次関数','関','二次関数のグラフ','最大・最小','二次方程式・二次不等式'), K('図形と計量','図','三角比','正弦定理・余弦定理'), K('データの分析','デ','代表値と散らばり','相関'), KAKO ] },
+      K('数と式','式',{ t:'式の展開と因数分解', ready:'m1' },'実数','平方根','1次不等式'), K('集合と論理','論',{ t:'集合', ready:'m3' },{ t:'命題と論理', ready:'m4' }), K('2次関数','関','関数とグラフ','2次関数の最大・最小','2次関数の決定','2次方程式','グラフと x軸・直線','2次不等式'), K('図形と計量','図','三角比','三角比の拡張','正弦定理・余弦定理','図形の面積','空間図形'), K('データの分析','デ','データの整理と代表値','データの散らばり','変量変換','相関','仮説検定'), KAKO ] },
     { id:'eng', name:'英語', k:'英', note:'文法・読解', subjects:[
       { name:'文法', k:'文', go:'海月時間 ▶ 英語 ▶ 文法', units:[] }, K('語い・会話文','語','単語・熟語','会話文'), K('読解','読','短い英文','長文読解'), KAKO ] },
     { id:'geo', name:'地理', k:'理', note:'地理総合', subjects:[
