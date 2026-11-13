@@ -175,6 +175,7 @@ p{margin:0}
 .ytext p{margin:0 0 0 .6em;text-indent:1em}.ytext .waka{text-indent:3em;font-weight:700;color:var(--teal);margin-left:1.2em}.ytext .src{text-indent:0;font-size:.85rem;color:var(--muted);padding-top:12em}.ytext rt{font-size:.5em}
 .vadj .hojo{color:var(--accent-ink);background:var(--accent-soft);border-radius:3px}.vadj table{height:auto;table-layout:auto}.vadj td{white-space:nowrap}.vadj tr:nth-child(2)>*,.vadj tr:nth-child(3)>*{width:4.4em;text-align:start}.vadj tr>th:first-child{white-space:nowrap}.vadj td{line-height:1.5}
 .trfig{width:100%;max-width:420px;display:block;margin:8px auto}.trfig .tf-h{font-size:13px;font-weight:700;fill:var(--ink)}.trfig .tf-s{font-size:12px;fill:var(--ink)}.trfig .tf-t{font-size:11px;fill:var(--muted)}
+.trfig .jm-t{font-size:17px;font-weight:700;fill:var(--ink)}
 .vnote{border-left:4px solid var(--accent);background:var(--sunk);border-radius:6px;padding:8px 12px;margin:8px 0;line-height:1.75;font-size:.94rem}
 ol.ksteps{margin:6px 0 10px;padding-left:1.6em;line-height:1.9}ol.ksteps li::marker{font-weight:700;color:var(--teal)}
 .rule{background:var(--accent-soft);color:var(--accent-ink);border-radius:12px;padding:12px 14px;font-weight:700;line-height:1.75}
@@ -3443,6 +3444,79 @@ const L310 = { id:'3-10', t:'「べし」', sub:'スイカトメテ', plan:['kbB
     <tr><td>下に<b>打消・反語</b>がある</td><td><b>可能</b></td></tr></table>
   ${note('命令と適当','<b>命令</b>：会話文で、上下関係が強く、目の前の相手に向かって言うとき。<br><b>適当</b>：地の文や、おだやかに・やわらかくすすめるとき。')}</section>` };
 
+/* --- 3-11 「じ」「まじ」 --- */
+const jmfig = () => { const box=(x,y,t,c)=>`<rect x="${x-34}" y="${y-20}" width="68" height="40" rx="10" fill="${c}"/><text x="${x}" y="${y+7}" text-anchor="middle" class="jm-t">${t}</text>`;
+  return `<svg viewBox="0 0 340 210" class="trfig" role="img" aria-label="む・べし・じ・まじの関係図">
+  <defs><marker id="jmA" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="var(--teal)"/></marker>
+  <marker id="jmB" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="var(--accent)"/></marker></defs>
+  <line x1="110" y1="50" x2="226" y2="50" stroke="var(--teal)" stroke-width="3" marker-end="url(#jmA)"/><text x="170" y="40" text-anchor="middle" class="tf-s">強める</text>
+  <line x1="110" y1="160" x2="226" y2="160" stroke="var(--teal)" stroke-width="3" marker-end="url(#jmA)"/><text x="170" y="150" text-anchor="middle" class="tf-s">強める</text>
+  <line x1="76" y1="74" x2="76" y2="132" stroke="var(--accent)" stroke-width="3" marker-end="url(#jmB)"/><text x="70" y="108" text-anchor="end" class="tf-s">否定</text>
+  <line x1="264" y1="74" x2="264" y2="132" stroke="var(--accent)" stroke-width="3" marker-end="url(#jmB)"/><text x="272" y="108" class="tf-s">否定</text>
+  ${box(76,50,'む','var(--sunk)')}${box(264,50,'べし','var(--sunk)')}${box(76,160,'じ','var(--accent-soft)')}${box(264,160,'まじ','var(--accent-soft)')}
+  <text x="170" y="204" text-anchor="middle" class="tf-t">じ＝「む」の否定　／　まじ＝「べし」の否定</text></svg>`; };
+const JM_ALLJ = ['打消推量','打消意志','打消当然','不可能'];
+const JM_ALLM = ['打消推量','打消意志','打消当然','不可能','禁止','不適当'];
+const JM_M = [ // [前, 傍線, 後, 意味, 解説, 種類]
+  ['明日は雨降ら','じ','。','打消推量','「じ」で主語は「雨」（三人称）。「明日は雨が降らないだろう」。','j'],
+  ['かの人は、よも来','じ','。','打消推量','主語は「かの人」（三人称）。「まさか来ないだろう」。','j'],
+  ['我、二度とここへは来','じ','。','打消意志','「じ」で主語は「我」（一人称）。「二度とここへは来るまい」。','j'],
+  ['我はさらに言は','じ','。','打消意志','主語は「我」（一人称）。「私は決して言うまい」。','j'],
+  ['この雨、今日はやむ','まじ','。','打消推量','「まじ」で主語は「雨」（三人称）。「今日はやまないだろう」。','m'],
+  ['我は決して泣く','まじ','。','打消意志','「まじ」で主語は「我」（一人称）。「決して泣くまい」。','m'],
+  ['人の物を取る','まじき','わざなり','打消当然','「取るべきでないことだ」。当然そうするべきでない。','m'],
+  ['この川は深くて、たやすく渡る','まじ','。','不可能','「簡単には渡ることができそうにない」。','m'],
+  ['「この戸、開く','まじ','」と言ふ','禁止','会話文で、目の前の相手に強く言っている。「この戸を開けるな」。','m'],
+  ['さやうのことは、人に語る','まじ','。','不適当','おだやかにすすめている。「人に話さないのがよい」。','m'],
+];
+const JM_F = [
+  ['ある','まじき','こと','連体形','体言「こと」に続くので連体形。'],['かく思ふ','まじけれ','ど、','已然形','接続助詞「ど」は已然形に付く。'],
+  ['行く','まじかり','けり','連用形','過去「けり」は連用形に付く。助動詞に続くので補助活用「まじかり」。'],['この雨、やむ','まじ','。','終止形','文末で言い切っているので終止形。'],
+  ['我こそ言は','じ','。','已然形','係助詞「こそ」の結びは已然形。「じ」は終止・連体・已然形がすべて「じ」。'],['二度と来','じ','。','終止形','文末で言い切っているので終止形。'],
+];
+const JM_X = [
+  ['「む」の否定にあたる助動詞は？','む ⇔ ？','じ',['まじ','ず','べし'],'「じ」は「む」の否定（打消推量・打消意志）。'],
+  ['「べし」の否定にあたる助動詞は？','べし ⇔ ？','まじ',['じ','ず','まし'],'「まじ」は「べし」の否定。'],
+  ['「む」の意味を強めたものにあたる助動詞は？','む →（強める）？','べし',['まじ','らむ','けむ'],'「べし」は「む」を強めた意味をもつ。'],
+  ['「じ」の意味を強めたものにあたる助動詞は？','じ →（強める）？','まじ',['べし','ず','まし'],'「まじ」は「じ」を強めた意味をもつ。'],
+  ['「じ」の接続は？','じ','未然形',['終止形','連用形','連体形'],'「じ」は「む」と同じく未然形に付く（行かじ）。'],
+  ['「まじ」の接続は？','まじ','終止形（ラ変型は連体形）',['未然形','連用形','已然形'],'「まじ」は「べし」と同じく終止形に付く（行くまじ・あるまじ）。'],
+  ['「じ」の活用の型は？','じ','無変化型',['シク活用型','四段型','ラ変型'],'「じ」は終止・連体・已然形がすべて「じ」で、形が変わらない。'],
+  ['「まじ」の活用の型は？','まじ','シク活用型',['ク活用型','無変化型','下二段型'],'「まじ」は形容詞のシク活用と同じ型。'],
+];
+G.kbJm1 = () => { if (Math.random()<.4) { const v=pick([['行く','じ','行かじ',['行きじ','行くじ','行けじ'],'未然形'],['思ふ','じ','思はじ',['思ひじ','思ふじ','思へじ'],'未然形'],['来','じ','来（こ）じ',['来（き）じ','来（く）じ','来（くる）じ'],'未然形'],['行く','まじ','行くまじ',['行かまじ','行きまじ','行けまじ'],'終止形'],['あり（ラ変）','まじ','あるまじ',['ありまじ','あらまじ','あれまじ'],'ラ変型なので連体形'],['見る','まじ','見るまじ',['見まじ','見れまじ','見よまじ'],'終止形']]);
+    return Q(`「${v[0]}」に「${v[1]}」を付けると？`, tq(`${v[0]}　＋　${v[1]}`), v[2], v[3], '「じ」は未然形、「まじ」は終止形（ラ変型は連体形）に付く。', `${v[4]}に付いて <b>${v[2]}</b>。`, { words:true }); }
+  const [a,w,b,ans,why]=pick(JM_F);
+  return Q('傍線部の活用形は？', tq(`${a}${B(w)}${b}`), ans, KF6.filter(x=>x!==ans&&x!=='命令形').sort(()=>Math.random()-.5).slice(0,3), '「じ」：○・○・じ・じ・じ・○／「まじ」：（まじく）・まじく・まじ・まじき・まじけれ・○', `「${w}」は <b>${ans}</b>。<br>${why}`, { words:true }); };
+G.kbJm2 = () => { const [a,w,b,ans,why,k]=pick(JM_M);
+  return Q('傍線部の意味は？', tq(`${a}${B(w)}${b}`), ans, shuffle((k==='j'?JM_ALLJ:JM_ALLM).filter(x=>x!==ans)).slice(0,3), '主語が 一人称→打消意志、三人称→打消推量。「まじ」は「べし」の否定（打消当然・不可能・禁止・不適当も）。', `<b>${ans}</b>。<br>${why}`); };
+G.kbJm3 = () => { const [q,e,ans,wr,why]=pick(JM_X);
+  return Q(q, tq(e), ans, wr, 'じ＝「む」の否定、まじ＝「べし」の否定。', `<b>${ans}</b>。<br>${why}`, { words:true }); };
+
+const L311 = { id:'3-11', t:'「じ」「まじ」', sub:'打消推量・打消意志', plan:['kbJm1','kbJm2','kbJm2','kbJm3','kbJm2'], body:()=>`
+  <section class="panel"><h3>助動詞「じ」</h3>
+  ${auxbox([['接続','<b>未然形</b>'],['意味','「<b>む</b>」の否定にあたる意味をもつ']])}
+  <p class="small muted">縦書きの表です。右から左へ読みます。</p>
+  ${auxtab('じ',['○','○','じ','じ','じ','○'],'無変化型')}
+  <table class="dtab"><tr><th>意味</th><th>訳・例</th></tr>
+    <tr><td style="white-space:nowrap">① <b>打消推量</b></td><td><span class="small muted">訳：〜ないだろう</span><br>主語が<b>三人称</b>のときに多い。<br>例：明日は雨降ら<b>じ</b>。（明日は雨が降らないだろう）</td></tr>
+    <tr><td style="white-space:nowrap">② <b>打消意志</b></td><td><span class="small muted">訳：〜まい・〜ないつもりだ</span><br>主語が<b>一人称</b>のときに多い。<br>例：我、二度とここへは来<b>じ</b>。（二度とここへは来るまい）</td></tr></table></section>
+  <section class="panel"><h3>助動詞「まじ」</h3>
+  ${auxbox([['接続','<b>終止形</b>（ラ変型の語には<b>連体形</b>）'],['意味','「<b>べし</b>」の否定にあたる意味をもつ']])}
+  ${auxtab2([['本活用',['（まじく）','まじく','まじ','まじき','まじけれ','○'],'シク活用型','まじ'],['補助活用',['まじから','まじかり','○','まじかる','○','○'],'シク活用型','まじ']])}
+  <table class="dtab"><tr><th>意味</th><th>訳・例</th></tr>
+    <tr><td style="white-space:nowrap">① <b>打消推量</b></td><td><span class="small muted">訳：〜ないだろう・〜まい</span>　<span class="small">三人称が主語</span><br>例：この雨、今日はやむ<b>まじ</b>。</td></tr>
+    <tr><td style="white-space:nowrap">② <b>打消意志</b></td><td><span class="small muted">訳：〜まい・〜ないつもりだ</span>　<span class="small">一人称が主語</span><br>例：我は決して泣く<b>まじ</b>。</td></tr>
+    <tr><td style="white-space:nowrap">③ <b>打消当然</b></td><td><span class="small muted">訳：〜べきでない・〜はずがない</span>（本来の意味）<br>例：人の物を取る<b>まじき</b>わざなり。</td></tr>
+    <tr><td style="white-space:nowrap">④ <b>不可能</b></td><td><span class="small muted">訳：〜できない・〜できそうにない</span><br>例：この川、たやすく渡る<b>まじ</b>。</td></tr>
+    <tr><td style="white-space:nowrap">⑤ <b>禁止</b></td><td><span class="small muted">訳：〜するな</span>　<span class="small">会話文で、上下関係が強いとき</span><br>例：「この戸、開く<b>まじ</b>」</td></tr>
+    <tr><td style="white-space:nowrap">⑥ <b>不適当</b></td><td><span class="small muted">訳：〜ないのがよい・〜のはふさわしくない</span><br>例：さやうのことは、人に語る<b>まじ</b>。</td></tr></table></section>
+  <section class="panel"><h3>「む」「べし」「じ」「まじ」の関係</h3>
+  <p>「べし」が「む」を強めた意味であったのと同じように、「まじ」は「じ」を強めた意味をもつ。「じ」「まじ」は、それぞれ「む」「べし」の<b>否定</b>にあたる。</p>${jmfig()}
+  <table class="dtab"><tr><th></th><th>肯定</th><th>否定</th></tr>
+    <tr><td style="white-space:nowrap"><b>未然形接続</b></td><td>む</td><td>じ</td></tr>
+    <tr><td style="white-space:nowrap"><b>終止形接続</b></td><td>べし（むを強める）</td><td>まじ（じを強める）</td></tr></table></section>` };
+
 /* --- 7-1 大和物語（姥捨）【動詞】 --- */
 const deck = arr => { let q=[]; return () => { if(!q.length) q=shuffle(arr.map((_,i)=>i)); return arr[q.pop()]; }; };
 const YS_V = [ // [前, 傍線部, 後, 答え, 誤答, 解説]
@@ -3674,7 +3748,7 @@ const L73 = { id:'7-3', t:'竹取物語（かぐや姫の誕生）【助動詞�
     <tr><td>す・さす</td><td>使役</td><td>養はす／髪上げさせ／つけさす</td></tr></table>
   ${rule('係り結びに注意！<br>「なむ」「ぞ」…「ける」（連体形）<br>名をば、さぬきの造となむいひ<u>ける</u>。')}</section>` };
 
-return { G, LESSONS:[L11,L12,L13,L22,L23,L31,L32,L33,L34,L35,L36,L37,L38,L39,L310,L71,L72,L73], TERMS:[
+return { G, LESSONS:[L11,L12,L13,L22,L23,L31,L32,L33,L34,L35,L36,L37,L38,L39,L310,L311,L71,L72,L73], TERMS:[
   ['自立語','それだけで文節をつくれる語。'],['付属語','それだけでは文節をつくれない語。助動詞・助詞。'],['用言','述語になる、活用する自立語。動詞・形容詞・形容動詞。'],['体言','実体を表し、主語になる語。名詞。'],
   ['動詞','ウ段（ラ変は「り」）で言い切る。'],['形容詞','「し」で言い切る。'],['形容動詞','「なり」「たり」で言い切る。'],['副詞','おもに用言を修飾する。活用しない。'],['連体詞','体言を修飾する。活用しない。'],['助動詞','活用する付属語。'],['助詞','活用しない付属語。'],
   ['未然形','まだそうなっていない形。「ず」「む」「ば（仮定）」が付く。'],['連用形','用言に続く形。「けり」「て」が付く。'],['終止形','言い切る形。「べし」「らむ」が付く。'],['連体形','体言に続く形。「ぞ・なむ・や・か」の結び。'],['已然形','すでにそうなった形。「ど・ども」「ば（確定）」が付く。「こそ」の結び。'],['命令形','命令して言い切る形。'],
@@ -3696,7 +3770,8 @@ return { G, LESSONS:[L11,L12,L13,L22,L23,L31,L32,L33,L34,L35,L36,L37,L38,L39,L31
   ['む・むず','推量・意志・仮定・適当・勧誘・婉曲（スイカテカ）。未然形接続。'],['こそ〜め','適当・勧誘「〜するのがよい」。'],['むず','「むとす」が変化した形。打消の意味はない。'],
   ['らむ','①現在推量 ②原因推量 ③伝聞・婉曲。終止形接続（ラ変型は連体形）。'],['けむ','①過去推量 ②過去の原因推量 ③過去の伝聞・婉曲。連用形接続。'],
   ['まし','①反実仮想 ②ためらいの意志 ③実現不可能な希望。未然形接続。'],['反実仮想','「Aましかば（ませば・せば）、Bまし」＝もしAなら、Bだろうに。'],
-  ['べし','推量・意志・可能・当然・命令・適当（スイカトメテ）。終止形接続（ラ変型は連体形）。'] ] };
+  ['べし','推量・意志・可能・当然・命令・適当（スイカトメテ）。終止形接続（ラ変型は連体形）。'],
+  ['じ','「む」の否定。①打消推量 ②打消意志。未然形接続。無変化型。'],['まじ','「べし」の否定。打消推量・打消意志・打消当然・不可能・禁止・不適当。'] ] };
 })();
 
 /* ===== 波（1つ約5分） ===== */
@@ -3787,7 +3862,7 @@ const UNITS = {
     KB.LESSONS.find(l=>l.id==='3-8'),
     KB.LESSONS.find(l=>l.id==='3-9'),
     KB.LESSONS.find(l=>l.id==='3-10'),
-    { id:'3-11', sub:'準備中', t:'「じ」「まじ」', soon:true },
+    KB.LESSONS.find(l=>l.id==='3-11'),
     { id:'3-12', sub:'準備中', t:'「なり（伝聞・推定）」「めり」「らし」', soon:true },
     { id:'3-13', sub:'準備中', t:'「なり（断定）」「たり」', soon:true },
     { id:'3-14', sub:'準備中', t:'「まほし」「たし」', soon:true },
