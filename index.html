@@ -173,6 +173,7 @@ p{margin:0}
 .vsum table{font-size:.8rem}.vsum th,.vsum td{padding:5px 3px}.vsum td{text-orientation:upright;font-weight:700;color:var(--teal);text-align:center}.vsum th.hen{background:#f6dcdc;color:#8a2d2d}.vsum th.sei{background:var(--sunk);color:var(--ink)}
 .vverb table{table-layout:fixed;height:41em}.vverb th,.vverb td{white-space:normal;text-align:center}.vverb tr:first-child>th{width:2.6em}.vverb tr:nth-child(2)>*{width:2.6em}.vverb tr:nth-child(3)>td{width:4.6em;text-align:start}
 .ytext p{margin:0 0 0 .6em;text-indent:1em}.ytext .waka{text-indent:3em;font-weight:700;color:var(--teal);margin-left:1.2em}.ytext .src{text-indent:0;font-size:.85rem;color:var(--muted);padding-top:12em}.ytext rt{font-size:.5em}
+.vadj .hojo{color:var(--accent-ink);background:var(--accent-soft);border-radius:3px}.vadj table{height:auto;table-layout:auto}.vadj td{white-space:nowrap}.vadj tr:nth-child(2)>*,.vadj tr:nth-child(3)>*{width:4.4em;text-align:start}.vadj tr>th:first-child{white-space:nowrap}.vadj td{line-height:1.5}
 .vnote{border-left:4px solid var(--accent);background:var(--sunk);border-radius:6px;padding:8px 12px;margin:8px 0;line-height:1.75;font-size:.94rem}
 ol.ksteps{margin:6px 0 10px;padding-left:1.6em;line-height:1.9}ol.ksteps li::marker{font-weight:700;color:var(--teal)}
 .rule{background:var(--accent-soft);color:var(--accent-ink);border-radius:12px;padding:12px 14px;font-weight:700;line-height:1.75}
@@ -2782,6 +2783,61 @@ const L13 = { id:'2-1', sec:'2　用言', t:'動詞', sub:'活用の種類', pla
     <tr><td>植う・飢う・据う</td><td><b>ワ行</b>下二段（植ゑず）</td></tr>
     <tr><td>見ゆ・絶ゆ・聞こゆ・覚ゆ</td><td><b>ヤ行</b>下二段（見えず）</td></tr></table></section>` };
 
+/* --- 2-2 形容詞 --- */
+const adjtab = () => { const L=['基本形','語幹',...KF6], s=(a,b)=>`${a}<br><span class="hojo">${b}</span>`;
+  const K=['高し','高',s('（く）','から'),s('く','かり'),s('し','○'),s('き','かる'),s('けれ','○'),s('○','かれ')];
+  const SK=['美し','美',s('（しく）','しから'),s('しく','しかり'),s('し','○'),s('しき','しかる'),s('しけれ','○'),s('○','しかれ')];
+  return `<div class="vtab vverb vadj"><table><tr><th></th>${L.map(x=>`<th>${x}</th>`).join('')}</tr>
+  <tr><th>ク活用</th>${K.map((x,i)=>`<td class="${i<2?'vb':'ve'}">${x}</td>`).join('')}</tr>
+  <tr><th>シク活用</th>${SK.map((x,i)=>`<td class="${i<2?'vb':'ve'}">${x}</td>`).join('')}</tr></table></div>`; };
+const ADJ_K = [['高し','高'],['白し','白'],['長し','長'],['寒し','寒'],['深し','深'],['近し','近'],['遠し','遠'],['憂し','憂'],['心憂し','心憂'],['なし','な'],['よし','よ'],['若し','若'],['暗し','暗'],['疾し','と']];
+const ADJ_S = [['美し','うつく'],['をかし','をか'],['あやし','あや'],['恋し','恋'],['悲し','悲'],['うれし','うれ'],['恐ろし','恐ろ'],['あさまし','あさま'],['いみじ','いみ'],['すさまじ','すさま'],['めづらし','めづら']];
+const ADJ_F = [ // [活用形の番号, ク活用の語尾, シク活用の語尾, 後ろ, 解説]
+  [0,'から','しから','ず','打消「ず」が付くので未然形（補助活用）。'],[0,'から','しから','む','推量「む」が付くので未然形（補助活用）。'],
+  [1,'く','しく','て、','接続助詞「て」が付くので連用形。'],[1,'く','しく','なりぬ','用言「なる」に続くので連用形。'],[1,'かり','しかり','けり','過去「けり」が付くので連用形（補助活用）。'],
+  [2,'し','し','。','文末で言い切っているので終止形。'],
+  [3,'き','しき','人','体言に続くので連体形。'],[3,'かる','しかる','べし','助動詞「べし」は補助活用の連体形「〜かる」に付く。'],
+  [4,'けれ','しけれ','ど','接続助詞「ど」が付くので已然形。'],[4,'けれ','しけれ','ば、','「ば」が已然形に付くと確定（〜ので）。'],
+  [5,'かれ','しかれ','。','命令の意味で言い切っているので命令形（補助活用）。'],
+];
+const GOKAN = [ // [例, 用法, 訳]
+  ['あな、寒。','感動','ああ、寒い。'],['あな、かしこ。','感動','ああ、おそれ多い。'],['あな、めでた。','感動','ああ、すばらしい。'],
+  ['あな、をかしの事や。','連体修飾','ああ、おもしろいことだなあ。'],['あな、めでたの人や。','連体修飾','ああ、すばらしい人だなあ。'],
+  ['瀬を早み','原因・理由','川の瀬の流れが速いので'],['風を寒み','原因・理由','風が寒いので'],['山を高み','原因・理由','山が高いので'],
+  ['夜の寒さ','名詞','夜の寒いこと'],['山の深み','名詞','山の深い所'],['別れの悲しさ','名詞','別れの悲しいこと'],
+];
+const GK_NAME = { 感動:'語幹だけで感動', 連体修飾:'語幹＋「の」で連体修飾', '原因・理由':'「AをBみ」で原因・理由', 名詞:'語幹＋「さ」「み」で名詞' };
+const AUX = [['べし','ク活用型'],['たし','ク活用型'],['まじ','シク活用型'],['まほし','シク活用型'],['ごとし','形容詞型（補助活用なし）']];
+G.kbAd1 = () => { const sk=Math.random()<.5, [w,g]=pick(sk?ADJ_S:ADJ_K), ans=sk?'シク活用':'ク活用';
+  return Q('活用の種類は？', tq(`「${w}」`), ans, [sk?'ク活用':'シク活用','ナリ活用','タリ活用'], '動詞「なる」を付けてみよう。「〜くなる」ならク活用、「〜しくなる」ならシク活用。',
+    `「${g}${sk?'しく':'く'}なる」となるので <b>${ans}</b>。`); };
+G.kbAd2 = () => { const sk=Math.random()<.5, [w,g]=pick(sk?ADJ_S:ADJ_K), [n,k,s,b,why]=pick(ADJ_F), form=g+(sk?(n===2?'し':s):k);
+  const near={0:['連用形','已然形','終止形'],1:['未然形','連体形','終止形'],2:['連体形','連用形','已然形'],3:['終止形','連用形','已然形'],4:['命令形','連体形','未然形'],5:['已然形','終止形','未然形']}[n];
+  return Q('傍線部の活用形は？', tq(`${B(form)}${b}`), KF6[n], near, '下に付く語を見よう。助動詞には「〜から・〜かり・〜かる」の補助活用が付くことが多い。', `「${form}」は「${w}」の <b>${KF6[n]}</b>。<br>${why}`, { words:true }); };
+G.kbAd3 = () => { if (Math.random()<.3) { const [a,t]=pick(AUX), ng=pick(['む','けり','ず','き','つ','らむ']);
+    return Q('形容詞型の活用をする助動詞はどれ？', tq('次の助動詞のうち'), a, shuffle(['む','けり','ず','き','つ','らむ']).slice(0,3), '「べし」「まじ」「まほし」「たし」「ごとし」は形容詞型。', `「${a}」は <b>${t}</b>。`); }
+  const [e,u,tr]=pick(GOKAN), ans=GK_NAME[u];
+  return Q('語幹の用法として正しいものは？', tq(e), ans, Object.values(GK_NAME).filter(x=>x!==ans), '「あな」があれば感動、「の」＋体言なら連体修飾、「AをBみ」なら原因・理由、「さ」「み」で名詞。', `「${e}」＝${tr}<br><b>${ans}</b>`, { words:true }); };
+
+const L22 = { id:'2-2', t:'形容詞', sub:'ク活用とシク活用', plan:['kbAd1','kbAd2','kbAd1','kbAd2','kbAd3'], body:()=>`
+  <section class="panel"><h3>形容詞とは</h3><p>ものごとの<b>性質や状態</b>を表す、活用する自立語（用言）。言い切りの形が「<b>し</b>」で終わる（「いみじ」のように「じ」で終わる語もある）。</p>
+  ${rule('形容詞の活用は<br>ク活用 と シク活用 の2種類')}</section>
+  <section class="panel"><h3>活用</h3><p class="small muted">縦書きの表です。各マスの右が<b>本活用</b>、左（色つき）が<b>補助活用</b>（カリ活用）。</p>${adjtab()}
+  <table class="dtab"><tr><th></th><th>本活用</th><th>補助活用（カリ活用）</th></tr>
+    <tr><td style="white-space:nowrap"><b>ク活用</b></td><td>（く）・く・し・き・けれ・○</td><td>から・かり・○・かる・○・かれ</td></tr>
+    <tr><td style="white-space:nowrap"><b>シク活用</b></td><td>（しく）・しく・し・しき・しけれ・○</td><td>しから・しかり・○・しかる・○・しかれ</td></tr></table>
+  ${note('補助活用（カリ活用）','連用形「〜く」＋ラ変動詞「あり」からできた活用（高く＋あり→高かり）。ラ変型の活用をし、<b>主に助動詞に続く</b>。<br>例：高からず・高かりけり・高かるべし')}</section>
+  <section class="panel"><h3>活用の種類の見分け方</h3>${rule('動詞「なる」を付けて判別する')}
+  <table class="dtab"><tr><th>「なる」を付ける</th><th>活用の種類</th></tr><tr><td>高し＋なる → 高<b>く</b>なる</td><td>ク活用</td></tr><tr><td>美し＋なる → 美<b>しく</b>なる</td><td>シク活用</td></tr></table></section>
+  <section class="panel"><h3>語幹の用法</h3><p class="small muted">形容詞の語幹（シク活用は終止形）には、次の用法がある。</p>
+  <table class="dtab"><tr><th>用法</th><th>例</th></tr>
+    <tr><td>(1) 語幹だけで、<b>感動</b>的な言い方になる</td><td>あな、寒。<br><span class="small muted">（ああ、寒い。）</span></td></tr>
+    <tr><td>(2) 語幹＋「<b>の</b>」で、<b>連体修飾語</b>になる<br><span class="small muted">語幹＋の＋体言（＋間投助詞「や」）</span></td><td>あな、めでたの人や。<br><span class="small muted">（ああ、すばらしい人だなあ。）</span></td></tr>
+    <tr><td>(3) 語幹＋「<b>み</b>」で、<b>原因・理由</b>を表す<br><span class="small muted">「AをBみ」＝AがBなので</span></td><td>瀬を早み<br><span class="small muted">（川の瀬の流れが速いので）</span></td></tr>
+    <tr><td>(4) 語幹＋「<b>さ</b>」「<b>み</b>」で、<b>名詞</b>になる</td><td>夜の寒さ・山の深み</td></tr></table></section>
+  <section class="panel"><h3>形容詞型活用をする助動詞</h3><table class="dtab"><tr><th>助動詞</th><th>活用の型</th></tr>
+    <tr><td style="white-space:nowrap">べし・たし</td><td>ク活用型</td></tr><tr><td style="white-space:nowrap">まじ・まほし</td><td>シク活用型</td></tr><tr><td>ごとし</td><td>形容詞型だが、補助活用（ラ変型）はない</td></tr></table></section>` };
+
 /* --- 7-1 大和物語（姥捨）【動詞】 --- */
 const deck = arr => { let q=[]; return () => { if(!q.length) q=shuffle(arr.map((_,i)=>i)); return arr[q.pop()]; }; };
 const YS_V = [ // [前, 傍線部, 後, 答え, 誤答, 解説]
@@ -2857,7 +2913,7 @@ const L71 = { id:'7-1', sec:'7　読解', t:'大和物語（姥捨）【動詞�
     <tr><td>寝（ぬ）</td><td>ナ行下二段</td><td>寝られず</td></tr></table>
   ${rule('「来ぬ」に注意！<br>来（き）ぬ ＝ 完了（来てしまった）<br>来（こ）ぬ ＝ 打消（来ない）')}</section>` };
 
-return { G, LESSONS:[L11,L12,L13,L71], TERMS:[
+return { G, LESSONS:[L11,L12,L13,L22,L71], TERMS:[
   ['自立語','それだけで文節をつくれる語。'],['付属語','それだけでは文節をつくれない語。助動詞・助詞。'],['用言','述語になる、活用する自立語。動詞・形容詞・形容動詞。'],['体言','実体を表し、主語になる語。名詞。'],
   ['動詞','ウ段（ラ変は「り」）で言い切る。'],['形容詞','「し」で言い切る。'],['形容動詞','「なり」「たり」で言い切る。'],['副詞','おもに用言を修飾する。活用しない。'],['連体詞','体言を修飾する。活用しない。'],['助動詞','活用する付属語。'],['助詞','活用しない付属語。'],
   ['未然形','まだそうなっていない形。「ず」「む」「ば（仮定）」が付く。'],['連用形','用言に続く形。「けり」「て」が付く。'],['終止形','言い切る形。「べし」「らむ」が付く。'],['連体形','体言に続く形。「ぞ・なむ・や・か」の結び。'],['已然形','すでにそうなった形。「ど・ども」「ば（確定）」が付く。「こそ」の結び。'],['命令形','命令して言い切る形。'],
@@ -2865,7 +2921,8 @@ return { G, LESSONS:[L11,L12,L13,L71], TERMS:[
   ['サ変','「す」「おはす」の2語（＋複合語）。せ・し・す・する・すれ・せよ。'],['カ変','「来」の1語。こ・き・く・くる・くれ・こ（こよ）。'],['ナ変','「死ぬ」「往ぬ（去ぬ）」の2語。な・に・ぬ・ぬる・ぬれ・ね。'],
   ['ラ変','「あり」「居り」「侍り」「いまそかり」の4語。ら・り・り・る・れ・れ。'],['上一段','「ひ・い・き・に・み・ゐ（る）」。み・み・みる・みる・みれ・みよ。'],['下一段','「蹴る」の1語。け・け・ける・ける・けれ・けよ。'],
   ['四段','「ず」を付けるとア段。'],['上二段','「ず」を付けるとイ段。'],['下二段','「ず」を付けるとエ段。'],
-  ['年ごろ','長年。'],['いらへ','返事。'],['ところせがる','やっかいに思う。'],['夜一夜','一晩中。'],['〜かぬ','〜できない。'] ] };
+  ['年ごろ','長年。'],['いらへ','返事。'],['ところせがる','やっかいに思う。'],['夜一夜','一晩中。'],['〜かぬ','〜できない。'],
+  ['ク活用','「〜くなる」となる形容詞。く・く・し・き・けれ・○'],['シク活用','「〜しくなる」となる形容詞。しく・しく・し・しき・しけれ・○'],['補助活用（カリ活用）','連用形「く」＋「あり」からできた活用。主に助動詞に続く。'],['AをBみ','AがBなので（原因・理由）。'] ] };
 })();
 
 /* ===== 波（1つ約5分） ===== */
@@ -2941,10 +2998,10 @@ const UNITS = {
   d4:{ no:'データの分析 4章', title:'相関', subject:'数学', course:'math', subj:4, lessons:M7.CH[3], cards:'d4', drill:'d4' },
   d5:{ no:'データの分析 5章', title:'仮説検定', subject:'数学', course:'math', subj:4, lessons:M7.CH[4], cards:'d5', drill:'d5' },
   kb:{ no:'古文 3章', title:'古典文法', subject:'国語', course:'jpn', subj:1, lessons:KB.LESSONS, cards:'kb', drill:'kb', show:[
-    KB.LESSONS[0],
-    KB.LESSONS[1],
-    KB.LESSONS[2],
-    { id:'2-2', sub:'準備中', t:'形容詞', soon:true },
+    KB.LESSONS.find(l=>l.id==='1-1'),
+    KB.LESSONS.find(l=>l.id==='1-2'),
+    KB.LESSONS.find(l=>l.id==='2-1'),
+    KB.LESSONS.find(l=>l.id==='2-2'),
     { id:'2-3', sub:'準備中', t:'形容動詞', soon:true },
     { id:'3-1', sec:'3　助動詞', sub:'準備中', t:'「き」「けり」', soon:true },
     { id:'3-2', sub:'準備中', t:'「つ」「ぬ」', soon:true },
@@ -2971,7 +3028,7 @@ const UNITS = {
     { id:'5-2', sub:'準備中', t:'副詞', soon:true },
     { id:'6-1', sec:'6　敬語', sub:'準備中', t:'敬語の種類', soon:true },
     { id:'6-2', sub:'準備中', t:'注意すべき敬語表現', soon:true },
-    KB.LESSONS[3],
+    KB.LESSONS.find(l=>l.id==='7-1'),
     { id:'7-2', sub:'準備中', t:'枕草子（春はあけぼの）【形容詞】', soon:true },
     { id:'7-3', sub:'準備中', t:'竹取物語（かぐや姫の誕生）【助動詞①】', soon:true },
     { id:'7-4', sub:'準備中', t:'伊勢物語（東下り）【助動詞②】', soon:true },
