@@ -5905,6 +5905,11 @@ const UNITS = {
   m1:{ no:'数と式 1章', title:'式の展開と因数分解', subject:'数学', course:'math', subj:0, lessons:M1.LESSONS.filter(l=>!l.soon), show:M1.LESSONS, cards:'m1', drill:'m1' },
   bc:{ no:'生1', title:'細胞と体', subject:'生物', course:'bio', subj:0, lessons:BC_LESSONS, cards:'bc', drill:'bc' },
 };
+/* 章ごとに波の番号を 1-1 から振り直す（数学の各章） */
+['m3','m4','q1','q2','q3','q4','q5','q6','z1','z2','z3','z4','z5','d1','d2','d4','d5'].forEach(k=>{ const u=UNITS[k]; if(!u) return;
+  const num=l=>/^\d+-\d+$/.test(String(l.id)), min=Math.min(...u.lessons.filter(num).map(l=>+String(l.id).split('-')[0])); if(!(min>1)) return;
+  u.lessons.forEach(l=>{ if(!num(l)) return; const [a,b]=String(l.id).split('-'); l.id=(a-min+1)+'-'+b; if(l.sec) l.sec=l.sec.replace(/^(\d+)(　)/,(m,n,s)=>(n-min+1)+s); }); });
+
 const U = (...t) => t.map(x => typeof x === 'string' ? { t:x } : x);
 const K = (name, k, ...units) => ({ name, k, units:U(...units) });
 const KAKO = { name:'過去問', k:'過', units:[] };
@@ -6099,9 +6104,9 @@ const goItem = (lid, title, go) => { const inner=`<span class="lid">${lid}</span
 function vCourse(){
   const c=courseById(S.course);
   return `${top(c.name)}<div class="stack"><p class="muted small">${c.note}　項目を選ぼう</p><div class="list">
-  ${c.subjects.map((sb,i)=>{ if(sb.go) return goItem(sb.k, sb.name, sb.go); const r=sb.units.filter(u=>u.ready).length;
-    if(!sb.units.length) return `<button class="item" disabled><span class="lid">${sb.k}</span><span class="body"><b>${sb.name}</b><br><span class="small muted">準備中</span></span></button>`;
-    return `<button class="item" data-act="subject" data-arg="${i}"><span class="lid">${sb.k}</span><span class="body"><b>${sb.name}</b><br><span class="small muted">${sb.units.length}章</span></span><span class="tag ${r?'mid':''}">${r?'公開中 '+r:'準備中'}</span><span class="chev">›</span></button>`; }).join('')}</div>
+  ${c.subjects.map((sb,i)=>{ if(sb.go) return goItem(c.id==='math'?i+1:sb.k, sb.name, sb.go); const r=sb.units.filter(u=>u.ready).length;
+    if(!sb.units.length) return `<button class="item" disabled><span class="lid">${c.id==='math'?i+1:sb.k}</span><span class="body"><b>${sb.name}</b><br><span class="small muted">準備中</span></span></button>`;
+    return `<button class="item" data-act="subject" data-arg="${i}"><span class="lid">${c.id==='math'?i+1:sb.k}</span><span class="body"><b>${sb.name}</b><br><span class="small muted">${sb.units.length}章</span></span><span class="tag ${r?'mid':''}">${r?'公開中 '+r:'準備中'}</span><span class="chev">›</span></button>`; }).join('')}</div>
   ${c.subjects.filter(x=>x.go).map(x=>`<p class="small muted">${x.name}は、海月時間の「${x.go.split(' ▶ ')[1]}」の中の「${x.go.split(' ▶ ')[2]}」で学べます。</p>`).join('')}</div>`;
 }
 function vSubject(){
