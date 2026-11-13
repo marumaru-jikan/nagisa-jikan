@@ -5225,7 +5225,7 @@ G.kbHi2 = () => { if (Math.random()<.45) { const [tk,ans,wr,yk,f]=pick(HI_EX), o
   const [q,e,ans,wr,why]=pick(HI_X);
   return Q(q, tq(e), ans, wr, '否定形・二重否定・部分否定のきまりを思い出そう。', `<b>${ans}</b>。<br>${why}`, { words:true }); };
 
-const krow3 = rows => `<table class="dtab"><tr><th>形</th><th>書き下し</th><th>訳</th></tr>${rows.map(r=>`<tr><td style="white-space:nowrap">${r[0]}</td><td style="white-space:nowrap"><b>${r[1]}</b></td><td>${r[2]}</td></tr>`).join('')}</table>`;
+const krow3 = rows => `<table class="dtab"><tr><th>形</th><th>書き下し・訳</th></tr>${rows.map(r=>`<tr><td>${r[0]}</td><td><b>${r[1]}</b><br><span class="small muted">訳：${r[2]}</span></td></tr>`).join('')}</table>`;
 const LK15 = { id:'1-5', t:'否定形', sub:'不・無・非・勿／二重否定・部分否定', plan:['kbHi1','kbHi2','kbHi1','kbHi2','kbHi1'], body:()=>`
   <section class="panel"><h3>否定形とは</h3><p>動作や状態を<b>否定</b>する意味を表す形。「<b>不（弗）</b>」「<b>非</b>」「<b>無（莫）</b>」の助字を用いる。</p>
   <p>否定を重ねる<b>二重否定</b>や、全体の一部を否定する<b>部分否定</b>の形に注意する。</p></section>
