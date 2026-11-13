@@ -178,6 +178,7 @@ p{margin:0}
 .trfig .jm-t{font-size:17px;font-weight:700;fill:var(--ink)}
 .idt td:last-child,.idt th:last-child{white-space:nowrap}.idt td:nth-child(2){min-width:5.5em}
 .kh{margin:16px 0 4px;font-size:1rem;color:var(--teal)}
+.trfig .kg-p{font-size:11px;font-weight:700;fill:var(--ink)}
 .vnote{border-left:4px solid var(--accent);background:var(--sunk);border-radius:6px;padding:8px 12px;margin:8px 0;line-height:1.75;font-size:.94rem}
 ol.ksteps{margin:6px 0 10px;padding-left:1.6em;line-height:1.9}ol.ksteps li::marker{font-weight:700;color:var(--teal)}
 .rule{background:var(--accent-soft);color:var(--accent-ink);border-radius:12px;padding:12px 14px;font-weight:700;line-height:1.75}
@@ -4224,6 +4225,85 @@ const L52 = { id:'5-2', t:'呼応の副詞', sub:'下に決まった語をとる
     <tr><td><b>いかで</b>見<b>てしがな</b>。</td><td>なんとかして見たいものだ。</td></tr>
     <tr><td><b>いつしか</b>春になら<b>なむ</b>。</td><td>早く春になってほしい。</td></tr></table></section>` };
 
+/* --- 6-1 敬語の種類 --- */
+const kgfig = (kind) => { const P=(x,y,t,c)=>`<circle cx="${x}" cy="${y}" r="17" fill="${c}"/><text x="${x}" y="${y+5}" text-anchor="middle" class="kg-p">${t}</text>`;
+  const pink='var(--accent-soft)', gray='var(--sunk)';
+  const hi={son:[1,0,0], ken:[0,1,0], tei:[0,0,1]}[kind];
+  const arrowTo={son:[110,50], ken:[230,50], tei:[300,140]}[kind];
+  return `<svg viewBox="0 0 340 175" class="trfig" role="img" aria-label="敬意の向き">
+  <defs><marker id="kgA${kind}" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="var(--accent)"/></marker><marker id="kgG${kind}" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
+  <rect x="70" y="18" width="200" height="72" rx="12" fill="none" stroke="var(--line)" stroke-dasharray="4 3"/>
+  <text x="170" y="34" text-anchor="middle" class="tf-t">話題の中</text>
+  <line x1="130" y1="58" x2="208" y2="58" stroke="var(--muted)" stroke-width="2" marker-end="url(#kgG${kind})"/>
+  <text x="170" y="78" text-anchor="middle" class="tf-t">動作</text>
+  ${P(110,58,'主体',hi[0]?pink:gray)}${P(230,58,'客体',hi[1]?pink:gray)}
+  ${P(40,145,'話し手',pink)}${P(300,145,'聞き手',hi[2]?pink:gray)}
+  <line x1="58" y1="140" x2="${arrowTo[0]-(kind==='tei'?18:8)}" y2="${arrowTo[1]+(kind==='tei'?0:18)}" stroke="var(--accent)" stroke-width="3" marker-end="url(#kgA${kind})"/>
+  <text x="${kind==='tei'?170:kind==='son'?62:150}" y="${kind==='tei'?134:108}" class="tf-s">敬意</text></svg>`; };
+const KG_W = [ // [語, 種類, 意味]
+  ['給ふ（四段）','尊敬語','お与えになる・くださる'],['たまはす','尊敬語','お与えになる・くださる'],['おはす','尊敬語','いらっしゃる'],['おはします','尊敬語','いらっしゃる'],['いまそかり','尊敬語','いらっしゃる'],
+  ['のたまふ','尊敬語','おっしゃる'],['仰す','尊敬語','おっしゃる'],['思す','尊敬語','お思いになる'],['御覧ず','尊敬語','ご覧になる'],['大殿ごもる','尊敬語','おやすみになる'],['聞こし召す','尊敬語','お聞きになる・召し上がる'],
+  ['申す','謙譲語','申し上げる'],['聞こゆ','謙譲語','申し上げる'],['奏す','謙譲語','（帝・上皇に）申し上げる'],['啓す','謙譲語','（中宮・皇太子に）申し上げる'],['奉る','謙譲語','差し上げる'],['参らす','謙譲語','差し上げる'],
+  ['参る','謙譲語','参上する・参詣する'],['まうづ','謙譲語','参上する・参詣する'],['まかづ','謙譲語','退出する'],['賜る','謙譲語','いただく'],['承る','謙譲語','お聞きする・お受けする'],['仕うまつる','謙譲語','お仕えする・して差し上げる'],
+  ['侍り（丁寧）','丁寧語','あります・おります・ございます'],['候ふ（丁寧）','丁寧語','あります・おります・ございます'],
+];
+const KG_X = [
+  ['尊敬語は、誰への敬意を表す？','尊敬語','動作をする人（主体・為手）',['動作を受ける人（客体・受け手）','聞き手・読み手','話し手自身'],'尊敬語は動作の主体への敬意。'],
+  ['謙譲語は、誰への敬意を表す？','謙譲語','動作を受ける人（客体・受け手）',['動作をする人（主体・為手）','聞き手・読み手','話し手自身'],'謙譲語は動作の客体への敬意。'],
+  ['丁寧語は、誰への敬意を表す？','丁寧語','聞き手・読み手',['動作をする人（主体）','動作を受ける人（客体）','話題の中の人すべて'],'丁寧語は話し手（書き手）が聞き手（読み手）を敬う。'],
+  ['地の文の敬語は、誰からの敬意？','地の文','書き手（作者）',['話し手','登場人物','読み手'],'地の文＝書き手（作者）から。'],
+  ['会話文の敬語は、誰からの敬意？','会話文','話し手',['書き手（作者）','聞き手','主体'],'会話文＝その言葉を言った話し手から。'],
+  ['本来の動詞の意味を失って、敬意だけを添えるものを何という？','大納言が扇を広げ給ふ','補助動詞',['本動詞','助動詞','接続助詞'],'「給ふ」が「広げ」に付いて敬意だけを添えている。'],
+  ['「大納言が扇を給ふ」の「給ふ」は？','大納言が扇を給ふ','本動詞（お与えになる）',['補助動詞（〜なさる）','助動詞','謙譲語'],'「与える」という本来の意味がある。'],
+  ['「AはBに花を奉る」の敬意の対象は？','AはBに花を奉る','B（花を受け取る人）',['A（花を渡す人）','聞き手','話し手'],'「奉る」は謙譲語なので、動作の受け手Bへの敬意。'],
+  ['「AはBに花を給ふ」の敬意の対象は？','AはBに花を給ふ','A（花を与える人）',['B（花を受け取る人）','聞き手','話し手'],'「給ふ」は尊敬語なので、動作の主体Aへの敬意。'],
+];
+G.kbKg1 = () => { const [w,t,m]=pick(KG_W);
+  if (Math.random()<.5) return Q(`「${w}」の敬語の種類は？`, tq(`「${w}」`), t, ['尊敬語','謙譲語','丁寧語','敬語ではない'].filter(x=>x!==t), '動作をする人を高める→尊敬語、動作を受ける人を高める→謙譲語、聞き手に丁寧に→丁寧語。', `「${w}」＝${m}。<b>${t}</b>。`, { words:true });
+  const others=uniq(KG_W.filter(x=>x[2]!==m).map(x=>x[2]));
+  return Q(`「${w}」の意味は？`, tq(`「${w}」`), m, shuffle(others).slice(0,3), '主な敬語の意味は単語として覚えよう。', `「${w}」＝<b>${m}</b>（${t}）。`, { words:true }); };
+G.kbKg2 = () => { const [q,e,ans,wr,why]=pick(KG_X);
+  return Q(q, tq(e), ans, wr, '尊敬→主体、謙譲→客体、丁寧→聞き手。地の文→作者、会話文→話し手から。', `<b>${ans}</b>。<br>${why}`, { words:true }); };
+
+const krow = (rows) => `<table class="dtab"><tr><th>語</th><th>意味</th></tr>${rows.map(([a,b])=>`<tr><td style="white-space:nowrap"><b>${a}</b></td><td>${b}</td></tr>`).join('')}</table>`;
+const L61 = { id:'6-1', sec:'6　敬語', t:'敬語の種類', sub:'尊敬・謙譲・丁寧', plan:['kbKg2','kbKg1','kbKg1','kbKg2','kbKg1'], body:()=>`
+  <section class="panel"><h3>敬語とは</h3><p>話し手（書き手）が、話題の中の人や聞き手（読み手）を<b>敬う気持ち</b>を表す言葉。<b>尊敬語・謙譲語・丁寧語</b>の三つの種類がある。</p>
+  <table class="dtab"><tr><th>種類</th><th>だれを敬う？</th></tr>
+    <tr><td style="white-space:nowrap"><b>尊敬語</b></td><td>話し手（書き手）が、動作の<b>主体（為手）</b>を敬う</td></tr>
+    <tr><td style="white-space:nowrap"><b>謙譲語</b></td><td>話し手（書き手）が、動作の<b>客体（受け手）</b>を敬う</td></tr>
+    <tr><td style="white-space:nowrap"><b>丁寧語</b></td><td>話し手（書き手）が、<b>聞き手（読み手）</b>を敬う</td></tr></table></section>
+  <section class="panel"><h3>敬語の主体と対象</h3><p>敬語では、<b>だれから</b>（主体）<b>だれに対する</b>（対象）敬意かを明らかにする。</p>
+  <table class="dtab"><tr><th></th><th>だれからの敬意</th></tr>
+    <tr><td style="white-space:nowrap"><b>地の文</b></td><td>書き手（作者）から</td></tr>
+    <tr><td style="white-space:nowrap"><b>会話文</b></td><td>話し手から</td></tr></table>
+  <table class="dtab"><tr><th></th><th>だれへの敬意</th></tr>
+    <tr><td style="white-space:nowrap"><b>尊敬語</b></td><td>動作の主体（為手）へ</td></tr>
+    <tr><td style="white-space:nowrap"><b>謙譲語</b></td><td>動作の客体（受け手）へ</td></tr>
+    <tr><td style="white-space:nowrap"><b>丁寧語</b></td><td>聞き手（読み手）へ</td></tr></table></section>
+  <section class="panel"><h3>敬語の種類</h3>
+  <h4 class="kh">1 尊敬語</h4><p>話題となっている事柄の<b>動作をする人（主体）</b>に敬意を表す。</p>
+  ${kgfig('son')}<p class="small">例：AはBに花を<b>給ふ</b>。（AはBに花をお与えになる）</p>
+  <h4 class="kh">2 謙譲語</h4><p>話題となっている事柄の<b>動作の受け手（客体）</b>に敬意を表す。</p>
+  ${kgfig('ken')}<p class="small">例：AはBに花を<b>奉る</b>。（AはBに花を差し上げる）</p>
+  <h4 class="kh">3 丁寧語</h4><p>話し手（書き手）が、目の前の<b>聞き手（読み手）</b>に敬意を表す。</p>
+  ${kgfig('tei')}<p class="small">例：AはBに花を与へ<b>侍り</b>。（AはBに花を与えます）</p></section>
+  <section class="panel"><h3>主な尊敬語</h3>${krow([
+    ['給ふ（四段）','お与えになる・くださる<br><span class="small muted">補助：お〜になる・〜なさる</span>'],['たまはす','お与えになる・くださる'],
+    ['おはす・おはします','いらっしゃる・おいでになる<br><span class="small muted">補助：〜ていらっしゃる</span>'],['いまそかり','いらっしゃる'],['ます・まします','いらっしゃる'],
+    ['のたまふ・のたまはす','おっしゃる'],['仰す','おっしゃる'],['思す・思し召す','お思いになる'],['御覧ず','ご覧になる'],['聞こし召す','お聞きになる・召し上がる'],['大殿ごもる','おやすみになる'],['召す','お呼びになる・召し上がる・お召しになる']])}</section>
+  <section class="panel"><h3>主な謙譲語</h3>${krow([
+    ['申す・聞こゆ','申し上げる<br><span class="small muted">補助：お〜申し上げる</span>'],['奏す','（帝・上皇に）申し上げる'],['啓す','（中宮・皇太子に）申し上げる'],
+    ['奉る・参らす','差し上げる<br><span class="small muted">補助：お〜申し上げる</span>'],['参る・まうづ','参上する・参詣する'],['まかる・まかづ','退出する'],
+    ['賜る・給はる','いただく'],['承る','お聞きする・お受けする'],['仕うまつる','お仕えする・して差し上げる'],['侍り・候ふ（謙譲）','お仕えする・お控えする']])}</section>
+  <section class="panel"><h3>主な丁寧語</h3>${krow([['侍り・候ふ','あります・おります・ございます<br><span class="small muted">補助：〜です・〜ます・〜ございます</span>']])}
+  <p class="small muted">「侍り」「候ふ」は、謙譲語（お仕えする）にも丁寧語にもなる。</p></section>
+  <section class="panel"><h3>敬語の補助動詞</h3>
+  <p>動詞としての本来の意味を持っているものを「<b>本動詞</b>」という。それに対して、本来の意味を失って、ほかの動詞について敬意だけを添えるものを「<b>補助動詞</b>」という。</p>
+  <table class="dtab"><tr><th>例</th><th>種類</th></tr>
+    <tr><td>大納言が扇を<b>給ふ</b>。<br><span class="small muted">（扇をお与えになる）</span></td><td><b>本動詞</b><br>「与える」の意味がある</td></tr>
+    <tr><td>大納言が扇を広げ<b>給ふ</b>。<br><span class="small muted">（扇を広げなさる）</span></td><td><b>補助動詞</b><br>「与える」の意味がない</td></tr></table>
+  ${rule('尊敬語 → 主体へ／謙譲語 → 客体へ／丁寧語 → 聞き手へ')}</section>` };
+
 /* --- 7-1 大和物語（姥捨）【動詞】 --- */
 const deck = arr => { let q=[]; return () => { if(!q.length) q=shuffle(arr.map((_,i)=>i)); return arr[q.pop()]; }; };
 const YS_V = [ // [前, 傍線部, 後, 答え, 誤答, 解説]
@@ -4743,7 +4823,7 @@ const L77 = { id:'7-7', t:'更級日記（源氏の五十余巻）【副詞】',
     <tr><td>まづ</td><td>（何よりも）</td><td>まづいとはかなく</td></tr></table>
   ${rule('「え」を見たら、下の「ず」を探そう！<br>えせず・え見つけず ＝ 〜できない')}</section>` };
 
-return { G, LESSONS:[L11,L12,L13,L22,L23,L31,L32,L33,L34,L35,L36,L37,L38,L39,L310,L311,L312,L313,L314,L315,L41,L42,L43,L44,L45,L46,L51,L52,L71,L72,L73,L74,L75,L76,L77], TERMS:[
+return { G, LESSONS:[L11,L12,L13,L22,L23,L31,L32,L33,L34,L35,L36,L37,L38,L39,L310,L311,L312,L313,L314,L315,L41,L42,L43,L44,L45,L46,L51,L52,L61,L71,L72,L73,L74,L75,L76,L77], TERMS:[
   ['自立語','それだけで文節をつくれる語。'],['付属語','それだけでは文節をつくれない語。助動詞・助詞。'],['用言','述語になる、活用する自立語。動詞・形容詞・形容動詞。'],['体言','実体を表し、主語になる語。名詞。'],
   ['動詞','ウ段（ラ変は「り」）で言い切る。'],['形容詞','「し」で言い切る。'],['形容動詞','「なり」「たり」で言い切る。'],['副詞','おもに用言を修飾する。活用しない。'],['連体詞','体言を修飾する。活用しない。'],['助動詞','活用する付属語。'],['助詞','活用しない付属語。'],
   ['未然形','まだそうなっていない形。「ず」「む」「ば（仮定）」が付く。'],['連用形','用言に続く形。「けり」「て」が付く。'],['終止形','言い切る形。「べし」「らむ」が付く。'],['連体形','体言に続く形。「ぞ・なむ・や・か」の結び。'],['已然形','すでにそうなった形。「ど・ども」「ば（確定）」が付く。「こそ」の結び。'],['命令形','命令して言い切る形。'],
@@ -4781,7 +4861,8 @@ return { G, LESSONS:[L11,L12,L13,L22,L23,L31,L32,L33,L34,L35,L36,L37,L38,L39,L31
   ['間投助詞','よ・や（詠嘆・呼びかけ）、を（詠嘆・強調）。'],
   ['わぶ','つらく思う・心細く思う。'],['言問ふ','尋ねる。'],['こぞりて','残らずみな。'],
   ['え〜ず','〜できない。'],['よも〜じ','まさか〜ないだろう。'],['ゆめ〜な','決して〜するな。'],['つゆ〜ず','少しも〜ない。'],['いかで＋願望','なんとかして〜。'],['いつしか＋願望','早く〜。'],['やがて','そのまま・すぐに。'],
-  ['ゆかし','見たい・知りたい。'],['心もとなし','じれったい・待ち遠しい。'],['まさなし','よくない。'],['あさまし','あきれたことだ。'] ] };
+  ['ゆかし','見たい・知りたい。'],['心もとなし','じれったい・待ち遠しい。'],['まさなし','よくない。'],['あさまし','あきれたことだ。'],
+  ['尊敬語','動作の主体（為手）への敬意。'],['謙譲語','動作の客体（受け手）への敬意。'],['丁寧語','聞き手（読み手）への敬意。'],['奏す','（帝・上皇に）申し上げる。'],['啓す','（中宮・皇太子に）申し上げる。'] ] };
 })();
 
 /* ===== 波（1つ約5分） ===== */
@@ -4885,7 +4966,7 @@ const UNITS = {
     KB.LESSONS.find(l=>l.id==='4-6'),
     KB.LESSONS.find(l=>l.id==='5-1'),
     KB.LESSONS.find(l=>l.id==='5-2'),
-    { id:'6-1', sec:'6　敬語', sub:'準備中', t:'敬語の種類', soon:true },
+    KB.LESSONS.find(l=>l.id==='6-1'),
     { id:'6-2', sub:'準備中', t:'注意すべき敬語表現', soon:true },
     KB.LESSONS.find(l=>l.id==='7-1'),
     KB.LESSONS.find(l=>l.id==='7-2'),
