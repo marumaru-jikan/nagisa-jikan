@@ -5001,7 +5001,7 @@ G.kbHt1 = () => { const [tk,ans,wr,mk]=pick(HT_EX);
 G.kbHt2 = () => { const [q,e,ans,wr,why]=pick(HT_X);
   return Q(q, tq(e), ans, wr, '返り点・送り仮名・書き下し文のきまりを思い出そう。', `<b>${ans}</b>。<br>${why}`, { words:true }); };
 
-const LK21 = { id:'2-1', sec:'2　句法', t:'訓読の決まり', sub:'返り点と書き下し文', plan:['kbHt2','kbHt1','kbHt1','kbHt2','kbHt1'], body:()=>`
+const LK21 = { id:'1-1', sec:'1　句法', t:'訓読のきまり', sub:'返り点と書き下し文', plan:['kbHt2','kbHt1','kbHt1','kbHt2','kbHt1'], body:()=>`
   <section class="panel"><h3>訓読とは</h3><p>漢字だけで書かれた漢文（<b>白文</b>）に、送り仮名や返り点・句読点などの<b>訓点</b>を付けて、日本語の語順で読めるようにすること。</p>
   <table class="dtab"><tr><th>用語</th><th>意味</th></tr>
     <tr><td style="white-space:nowrap"><b>白文</b></td><td>漢字だけで書かれた文</td></tr>
@@ -5011,7 +5011,7 @@ const LK21 = { id:'2-1', sec:'2　句法', t:'訓読の決まり', sub:'返り�
   <section class="panel"><h3>送り仮名の付け方</h3>
   <p>漢字の<b>右下</b>に<b>カタカナ</b>で付ける。文語文法の規則に従い、<b>歴史的仮名遣い</b>で書く。</p>
   ${KBR([[[['山'],['高','シ']],'山高し'],[[['花'],['紅','ナリ']],'花紅なり']])}
-  <p class="small muted">※ 再読文字（二度読む文字）は、二度目の読みの送り仮名を<b>左下</b>に付ける（2-2 で学ぶ）。</p></section>
+  <p class="small muted">※ 再読文字（二度読む文字）は、二度目の読みの送り仮名を<b>左下</b>に付ける（1-2 で学ぶ）。</p></section>
   <section class="panel"><h3>返り点</h3><p>返り点は、漢文を日本語の語順で読むために、漢字の<b>左下</b>に付ける記号。下から上に返って読む場合にのみ付ける。<b>レ点と一・二点が基本</b>。</p>
   <p class="small muted">図の小さな数字は、読む順番。</p>
   <h4 class="kh">1 レ点</h4><p>下の字から、<b>すぐ上の一字</b>に返る。</p>
@@ -5066,7 +5066,7 @@ G.kbSd2 = () => { const [k,r1,r2,yomi,mean,tk,kaki,yaku]=pick(SD);
 G.kbSd3 = () => { const [q,e,ans,wr,why]=pick(SD_X);
   return Q(q, tq(e), ans, wr, '一度目＝右の送り仮名で副詞（漢字）、二度目＝左の送り仮名で助動詞・動詞（ひらがな）。', `<b>${ans}</b>。<br>${why}`, { words:true }); };
 
-const LK22 = { id:'2-2', t:'再読文字', sub:'一字を二度読む文字', plan:['kbSd3','kbSd1','kbSd2','kbSd1','kbSd2'], body:()=>`
+const LK22 = { id:'1-2', t:'再読文字', sub:'一字を二度読む文字', plan:['kbSd3','kbSd1','kbSd2','kbSd1','kbSd2'], body:()=>`
   <section class="panel"><h3>再読文字</h3><p>一字を<b>二度読む</b>文字。<b>一度目</b>は右側の送り仮名で<b>副詞</b>として読み、下の語を読んだ後、<b>二度目</b>は左側の送り仮名で<b>助動詞や動詞</b>として読む。</p>
   ${rule('一度目 ＝ 副詞（漢字で書く）<br>二度目 ＝ 助動詞・動詞（ひらがなで書く）')}</section>
   <section class="panel"><h3>再読文字の読み方</h3>
@@ -5246,11 +5246,15 @@ const UNITS = {
   kk:{ no:'漢文 2章', title:'句法', subject:'国語', course:'jpn', subj:2, lessons:KB.KK, cards:'kk', drill:'kk', show:[
     KB.KK[0],
     KB.KK[1],
-    { id:'2-3', sub:'準備中', t:'受身形', soon:true },
-    { id:'2-4', sub:'準備中', t:'使役形', soon:true },
-    { id:'2-5', sub:'準備中', t:'否定形', soon:true },
-    { id:'2-6', sub:'準備中', t:'疑問形・反語形', soon:true },
-    { id:'2-7', sub:'準備中', t:'抑揚形', soon:true } ] },
+    { id:'1-3', sub:'準備中', t:'受身形', soon:true },
+    { id:'1-4', sub:'準備中', t:'使役形', soon:true },
+    { id:'1-5', sub:'準備中', t:'否定形', soon:true },
+    { id:'1-6', sub:'準備中', t:'疑問形・反語形', soon:true },
+    { id:'1-7', sub:'準備中', t:'抑揚形', soon:true },
+    { id:'2-1', sec:'2　読解', sub:'準備中', t:'論語・春秋左氏伝【訓読】', soon:true },
+    { id:'2-2', sub:'準備中', t:'後漢書【受身形】', soon:true },
+    { id:'2-3', sub:'準備中', t:'西京雑記【使役形・否定形】', soon:true },
+    { id:'2-4', sub:'準備中', t:'十八史略【疑問形・反語形・抑揚形】', soon:true } ] },
   m1:{ no:'数と式 1章', title:'式の展開と因数分解', subject:'数学', course:'math', subj:0, lessons:M1.LESSONS.filter(l=>!l.soon), show:M1.LESSONS, cards:'m1', drill:'m1' },
   bc:{ no:'生1', title:'細胞と体', subject:'生物', course:'bio', subj:0, lessons:BC_LESSONS, cards:'bc', drill:'bc' },
 };
