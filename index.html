@@ -385,7 +385,7 @@ ol.steps{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:6px}
 /* ===== 設定（GitHubに置くときにここを書きかえます） ===== */
 // 先生用スプレッドシートの送信先（Apps Script のウェブアプリURL）。空のままだと送信しません。
 const GAS_URL = '';
-// 章をぜんぶクリアしたときにめくる海のカード。写真は cards フォルダへ。
+// 項目（古文・2次関数など）をぜんぶクリアしたときにめくる海のカード。写真は cards フォルダへ。
 // t は p（海の写真）か h（海の作品）。note は日付や場所（空でもOK）。
 // 例：{ t:'p', src:'cards/p01.jpg', name:'天草の潮だまり', note:'2026.8　天草' },
 // 写真を書き足すと、潮だまり図鑑（アプリに入っているカード）といっしょにめくれるようになります。
@@ -519,10 +519,10 @@ const ZUKAN = [
 const KURAGE_URL = 'https://marumaru-jikan.github.io/kurage-jikan/';
 
 // 演習問題PDF。pdf フォルダに入れたファイル名を書きます。空なら「準備中」と表示されます。
-// 1つの項目をぜんぶ終えたときに届く小瓶の手紙。好きな言葉に書きかえてOK。
+// 1つの章をぜんぶ終えたときに届く小瓶の手紙。好きな言葉に書きかえてOK。
 // まだ読んでいない手紙から順に届きます。
 const BOTTLE_MSGS = [
-  'ひとつの項目を、最後まで歩ききったね。それは、ちゃんとあなたの力です。',
+  'ひとつの章を、最後まで歩ききったね。それは、ちゃんとあなたの力です。',
   '毎日じゃなくていい。戻ってきたあなたが、いちばんえらい。',
   '寄せては返す波みたいに、行ったり来たりでいいんだよ。',
   'わからなかったところは、伸びるところ。今日のあなたは、昨日より少し先にいます。',
@@ -5958,7 +5958,7 @@ function drawReward(){
   if(isNew){ R.cards.push(ALLC[i].key); save(); } return { i, isNew };
 }
 function rewardCard(rw){ const c=ALLC[rw.i];
-  return `<div class="rcard pop"><p class="rlead">${rw.title?esc(rw.title)+'を':''}ぜんぶクリア！ 海のカードが1まい届きました</p>
+  return `<div class="rcard pop"><p class="rlead">${rw.title?'項目「'+esc(rw.title)+'」を':''}ぜんぶクリア！ 海のカードが1まい届きました</p>
   <button class="rflip" data-act="openReward" aria-label="カードをめくる"><span class="rinner"><span class="rback">${CARD_BACK}<span class="rhint">タップしてめくる</span></span><span class="rfront${c.zimg?' fit':''}">${cardFace(rw.i)}</span></span></button>
   <div class="rcap"><span class="rno">${cardLabel(rw.i)}${rw.isNew?'<em>NEW</em>':''}</span><b class="rname">${esc(c.name)}</b>${c.note?`<span class="rnote">${esc(c.note)}</span>`:''}<span class="rcount num">集めたカード ${ALLC.filter(x=>R.cards.includes(x.key)).length} / ${ALLC.length}</span></div></div>`;
 }
@@ -6074,7 +6074,7 @@ function drawBottle(key, name){
   const m = rest.length ? rest[0] : ri(0,BOTTLE_MSGS.length-1);
   const b={ key, name, m, d:today() }; R.bottles.push(b); save(); return b;
 }
-const bottleCard = b => `<div class="panel bottle pop"><p class="rlead">項目「${esc(b.name)}」をぜんぶ終えました！<br>小瓶が流れてきました</p>
+const bottleCard = b => `<div class="panel bottle pop"><p class="rlead">章「${esc(b.name)}」をぜんぶ終えました！<br>小瓶が流れてきました</p>
   <button class="bopen" data-act="openBottle" aria-label="小瓶をあける">${BOTTLE_SVG}<span class="rhint">タップしてあける</span></button>
   <div class="letter">${esc(BOTTLE_MSGS[b.m])}</div></div>`;
 function vSetup(){
@@ -6124,7 +6124,7 @@ function vGoto(){
 }
 function vUnit(){
   const u=CU(), uid=S.uid, T=TERMS[u.cards]||[], kn=(R.known[uid]||[]).length, hasPdf=Object.keys(PDF).some(k=>k.startsWith(u.drill+'-')&&PDF[k].q);
-  return `${top(u.no+'　'+u.title)}<div class="stack"><p class="muted small">${u.lessons.length?`${u.lessons.length<10?u.lessons.length+"つ":u.lessons.length}の波　1つ約5分。上から順に進めるのがおすすめです。ぜんぶクリアすると海のカードが1まい届きます。`:"この章の目次です。波は準備ができたものから公開します。"}</p><div class="list">
+  return `${top(u.no+'　'+u.title)}<div class="stack"><p class="muted small">${u.lessons.length?`${u.lessons.length<10?u.lessons.length+"つ":u.lessons.length}の波　1つ約5分。上から順に進めるのがおすすめです。ぜんぶクリアすると小瓶の手紙が届きます。`:"この章の目次です。波は準備ができたものから公開します。"}</p><div class="list">
   ${(u.show||u.lessons).map(l=>l.soon?`${l.sec?`<div class="secrow">${l.sec}</div>`:''}<div class="item" style="opacity:.55"><span class="lid">${l.id}</span><span class="body"><b>${l.t}</b><br><span class="small muted">準備中</span></span></div>`:`${l.sec?`<div class="secrow">${l.sec}</div>`:''}<button class="item" data-act="lesson" data-arg="${l.id}"><span class="lid ${R.lessons[lkey(uid,l.id)]?'done':''}">${l.id}</span><span class="body"><b>${l.t}</b><br><span class="small muted">${l.sub}</span></span>${lTag(uid,l.id)}<span class="chev">›</span></button>`).join('')}
   ${hasPdf?`<button class="item" data-act="go" data-arg="drill"><span class="lid">▶</span><span class="body"><b>演習問題</b><br><span class="small muted">PDF・Lv1〜Lv5</span></span><span class="chev">›</span></button>`:''}
   </div>${T.length?`<div class="list"><button class="item" data-act="cards"><span class="body"><b>用語カード</b><br><span class="small muted">用語の確認 ${T.length}枚</span></span><span class="tag ${kn===T.length?'done':kn?'mid':''}">${kn}/${T.length}</span><span class="chev">›</span></button></div>`:''}</div>`;
@@ -6170,8 +6170,8 @@ function vResult(){
   const msg = Q.score===n?'全問正解。よく頑張りました。':Q.score>=n*0.6?'あと少し。間違えた問題を見直せば完璧です。':'大丈夫。間違えた問題こそ、伸びるところです。';
   return `${top('結果')}<div class="stack">
   <div class="panel result pop"><div class="big">${Q.score}/${n}</div><h2>${Q.retry?'見直し完了':l.id+'　'+l.t}</h2><p class="muted">${msg}</p></div>
-  ${S.reward?rewardCard(S.reward):''}
   ${S.bottle?bottleCard(S.bottle):''}
+  ${S.reward?rewardCard(S.reward):''}
   ${S.gotWave?`<div class="panel waveget pop">${WAVE_I}<div><b>波を1つつかまえました</b><br><span class="small muted">もっている波 ${R.pool.waves}　潮だまりに寄せよう</span></div><button class="btn" data-act="toPool">寄せる →</button></div>`:''}
   ${Q.wrong.length?`<button class="btn warm wide" data-act="retry">間違えた ${Q.wrong.length}問 をもう一度</button>`:''}
   ${nx&&!Q.retry?`<button class="btn wide" data-act="lessonNext" data-arg="${nx.id}">次へ　${nx.id} ${nx.t} →</button>`:''}
@@ -6309,8 +6309,9 @@ document.addEventListener('click', e=>{
       report({ subject:u.subject, unit:u.no+' '+u.title, lesson:l.id, title:l.t, score:Q.score, total:n, sec:Math.round((Date.now()-S.lessonStart)/1000) });
       if(!wasDone&&unitDone(S.uid)){
         const sb=courseById(u.course).subjects[u.subj], pub=sb.units.filter(x=>x.ready&&UNITS[x.ready].lessons.length);
-        if(pub.length && pub.every(x=>unitDone(x.ready))) S.bottle=drawBottle(u.course+':'+u.subj, sb.name);
-        if(!S.bottle){ S.reward=drawReward(); S.reward.title=u.title; } }
+        S.bottle=drawBottle('u:'+S.uid, u.title);
+        const sk=u.course+':'+u.subj; R.subjDone=R.subjDone||[];
+        if(pub.length && pub.every(x=>unitDone(x.ready)) && !R.subjDone.includes(sk)){ R.subjDone.push(sk); S.reward=drawReward(); S.reward.title=sb.name; save(); } }
       if(first){ R.pool.waves++; R.pool.total++; S.gotWave=true; save(); } }
     S.view='result'; render(); window.scrollTo(0,0); }
   else if(a==='retry'){ const list=S.quiz.wrong.map(q=>Object.assign({},q,{choices:shuffle([...q.choices])})); S.view=S.stack.pop()||'lesson'; startQuiz(list); }
