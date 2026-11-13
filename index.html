@@ -2649,23 +2649,17 @@ G.kbKF2 = () => { const v=pick(V4), [n,a,b,why]=pick(CTX), w=v[0]+v[1+n];
 const T = s => `<div class="tate">${s}</div>`;
 const L11 = { id:'1-1', sec:'1　品詞', t:'品詞分類', sub:'十の品詞', plan:['kbTree','kbGroup','kbWord','kbWord','kbWord'], body:()=>`
   <section class="panel"><h3>品詞分類表</h3><p class="small muted">上から下へ読みます。右側が自立語、左側が付属語です。</p>${chart()}</section>
-  <section class="panel"><p class="small muted">縦書きです。左へスワイプして読みます。</p>${T(`
-    <h4>品詞とは</h4>
-    <p>単語を、文法上の性質で分けたものを<b>品詞</b>といいます。古文の品詞は<b>十</b>あります。</p>
-    <p>分けるときの基準は三つです。</p>
-    <p>①　<b>自立語</b>か<b>付属語</b>か</p>
-    <p>②　<b>活用する</b>か、しないか</p>
-    <p>③　どんな<b>文節</b>になるか</p>
-    <h4>自立語と付属語</h4>
-    <p><b>自立語</b>は、それだけで文節をつくれる語。一つの文節に必ず一つあります。</p>
-    <p><b>付属語</b>は、それだけでは文節をつくれない語。自立語のあとについて使われます。</p>
-    <h4>用言と体言</h4>
-    <p><b>用言</b>は、述語になる語。<span class="kz2">動詞・形容詞・形容動詞</span>の三つです。</p>
-    <p><b>体言</b>は、ものごとの実体を表し、主語になる語。名詞のことです。</p>
-    <h4>おぼえよう</h4>
-    <p>活用する（形が変わる）のは、<span class="kz2">動詞・形容詞・形容動詞・助動詞</span>の四つだけ。</p>
-    <p>見分けるときは、まず<b>言い切りの形</b>にしてみよう。</p>
-    <p>ウ段（ラ変は「り」）→動詞、「し」→形容詞、「なり」「たり」→形容動詞。</p>`)}</section>` };
+  <section class="panel"><h3>品詞とは</h3><p>単語を、文法上の性質で分けたものを<b>品詞</b>といいます。古文の品詞は<b>10種類</b>です。</p>
+  ${rule('分け方の3つの基準<br>① 自立語か、付属語か<br>② 活用するか、しないか<br>③ どんな文節（主語・述語・修飾語など）になるか')}</section>
+  <section class="panel"><h3>自立語と付属語</h3><table class="dtab"><tr><th></th><th>はたらき</th><th>品詞</th></tr>
+    <tr><td style="white-space:nowrap"><b>自立語</b></td><td>それだけで文節をつくれる。1つの文節に必ず1つある</td><td>動詞・形容詞・形容動詞・名詞・副詞・連体詞・接続詞・感動詞</td></tr>
+    <tr><td style="white-space:nowrap"><b>付属語</b></td><td>それだけでは文節をつくれない。自立語のあとに付く</td><td>助動詞・助詞</td></tr></table></section>
+  <section class="panel"><h3>用言と体言</h3><table class="dtab"><tr><th></th><th>はたらき</th><th>品詞</th></tr>
+    <tr><td style="white-space:nowrap"><b>用言</b></td><td>述語になる。活用する</td><td><span class="kz2">動詞・形容詞・形容動詞</span></td></tr>
+    <tr><td style="white-space:nowrap"><b>体言</b></td><td>ものごとの実体を表し、主語になる</td><td>名詞</td></tr></table></section>
+  <section class="panel"><h3>おぼえよう</h3>${rule('活用するのは 動詞・形容詞・形容動詞・助動詞 の4つだけ')}
+  <table class="dtab"><tr><th>言い切りの形</th><th>品詞</th><th>例</th></tr><tr><td>ウ段（ラ変は「り」）</td><td>動詞</td><td>咲く・あり</td></tr><tr><td>「し」</td><td>形容詞</td><td>白し・をかし</td></tr><tr><td>「なり」「たり」</td><td>形容動詞</td><td>静かなり・堂々たり</td></tr></table>
+  <p class="small muted">見分けるときは、まず<b>言い切りの形</b>にしてみよう。</p></section>` };
 const L12 = { id:'1-2', t:'活用形', sub:'六つの形と下に付く語', plan:['kbKF1','kbKF1','kbKF2','kbKF2','kbKF2'], body:()=>`
   <section class="panel"><h3>六つの活用形</h3><p class="small muted">縦書きの表です。右から 未然形 → 命令形 の順。左へスワイプして読みます。</p>${ktab()}
   <p class="small muted">活用形は「下に何が付いているか」で見分けます。四段動詞では、已然形と命令形、終止形と連体形が同じ形になるので、下の語で区別しよう。</p></section>` };
