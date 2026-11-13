@@ -192,6 +192,7 @@ p{margin:0}
 .qbox .expr .kbn{font-size:1.7rem}
 .kbn .l{position:absolute;left:-.05em;top:1.35em;font-size:.42em;line-height:1.05;writing-mode:vertical-rl;color:var(--ink)}.kbn .lo .t{top:2.6em}.kbn .n.w{width:auto;padding:0 .35em;border-radius:.8em;left:-2.6em}.kbn .o,.kbn .l{white-space:nowrap}
 .kbtext{display:flex;flex-direction:row-reverse;gap:2px;overflow-x:auto;padding:6px 4px;justify-content:flex-start}.kbtext .kbn{font-size:1.35rem;flex:none}
+.kbn .c.p{height:.75em}.kbn .c.p .k{writing-mode:vertical-rl;top:0;left:.55em;width:1em;height:.75em;line-height:1em;font-weight:400;text-align:start}
 .vnote{border-left:4px solid var(--accent);background:var(--sunk);border-radius:6px;padding:8px 12px;margin:8px 0;line-height:1.75;font-size:.94rem}
 ol.ksteps{margin:6px 0 10px;padding-left:1.6em;line-height:1.9}ol.ksteps li::marker{font-weight:700;color:var(--teal)}
 .rule{background:var(--accent-soft);color:var(--accent-ink);border-radius:12px;padding:12px 14px;font-weight:700;line-height:1.75}
@@ -4967,7 +4968,7 @@ const L78 = { id:'7-8', t:'徒然草（九月二十日のころ）【敬語】',
 
 /* ===== 漢文 2章 句法 ===== */
 /* 訓点つき漢文：[字, 送り仮名, 返り点, 読む順, ハイフン] */
-const KBN = (toks, num) => `<div class="kbn">${toks.map(([k,o,t,n,h,l])=>`<span class="c${l?' lo':''}"><span class="k">${k}</span>${o?`<span class="o">${o}</span>`:''}${l?`<span class="l">${l}</span>`:''}${t?`<span class="t">${t}</span>`:''}${num&&n?`<span class="n${String(n).length>1?' w':''}">${n}</span>`:''}${h?'<span class="hy"></span>':''}</span>`).join('')}</div>`;
+const KBN = (toks, num) => `<div class="kbn">${toks.map(([k,o,t,n,h,l])=>`<span class="c${l?' lo':''}${/^[。、「」『』]$/.test(k)?' p':''}"><span class="k">${k}</span>${o?`<span class="o">${o}</span>`:''}${l?`<span class="l">${l}</span>`:''}${t?`<span class="t">${t}</span>`:''}${num&&n?`<span class="n${String(n).length>1?' w':''}">${n}</span>`:''}${h?'<span class="hy"></span>':''}</span>`).join('')}</div>`;
 const KBR = (items) => `<div class="kbrow">${items.map(([toks,cap])=>`<figure>${KBN(toks,true)}<figcaption>${cap}</figcaption></figure>`).join('')}</div>`;
 const HT_EX = [ // [訓点, 書き下し, 誤答, 使う返り点]
   [[['登','ル','レ'],['山','ニ']],'山に登る',['登る山に','山登るに','登山す'],'レ点'],
