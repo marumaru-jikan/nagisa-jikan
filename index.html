@@ -2725,7 +2725,7 @@ G.kbVK3 = () => { const [w,t,f]=pick(VS), n=Math.floor(Math.random()*6);
   return Q(`「${w}」（${t}）の${KF6[n]}は？`, tq(`${w}　→　${KF6[n]}`), f[n], uniq(f.filter(x=>x!==f[n])).sort(()=>Math.random()-.5),
     '活用表を「未然・連用・終止・連体・已然・命令」の順に唱えてみよう。', `${t}「${w}」：${f.join('・')}<br>${KF6[n]}は <b>${f[n]}</b>。`, { words:true }); };
 
-const L13 = { id:'1-3', t:'動詞の活用の種類', sub:'九つの活用', plan:['kbVK1','kbVK2','kbVK1','kbVK3','kbVK1'], body:()=>`
+const L13 = { id:'2-1', sec:'2　用言', t:'動詞', sub:'活用の種類', plan:['kbVK1','kbVK2','kbVK1','kbVK3','kbVK1'], body:()=>`
   <section class="panel"><h3>正格活用と変格活用</h3>
   <table class="dtab"><tr><th></th><th>意味</th><th>種類</th></tr>
     <tr><td style="white-space:nowrap"><b>正格活用</b></td><td>一定のきまりに従って、規則正しく活用する</td><td>四段・上一段・上二段・下一段・下二段（5種）</td></tr>
@@ -2865,7 +2865,6 @@ const UNITS = {
     KB.LESSONS[0],
     KB.LESSONS[1],
     KB.LESSONS[2],
-    { id:'2-1', sec:'2　用言', sub:'準備中', t:'動詞', soon:true },
     { id:'2-2', sub:'準備中', t:'形容詞', soon:true },
     { id:'2-3', sub:'準備中', t:'形容動詞', soon:true },
     { id:'3-1', sec:'3　助動詞', sub:'準備中', t:'「き」「けり」', soon:true },
