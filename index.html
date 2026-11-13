@@ -942,7 +942,7 @@ const talkPara = t => { const h=esc(t).replace(/【([Ａ-Ｚ])　(.+?)】/g,'<sp
   return m ? `<p class="talk"><b>${m[1]}</b><span>${m[2]}</span></p>` : `<p>${h}</p>`; };
 const blockHtml = b => typeof b==='string' ? `<p>${esc(b)}</p>` : b.h ? `<h4 class="doc-h">${esc(b.h)}</h4>` : b.s ? `<p class="doc-s">${esc(b.s)}</p>`
   : b.img ? `<img class="doc-img" src="${b.img}" alt="${esc(b.alt)}">` : b.table ? `<div class="scroll"><table class="tbl doc-t"><tr><th>項目</th><th>記入内容</th></tr>${b.table.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td></tr>`).join('')}</table></div>` : '';
-const nvText = (N,a,b) => `<div class="novel">${N.text.slice(a,b).map(t=>N.blocks?blockHtml(t):N.talk?talkPara(t):`<p>${nvPara(t)}</p>`).join('')}${N.credit&&b>=N.text.length?`<p class="credit">（福田海凪『${N.credit}』）</p>`:''}</div>`;
+const nvText = (N,a,b) => `<div class="novel">${N.text.slice(a,b).map(t=>N.blocks?blockHtml(t):N.talk?talkPara(t):`<p>${nvPara(t)}</p>`).join('')}${N.credit&&b>=N.text.length?`<p class="credit">（オリジナル問題）</p>`:''}</div>`;
 const nq2 = (key,n) => { const N=NOVELS[key], Q=N.q[n], sec=N.qsec[n], [a,b]=sec<0?[0,N.text.length]:N.sec[sec];
   const order=N.shuffle?shuffle([0,1,2,3,4]):[0,1,2,3,4], choices=order.map((k,i)=>MARU[i]+'　'+esc(Q.c[k]));
   return { raw:true, long:true, prompt:'問'+(n+1)+'　'+esc(Q.q).replace(/\n/g,'<br>'), expr:`<details class="reread"><summary>${N.blocks?(sec<0?'資料すべて':'資料'):(sec<0?'本文全体':'本文')}を読み返す</summary>${nvText(N,a,b)}</details>`,
