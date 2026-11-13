@@ -174,6 +174,7 @@ p{margin:0}
 .vverb table{table-layout:fixed;height:41em}.vverb th,.vverb td{white-space:normal;text-align:center}.vverb tr:first-child>th{width:2.6em}.vverb tr:nth-child(2)>*{width:2.6em}.vverb tr:nth-child(3)>td{width:4.6em;text-align:start}
 .ytext p{margin:0 0 0 .6em;text-indent:1em}.ytext .waka{text-indent:3em;font-weight:700;color:var(--teal);margin-left:1.2em}.ytext .src{text-indent:0;font-size:.85rem;color:var(--muted);padding-top:12em}.ytext rt{font-size:.5em}
 .vadj .hojo{color:var(--accent-ink);background:var(--accent-soft);border-radius:3px}.vadj table{height:auto;table-layout:auto}.vadj td{white-space:nowrap}.vadj tr:nth-child(2)>*,.vadj tr:nth-child(3)>*{width:4.4em;text-align:start}.vadj tr>th:first-child{white-space:nowrap}.vadj td{line-height:1.5}
+.trfig{width:100%;max-width:420px;display:block;margin:8px auto}.trfig .tf-h{font-size:13px;font-weight:700;fill:var(--ink)}.trfig .tf-s{font-size:12px;fill:var(--ink)}.trfig .tf-t{font-size:11px;fill:var(--muted)}
 .vnote{border-left:4px solid var(--accent);background:var(--sunk);border-radius:6px;padding:8px 12px;margin:8px 0;line-height:1.75;font-size:.94rem}
 ol.ksteps{margin:6px 0 10px;padding-left:1.6em;line-height:1.9}ol.ksteps li::marker{font-weight:700;color:var(--teal)}
 .rule{background:var(--accent-soft);color:var(--accent-ink);border-radius:12px;padding:12px 14px;font-weight:700;line-height:1.75}
@@ -3009,6 +3010,58 @@ const L32 = { id:'3-2', t:'「つ」「ぬ」', sub:'完了・強意の助動詞
     <tr><td>とく帰り<b>てむ</b>。</td><td>早く帰ってしまおう。</td></tr>
     <tr><td>風も吹き<b>ぬべし</b>。</td><td>きっと風も吹くだろう。</td></tr></table></section>` };
 
+/* --- 3-3 「たり」「り」 --- */
+const trfig = () => `<svg viewBox="0 0 340 168" class="trfig" role="img" aria-label="存続と完了の図">
+  <defs><marker id="trA" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--muted)"/></marker></defs>
+  <text x="8" y="22" class="tf-h">① 存続「〜ている」</text>
+  <line x1="12" y1="52" x2="326" y2="52" stroke="var(--muted)" stroke-width="2" marker-end="url(#trA)"/>
+  <rect x="82" y="44" width="170" height="16" rx="8" fill="var(--teal)" opacity=".85"/>
+  <line x1="82" y1="36" x2="82" y2="68" stroke="var(--teal)" stroke-width="2"/><line x1="252" y1="36" x2="252" y2="68" stroke="var(--teal)" stroke-width="2"/>
+  <text x="167" y="84" text-anchor="middle" class="tf-s">動作・状態が続いている（幅がある）</text>
+  <text x="8" y="112" class="tf-h">② 完了「〜た」</text>
+  <line x1="12" y1="140" x2="326" y2="140" stroke="var(--muted)" stroke-width="2" marker-end="url(#trA)"/>
+  <circle cx="167" cy="140" r="8" fill="var(--accent)"/>
+  <text x="167" y="162" text-anchor="middle" class="tf-s">一回で完結した（点）</text>
+  <text x="326" y="40" text-anchor="end" class="tf-t">時間</text><text x="326" y="128" text-anchor="end" class="tf-t">時間</text></svg>`;
+const TR_F = [ // [前, 傍線, 後, 活用形, 解説]
+  ['雪の降れ','る','日','連体形','体言「日」に続くので連体形。「る」は「り」の連体形。'],['歌を詠め','り','。','終止形','文末で言い切っているので終止形。'],
+  ['咲き','たる','花','連体形','体言「花」に続くので連体形。'],['京に着き','たれ','ば、','已然形','「ば」が已然形に付くと確定。'],
+  ['花散り','たら','む','未然形','推量「む」は未然形に付く。'],['ここに住め','れ','ど、','已然形','接続助詞「ど」は已然形に付く。'],
+  ['文を書け','ら','む','未然形','推量「む」は未然形に付く。「ら」は「り」の未然形。'],['花咲き','たり','けり','連用形','過去「けり」は連用形に付く。'],
+  ['月の照れ','る','夜','連体形','体言「夜」に続くので連体形。'],['戸を開け','たり','。','終止形','文末で言い切っているので終止形。'],
+];
+const TR_M = [ // [前, 傍線, 後, 意味, 訳]
+  ['白き衣着','たる','人','存続','白い着物を着ている人'],['雪の降れ','る','日','存続','雪が降っている日'],['月の照れ','る','夜','存続','月が照っている夜'],
+  ['戸の開き','たる','所','存続','戸が開いている所'],['庭に花の咲き','たる','を見る','存続','庭に花が咲いているのを見る'],
+  ['ようやく京に着き','たり','。','完了','ようやく京に着いた'],['その夜、男、歌詠め','り','。','完了','その夜、男は歌を詠んだ'],
+  ['文を書き終へ','たり','。','完了','手紙を書き終えた'],['舟、岸に着け','り','。','完了','舟が岸に着いた'],
+];
+G.kbTr1 = () => { const r=Math.random();
+  if (r<.2) return Q('助動詞「り」が付く動詞は？', tq('「り」の接続'), '四段動詞・サ変動詞', ['上一段動詞・下一段動詞','カ変動詞・ナ変動詞','すべての動詞'], '「り」はサ変の未然形・四段の已然形に付く（サ・未・四・已）。', '<b>四段動詞・サ変動詞</b>。どちらも e段 の音に付く（書け・せ）。');
+  if (r<.35) return Q('サ変「す」に「り」を付けると？', tq('す　＋　り'), 'せり', ['しり','すり','すれり'], '「り」はサ変の未然形に付く。', 'サ変の未然形「せ」＋「り」＝ <b>せり</b>。', { words:true });
+  const v=pick(KK_STEM.filter(x=>['行く','書く','思ふ','住む'].includes(x[0]))), [base,st,a,i,u,e]=v;
+  if (r<.7) { const ok=st+e+'り'; return Q(`「${base}」（四段）に「り」を付けると？`, tq(`${base}　＋　り`), ok, [st+a+'り', st+i+'り', st+u+'り'], '「り」は四段動詞の已然形（e段）に付く。', `已然形「${st+e}」＋「り」＝ <b>${ok}</b>。`, { words:true }); }
+  const ok=st+i+'たり'; return Q(`「${base}」に「たり」を付けると？`, tq(`${base}　＋　たり`), ok, [st+a+'たり', st+u+'たり', st+e+'たり'], '「たり」は連用形に付く。', `連用形「${st+i}」＋「たり」＝ <b>${ok}</b>。`, { words:true }); };
+G.kbTr2 = () => { const [a,w,b,ans,why]=pick(TR_F);
+  return Q('傍線部の活用形は？', tq(`${a}${B(w)}${b}`), ans, KF6.filter(x=>x!==ans&&x!=='命令形').sort(()=>Math.random()-.5).slice(0,3), '「たり」：たら・たり・たり・たる・たれ・たれ／「り」：ら・り・り・る・れ・れ', `「${w}」は <b>${ans}</b>。<br>${why}`, { words:true }); };
+G.kbTr3 = () => { const [a,w,b,ans,tr]=pick(TR_M);
+  return Q('傍線部の意味は？', tq(`${a}${B(w)}${b}`), ans, ['存続','完了','断定','過去'].filter(x=>x!==ans), '「〜ている」と訳せたら存続。一回で終わった動作なら完了。', `<b>${ans}</b>。<br>「${tr}」`); };
+
+const L33 = { id:'3-3', t:'「たり」「り」', sub:'存続・完了の助動詞', plan:['kbTr1','kbTr2','kbTr3','kbTr1','kbTr3'], body:()=>`
+  <section class="panel"><h3>助動詞「たり」「り」</h3>
+  ${auxbox([['接続','<b>たり</b>：<b>連用形</b><br><b>り</b>：<b>サ変の未然形</b>・<b>四段の已然形</b>（どちらも e段）']])}
+  ${rule('「り」の接続は「サ・未・四・已（さみしい）」<br>せ＋り → せり　／　書け＋り → 書けり')}
+  <p class="small muted">縦書きの表です。右から左へ読みます。</p>
+  ${auxtab2([['たり',['たら','たり','たり','たる','たれ','たれ'],'ラ変型'],['り',['ら','り','り','る','れ','れ'],'ラ変型']])}</section>
+  <section class="panel"><h3>意味</h3>
+  ${auxbox([['① 存続','「〜ている・〜てある」<br>動作・状態が<b>続いている</b>'],['② 完了','「〜た・〜てしまった」<br><b>一回で完結</b>する動作・状態']])}
+  ${trfig()}
+  <table class="dtab"><tr><th>意味</th><th>例</th><th>訳</th></tr>
+    <tr><td style="white-space:nowrap">① 存続</td><td>雪の降れ<b>る</b>日</td><td>雪が降っている日</td></tr>
+    <tr><td style="white-space:nowrap">① 存続</td><td>白き衣着<b>たる</b>人</td><td>白い着物を着ている人</td></tr>
+    <tr><td style="white-space:nowrap">② 完了</td><td>京に着き<b>たり</b>。</td><td>京に着いた。</td></tr></table>
+  ${note('もともとは存続','「たり」「り」は、もともと<b>存続</b>（存在・継続）の意味。そこから完了の意味も生まれた。<br>「〜ている」と訳せるときは存続。迷ったら存続から考えよう。')}</section>` };
+
 /* --- 7-1 大和物語（姥捨）【動詞】 --- */
 const deck = arr => { let q=[]; return () => { if(!q.length) q=shuffle(arr.map((_,i)=>i)); return arr[q.pop()]; }; };
 const YS_V = [ // [前, 傍線部, 後, 答え, 誤答, 解説]
@@ -3163,7 +3216,7 @@ const L72 = { id:'7-2', t:'枕草子（春はあけぼの）【形容詞・形�
     <tr><td>あはれなり</td><td>形容動詞・ナリ活用</td><td>あはれなり</td></tr></table>
   ${rule('「近う」に注意！<br>連用形「近く」が「近う」に変わった形（ウ音便）')}</section>` };
 
-return { G, LESSONS:[L11,L12,L13,L22,L23,L31,L32,L71,L72], TERMS:[
+return { G, LESSONS:[L11,L12,L13,L22,L23,L31,L32,L33,L71,L72], TERMS:[
   ['自立語','それだけで文節をつくれる語。'],['付属語','それだけでは文節をつくれない語。助動詞・助詞。'],['用言','述語になる、活用する自立語。動詞・形容詞・形容動詞。'],['体言','実体を表し、主語になる語。名詞。'],
   ['動詞','ウ段（ラ変は「り」）で言い切る。'],['形容詞','「し」で言い切る。'],['形容動詞','「なり」「たり」で言い切る。'],['副詞','おもに用言を修飾する。活用しない。'],['連体詞','体言を修飾する。活用しない。'],['助動詞','活用する付属語。'],['助詞','活用しない付属語。'],
   ['未然形','まだそうなっていない形。「ず」「む」「ば（仮定）」が付く。'],['連用形','用言に続く形。「けり」「て」が付く。'],['終止形','言い切る形。「べし」「らむ」が付く。'],['連体形','体言に続く形。「ぞ・なむ・や・か」の結び。'],['已然形','すでにそうなった形。「ど・ども」「ば（確定）」が付く。「こそ」の結び。'],['命令形','命令して言い切る形。'],
@@ -3176,7 +3229,8 @@ return { G, LESSONS:[L11,L12,L13,L22,L23,L31,L32,L71,L72], TERMS:[
   ['ナリ活用','「〜なり」で終わる形容動詞。なら・なり（に）・なり・なる・なれ・なれ'],['タリ活用','「〜たり」で終わる形容動詞。語幹は漢語。たら・たり（と）・たり・たる・たれ・たれ'],
   ['あけぼの','夜がほのぼのと明けはじめるころ。'],['山ぎは','空の、山に接するあたり。'],['山の端','山の、空に接するあたり。'],['さらなり','言うまでもない。'],['をかし','趣がある。'],['つとめて','早朝。'],['つきづきし','似つかわしい。'],['わろし','よくない。'],
   ['き','過去（直接体験）。連用形接続。（せ）・○・き・し・しか・○'],['けり','①伝聞過去 ②詠嘆。連用形接続。（けら）・○・けり・ける・けれ・○'],
-  ['つ','①完了 ②強意。連用形接続。意識的な完了。て・て・つ・つる・つれ・てよ'],['ぬ','①完了 ②強意。連用形接続。自然的な完了。な・に・ぬ・ぬる・ぬれ・ね'],['ぬべし・てむ','強意＋推量「きっと〜だろう」。'] ] };
+  ['つ','①完了 ②強意。連用形接続。意識的な完了。て・て・つ・つる・つれ・てよ'],['ぬ','①完了 ②強意。連用形接続。自然的な完了。な・に・ぬ・ぬる・ぬれ・ね'],['ぬべし・てむ','強意＋推量「きっと〜だろう」。'],
+  ['たり（完了）','①存続「〜ている」 ②完了。連用形接続。ラ変型。'],['り','①存続 ②完了。サ変の未然形・四段の已然形に接続（サ・未・四・已）。ら・り・り・る・れ・れ'] ] };
 })();
 
 /* ===== 波（1つ約5分） ===== */
@@ -3259,7 +3313,7 @@ const UNITS = {
     KB.LESSONS.find(l=>l.id==='2-3'),
     KB.LESSONS.find(l=>l.id==='3-1'),
     KB.LESSONS.find(l=>l.id==='3-2'),
-    { id:'3-3', sub:'準備中', t:'「たり」「り」', soon:true },
+    KB.LESSONS.find(l=>l.id==='3-3'),
     { id:'3-4', sub:'準備中', t:'「ず」', soon:true },
     { id:'3-5', sub:'準備中', t:'「る」「らる」', soon:true },
     { id:'3-6', sub:'準備中', t:'「す」「さす」「しむ」', soon:true },
