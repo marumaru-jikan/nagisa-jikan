@@ -128,6 +128,22 @@ p{margin:0}
 .ctab td,.ctab th{padding:3px 5px;text-align:center;font-size:.85rem}
 .ua,.ub{text-decoration-line:underline;text-decoration-thickness:2.5px;text-underline-offset:5px;text-decoration-skip-ink:none}.ua{text-decoration-color:var(--teal)}.ub{text-decoration-color:var(--accent);text-decoration-style:double}
 .exq{border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;margin-top:6px;line-height:1.8}.exq p{margin:4px 0 0;font-weight:700}.exq-t{display:inline-block;font-size:.78rem;font-weight:700;color:var(--surface);background:var(--teal);border-radius:99px;padding:1px 10px}
+.kchart{display:block;width:100%;max-width:360px;margin:6px auto}
+.kchart .kv{writing-mode:vertical-rl;font-size:13px;fill:var(--ink);font-family:var(--f-body)}
+.kchart .kleaf{font-size:15px;font-weight:700;font-family:var(--f-display)}.kchart .ky{fill:var(--accent)}.kchart .kz{fill:var(--bad)}
+.kchart .ktag{fill:var(--accent);font-weight:700}.kchart .ksub{font-size:11px;fill:var(--muted)}.kchart .kl{stroke:var(--muted);stroke-width:1.2}
+.tate{writing-mode:vertical-rl;height:440px;overflow-x:auto;overflow-y:hidden;line-height:2.05;font-size:1.02rem;padding:2px 4px}
+.tate h4{margin:0 0 0 .7em;font-family:var(--f-display);color:var(--teal);font-size:1.08rem}.tate p{margin:0 0 0 .25em}
+.qbox .expr .tq,.tq{writing-mode:vertical-rl;display:inline-block;max-height:15em;font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;font-size:1.3rem;line-height:2;font-weight:700;text-align:start}
+.bou{text-decoration-line:underline;text-underline-position:right;text-decoration-thickness:2.5px;text-decoration-color:var(--accent);text-underline-offset:5px}
+.kz2{background:var(--accent-soft);border-radius:3px}
+.ktab{writing-mode:vertical-rl;overflow-x:auto;overflow-y:hidden;max-width:100%;margin:6px 0}
+.ktab table{border-collapse:collapse;font-size:.86rem;line-height:1.65}
+.ktab th,.ktab td{border:1px solid var(--line);padding:8px 5px;vertical-align:top;text-align:start}
+.ktab tr:first-child th{background:var(--sunk);color:var(--muted);font-size:.78rem}
+.ktab tr th:first-child{background:var(--accent-soft);color:var(--accent-ink);font-family:var(--f-display);font-size:.95rem;white-space:nowrap}
+.ktab td:nth-child(2){font-weight:700;color:var(--teal);white-space:nowrap}
+.ktab td:nth-child(3){height:19em}
 .secrow{font-family:var(--f-display);font-weight:900;color:var(--teal);font-size:.95rem;padding:14px 4px 2px;letter-spacing:.04em}
 .secrow:first-child{padding-top:2px}
 .mth{font-family:"Times New Roman","Hiragino Mincho ProN","Yu Mincho",serif;font-variant-numeric:normal;letter-spacing:.02em}
@@ -919,7 +935,7 @@ const RK_LESSONS = [['科学の説明は変わる','本文の前半　問1',['rk
 const NF_LESSONS = novelLessons('nf','7',[['「普通」という言葉','本文のはじめ　問1'],['文化祭の絵','本文の前半　問2'],['図書館へ','本文の中ほど　問3'],['先生との会話と文化祭','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
 const NV_LESSONS = novelLessons('nv','5',[['駅での再会','本文の前半　問1'],['無人駅','本文の中ほど　問2'],['「簡単に言うなよ」','本文の中ほど　問3'],['特急に抜かされる','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
 const NW_LESSONS = novelLessons('nw','6',[['二番目という場所','本文のはじめ　問1'],['航平の欠場','本文の前半　問2'],['決勝のスタート','本文の中ほど　問3'],['リレーの前に','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
-const makeQs = plan => { const used={}; return plan.map(k=>{ { const m=/^(nv|nw|rk|nf|ai|mu|mj|bs|sl)(\d+)$/.exec(k); if(m) return nq2(m[1],+m[2]); } if(/^m1[A-Z]/.test(k)) return M1.G[k](); if(/^s[1-5][A-Z]/.test(k)) return M3.G[k](); if(/^f2[A-Z]/.test(k)) return M5.G[k](); if(/^t3[A-Z]/.test(k)) return M6.G[k](); if(/^d4[A-Z]/.test(k)) return M7.G[k](); if(k.startsWith('gm')) return mq(GM[+k.slice(2)]); if(k.startsWith('gk')) return gq(GQ[+k.slice(2)]); if(k.startsWith('cj')) return cq(CJ[+k.slice(2)]); if(k.startsWith('kj')) return kq(KJ[+k.slice(2)]); const P=POOL[k]; used[k]=used[k]||shuffle(P.map((_,i)=>i)); if(!used[k].length) used[k]=shuffle(P.map((_,i)=>i)); return fq(P[used[k].pop()]); }); };
+const makeQs = plan => { const used={}; return plan.map(k=>{ { const m=/^(nv|nw|rk|nf|ai|mu|mj|bs|sl)(\d+)$/.exec(k); if(m) return nq2(m[1],+m[2]); } if(/^m1[A-Z]/.test(k)) return M1.G[k](); if(/^s[1-5][A-Z]/.test(k)) return M3.G[k](); if(/^f2[A-Z]/.test(k)) return M5.G[k](); if(/^t3[A-Z]/.test(k)) return M6.G[k](); if(/^d4[A-Z]/.test(k)) return M7.G[k](); if(/^kb[A-Z]/.test(k)) return KB.G[k](); if(k.startsWith('gm')) return mq(GM[+k.slice(2)]); if(k.startsWith('gk')) return gq(GQ[+k.slice(2)]); if(k.startsWith('cj')) return cq(CJ[+k.slice(2)]); if(k.startsWith('kj')) return kq(KJ[+k.slice(2)]); const P=POOL[k]; used[k]=used[k]||shuffle(P.map((_,i)=>i)); if(!used[k].length) used[k]=shuffle(P.map((_,i)=>i)); return fq(P[used[k].pop()]); }); };
 
 /* ===== 説明ページの部品 ===== */
 const rule = s => `<div class="rule">${s}</div>`;
@@ -2524,6 +2540,141 @@ const TM=[
 ];
 return { G, CH:[C1,C2,null,C4,C5], TM };
 })();
+/* ===== 古文 3章 古典文法（縦書き） ===== */
+const KB = (() => {
+const uniq = a => a.filter((v,i,s)=>s.indexOf(v)===i);
+const HS = ['動詞','形容詞','形容動詞','名詞','副詞','連体詞','接続詞','感動詞','助動詞','助詞'];
+const NEAR = { 動詞:['形容詞','形容動詞','助動詞'], 形容詞:['形容動詞','動詞','副詞'], 形容動詞:['形容詞','名詞','助動詞'], 名詞:['連体詞','副詞','形容動詞'],
+  副詞:['連体詞','形容詞','接続詞'], 連体詞:['副詞','名詞','動詞'], 接続詞:['副詞','感動詞','助詞'], 感動詞:['副詞','接続詞','名詞'], 助動詞:['助詞','動詞','形容詞'], 助詞:['助動詞','接続詞','副詞'] };
+const Q = (prompt, expr, ans, wrongs, hint, explain, extra) => { const ch=uniq([ans,...wrongs.filter(w=>w&&w!==ans)]).slice(0,4);
+  return Object.assign({ raw:true, prompt, expr, answer:ans, choices:shuffle(ch), words:false, hint, explain }, extra||{}); };
+const tq = s => `<div class="tq">${s}</div>`;
+const B = s => `<span class="bou">${s}</span>`;
+
+/* --- 品詞分類表（縦書きの樹形図） --- */
+function chart(){
+  const W=360, X=i=>W-24-i*34, F=13, S=15, V=(x,y,t,c='')=>`<text x="${x}" y="${y}" class="kv ${c}">${t}</text>`, len=t=>[...t].length*S;
+  const N={ 単語:{x:(X(0)+X(9))/2,y:8,c:['自立語','付属語']}, 自立語:{x:(X(0)+X(7))/2,y:56,c:['活自','非自']}, 付属語:{x:(X(8)+X(9))/2,y:56,c:['活付','非付']},
+    活自:{t:'活用する',x:X(1),y:118,c:['述語']}, 非自:{t:'活用しない',x:(X(3)+X(7))/2,y:118,c:['主語','修飾','接続語','独立語']}, 活付:{t:'活用する',x:X(8),y:118,c:['L8']}, 非付:{t:'活用しない',x:X(9),y:118,c:['L9']},
+    述語:{t:'述語となる',x:X(1),y:212,c:['ウ段','し','なり'],tag:'用言'}, 主語:{t:'主語となる',x:X(3),y:212,c:['L3'],tag:'体言'}, 修飾:{t:'修飾語となる',x:(X(4)+X(5))/2,y:212,c:['用修','体修']}, 接続語:{t:'接続語となる',x:X(6),y:212,c:['L6']}, 独立語:{t:'独立語となる',x:X(7),y:212,c:['L7']},
+    ウ段:{t:'ウ段で言い切る',x:X(0),y:378,c:['L0'],sub:'ラ変は「り」'}, し:{t:'「し」で言い切る',x:X(1),y:378,c:['L1']}, なり:{t:'「なり」「たり」で言い切る',x:X(2),y:378,c:['L2']}, 用修:{t:'用言を修飾する',x:X(4),y:378,c:['L4']}, 体修:{t:'体言を修飾する',x:X(5),y:378,c:['L5']} };
+  HS.forEach((h,i)=>N['L'+i]={t:h,x:X(i),y:628,leaf:true,c:[]});
+  let g='';
+  for(const [k,n] of Object.entries(N)){ const t=n.t||k, bot=n.y+len(t)+(n.tag?len('（'+n.tag+'）')+8:0)+(n.sub?len('（'+n.sub+'）')*11/15+10:0);
+    g+=V(n.x,n.y,t, n.leaf?(i=>i<3?'kleaf ky':i===8?'kleaf kz':'kleaf')(HS.indexOf(t)):'');
+    if(n.tag) g+=V(n.x,n.y+len(t)+6,`（${n.tag}）`,'ktag');
+    if(n.sub) g+=V(n.x+0,n.y+len(t)+8,`（${n.sub}）`,'ksub');
+    if(!n.c.length) continue; const cs=n.c.map(c=>N[c]), by=bot+6;
+    g+=`<line x1="${n.x}" y1="${bot}" x2="${n.x}" y2="${by}" class="kl"/>`;
+    if(cs.length>1) g+=`<line x1="${Math.min(...cs.map(c=>c.x))}" y1="${by}" x2="${Math.max(...cs.map(c=>c.x))}" y2="${by}" class="kl"/>`;
+    cs.forEach(c=>{ g+=`<line x1="${c.x}" y1="${by}" x2="${c.x}" y2="${c.y-4}" class="kl"/>`; }); }
+  return `<svg class="kchart" viewBox="0 0 ${W} 696" role="img" aria-label="品詞分類表">${g}</svg>`; }
+
+/* --- 例文（傍線部・品詞・ひとこと） --- */
+const ITEMS = [
+  ['今は昔', '、竹取の翁といふものありけり。','','名詞','「昔」は実体を表す語で、主語にもなれる。'],
+  ['今は昔、竹取の翁といふもの', 'あり','けり。','動詞','「あり」はラ変動詞。ラ変はウ段ではなく「り」で言い切る。'],
+  ['今は昔、竹取の翁といふものあり', 'けり','。','助動詞','「けり」は活用する付属語。単独では文節をつくれない。'],
+  ['竹取', 'の','翁といふもの','助詞','「の」は活用しない付属語。'],
+  ['春は', 'あけぼの','。','名詞','「あけぼの（夜明けごろ）」は体言。'],
+  ['', 'やうやう','白くなりゆく山ぎは','副詞','「やうやう（だんだん）」は「白くなりゆく」という用言を修飾する。'],
+  ['やうやう', '白く','なりゆく山ぎは','形容詞','言い切りの形は「白し」。「し」で言い切るので形容詞。'],
+  ['紫だちたる雲の', '細く','たなびきたる','形容詞','言い切りの形は「細し」。'],
+  ['夏は夜。月のころは', 'さらなり','。','形容動詞','「さらなり（言うまでもない）」は「なり」で言い切る。'],
+  ['', 'いと','をかし。','副詞','「いと（とても）」は「をかし」という用言を修飾する。'],
+  ['いと', 'をかし','。','形容詞','「をかし」は「し」で言い切る。'],
+  ['', 'ある','人、弓射ることを習ふに','連体詞','この「ある」は「人」という体言を修飾する連体詞。活用しない。'],
+  ['', 'いかで','このかぐや姫を得てしがな','副詞','「いかで（なんとかして）」は「得」を修飾する。'],
+  ['', 'あな','、うれし。','感動詞','「あな（ああ）」は感動を表し、独立語になる。'],
+  ['', 'いざ','、かいもちひせむ。','感動詞','「いざ（さあ）」は呼びかけで、独立語になる。'],
+  ['', 'しかれども','、人は来ず。','接続詞','前と後ろをつなぐ接続語になる。'],
+  ['京には見えぬ鳥', 'なれ','ば','助動詞','断定の助動詞「なり」。活用する付属語。'],
+  ['京には見え', 'ぬ','鳥なれば','助動詞','打消の助動詞「ず」の連体形。'],
+  ['竹の中に', 'おはする','にて知りぬ','動詞','言い切りの形は「おはす」。ウ段で言い切る。'],
+  ['いと', 'うつくしう','てゐたり','形容詞','「うつくしく」が音便で「うつくしう」になった形。言い切りは「うつくし」。'],
+  ['三寸', 'ばかり','なる人','助詞','「ばかり（くらい）」は活用しない付属語（副助詞）。'],
+  ['', 'この','児、養ふ','連体詞','「この」は体言「児」を修飾し、活用しない。'],
+  ['', '静かなる','夜','形容動詞','言い切りの形は「静かなり」。'],
+  ['花', '咲き','けり','動詞','言い切りの形は「咲く」。ウ段で言い切る。'],
+  ['人も', 'なし','。','形容詞','「なし」は「し」で言い切る。'],
+  ['人', 'も','なし','助詞','「も」は活用しない付属語。'],
+];
+const RULE = [
+  ['活用する自立語で、ウ段（ラ変は「り」）で言い切る','動詞'],['活用する自立語で、「し」で言い切る','形容詞'],['活用する自立語で、「なり」「たり」で言い切る','形容動詞'],
+  ['活用しない自立語で、主語となる','名詞'],['活用しない自立語で、用言を修飾する','副詞'],['活用しない自立語で、体言を修飾する','連体詞'],
+  ['活用しない自立語で、接続語となる','接続詞'],['活用しない自立語で、独立語となる','感動詞'],['活用する付属語','助動詞'],['活用しない付属語','助詞'],
+];
+const G = {
+  kbTree(){ const [d,a]=pick(RULE);
+    return Q('この説明にあてはまる品詞は？', tq(d), a, NEAR[a], '①自立語か付属語か　②活用するかしないか　③どんな文節になるか　の順に考えます。', `${d} → <b>${a}</b>`); },
+  kbGroup(){ const t=pick([
+      ['付属語はどれ？',['助動詞','助詞'],HS.slice(0,8),'単独で文節をつくれないのが付属語。助動詞と助詞の2つ。'],
+      ['用言はどれ？',['動詞','形容詞','形容動詞'],HS.slice(3),'述語になれる活用する自立語が用言。動詞・形容詞・形容動詞。'],
+      ['体言はどれ？',['名詞'],HS.filter(x=>x!=='名詞'),'実体を表し、主語になれる語が体言。名詞のこと。'],
+      ['活用するのはどれ？',['動詞','形容詞','形容動詞','助動詞'],['名詞','副詞','連体詞','接続詞','感動詞','助詞'],'活用するのは動詞・形容詞・形容動詞・助動詞の4つ。'],
+      ['活用しない自立語はどれ？',['名詞','副詞','連体詞','接続詞','感動詞'],['動詞','形容詞','形容動詞','助動詞','助詞'],'活用しない自立語は、名詞・副詞・連体詞・接続詞・感動詞。'],
+    ]), ok=pick(t[1]);
+    return Q(t[0], tq('次の品詞のうち'), ok, shuffle([...t[2]]).slice(0,3), t[3], `${t[3]}<br>答えは <b>${ok}</b>`); },
+  kbWord(){ const [a,w,b,h,why]=pick(ITEMS);
+    return Q('傍線部の品詞名は？', tq(`${a}${B(w)}${b}`), h, NEAR[h], '言い切りの形にしてみよう。①自立語か付属語か　②活用するか　③どんな文節になるか。', `「${w}」は <b>${h}</b>。<br>${why}`); },
+};
+
+/* --- 1-2 活用形 --- */
+const KF = ['未然形','連用形','終止形','連体形','已然形','命令形'];
+const KFT = [
+  ['未然形','まだそうなっていない形','助動詞「ず」「む」「むず」「る」「らる」「す」「さす」「しむ」「まし」「じ」「まほし」／接続助詞「ば」（仮定：もし〜ならば）「で」（〜ないで）／終助詞「ばや」「なむ」'],
+  ['連用形','用言に続く形','助動詞「き」「けり」「つ」「ぬ」「たり」（完了）「けむ」「たし」／接続助詞「て」「つつ」「ながら」／用言／文をいったん止めて続ける（中止法）'],
+  ['終止形','言い切る形','文末（。）／助動詞「べし」「らむ」「らし」「まじ」「めり」「なり」（伝聞・推定）※ラ変型には連体形に付く／接続助詞「とも」／格助詞「と」（引用）'],
+  ['連体形','体言に続く形','体言／助動詞「なり」（断定）「ごとし」／助詞「が」「の」「を」「に」／係助詞「ぞ」「なむ」「や」「か」の結び'],
+  ['已然形','すでにそうなった形','接続助詞「ば」（確定：〜ので・〜と）「ど」「ども」（〜けれども）／係助詞「こそ」の結び／助動詞「り」（四段動詞に付く）'],
+  ['命令形','命令して言い切る形','文末（命令の意味）／格助詞「と」（引用）'],
+];
+const ktab = () => `<div class="ktab"><table><tr><th>活用形</th><th>説明</th><th>下に付く語</th></tr>${KFT.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</table></div>`;
+const V4 = [['書','か','き','く','く','け','け','書く','文を'],['咲','か','き','く','く','け','け','咲く','花'],['行','か','き','く','く','け','け','行く','都へ'],['思','は','ひ','ふ','ふ','へ','へ','思ふ','人を'],['読','ま','み','む','む','め','め','読む','文を']];
+const CTX = [ // [活用形の番号, 前（〇＝目的語など）, 後, ひとこと]
+  [0,'〇','ず。','打消の「ず」は未然形に付く。'],[0,'〇','む。','意志・推量の「む」は未然形に付く。'],[0,'〇','ば、','「ば」が未然形に付くと「もし〜ならば」（仮定）。'],
+  [1,'〇','けり。','過去の「けり」は連用形に付く。'],[1,'〇','て、','接続助詞「て」は連用形に付く。'],[1,'〇','たり。','完了の「たり」は連用形に付く。'],
+  [2,'〇','。','文の終わりで言い切っているので終止形。'],[2,'明日は〇','べし。','「べし」は終止形に付く。'],[2,'今ごろ〇','らむ。','「らむ」は終止形に付く。'],
+  [3,'〇','時、','体言「時」に続いているので連体形。'],[3,'〇ぞ','。','係助詞「ぞ」の結びは連体形。'],[3,'〇','こと、','体言「こと」に続いているので連体形。'],
+  [4,'〇','ども、','「ども」は已然形に付く。'],[4,'〇こそ','。','係助詞「こそ」の結びは已然形。'],[4,'〇','ば、','「ば」が已然形に付くと「〜ので・〜と」（確定）。'],
+  [5,'とく〇','。','「とく（はやく）〜せよ」という命令。命令形。'],
+];
+G.kbKF1 = () => { const [n,d,w]=pick(KFT.map((r,i)=>[i,r[1],r[2]])), it=pick([['説明',d],['下に付く語',w.split('／')[0]]]);
+  return Q('どの活用形？', tq(`${it[1]}`), KF[n], KF.filter((_,i)=>i!==n).sort(()=>Math.random()-.5), '未然・連用・終止・連体・已然・命令の六つ。説明と下に付く語をセットで覚えよう。', `${it[0]}が「${it[1].replace(/<[^>]+>/g,'')}」なのは <b>${KF[n]}</b>`, { words:true }); };
+G.kbKF2 = () => { const v=pick(V4), [n,a,b,why]=pick(CTX), w=v[0]+v[1+n];
+  const near={0:['已然形','連用形','終止形'],1:['未然形','連体形','終止形'],2:['連体形','連用形','命令形'],3:['終止形','已然形','連用形'],4:['命令形','未然形','連体形'],5:['已然形','終止形','未然形']}[n];
+  return Q('傍線部の活用形は？', tq(`${a.replace('〇',v[8])}${B(w)}${b}`), KF[n], near,
+    '下に付いている語（助動詞・助詞・体言など）や、係り結びを見て判断します。', `「${w}」は「${v[7]}」の <b>${KF[n]}</b>。<br>${why}`, { words:true }); };
+
+const T = s => `<div class="tate">${s}</div>`;
+const L11 = { id:'1-1', sec:'1　品詞', t:'品詞分類', sub:'十の品詞', plan:['kbTree','kbGroup','kbWord','kbWord','kbWord'], body:()=>`
+  <section class="panel"><h3>品詞分類表</h3><p class="small muted">上から下へ読みます。右側が自立語、左側が付属語です。</p>${chart()}</section>
+  <section class="panel"><p class="small muted">縦書きです。左へスワイプして読みます。</p>${T(`
+    <h4>品詞とは</h4>
+    <p>単語を、文法上の性質で分けたものを<b>品詞</b>といいます。古文の品詞は<b>十</b>あります。</p>
+    <p>分けるときの基準は三つです。</p>
+    <p>①　<b>自立語</b>か<b>付属語</b>か</p>
+    <p>②　<b>活用する</b>か、しないか</p>
+    <p>③　どんな<b>文節</b>になるか</p>
+    <h4>自立語と付属語</h4>
+    <p><b>自立語</b>は、それだけで文節をつくれる語。一つの文節に必ず一つあります。</p>
+    <p><b>付属語</b>は、それだけでは文節をつくれない語。自立語のあとについて使われます。</p>
+    <h4>用言と体言</h4>
+    <p><b>用言</b>は、述語になる語。<span class="kz2">動詞・形容詞・形容動詞</span>の三つです。</p>
+    <p><b>体言</b>は、ものごとの実体を表し、主語になる語。名詞のことです。</p>
+    <h4>おぼえよう</h4>
+    <p>活用する（形が変わる）のは、<span class="kz2">動詞・形容詞・形容動詞・助動詞</span>の四つだけ。</p>
+    <p>見分けるときは、まず<b>言い切りの形</b>にしてみよう。</p>
+    <p>ウ段（ラ変は「り」）→動詞、「し」→形容詞、「なり」「たり」→形容動詞。</p>`)}</section>` };
+const L12 = { id:'1-2', t:'活用形', sub:'六つの形と下に付く語', plan:['kbKF1','kbKF1','kbKF2','kbKF2','kbKF2'], body:()=>`
+  <section class="panel"><h3>六つの活用形</h3><p class="small muted">縦書きの表です。右から 未然形 → 命令形 の順。左へスワイプして読みます。</p>${ktab()}
+  <p class="small muted">活用形は「下に何が付いているか」で見分けます。四段動詞では、已然形と命令形、終止形と連体形が同じ形になるので、下の語で区別しよう。</p></section>` };
+return { G, LESSONS:[L11,L12], TERMS:[
+  ['自立語','それだけで文節をつくれる語。'],['付属語','それだけでは文節をつくれない語。助動詞・助詞。'],['用言','述語になる、活用する自立語。動詞・形容詞・形容動詞。'],['体言','実体を表し、主語になる語。名詞。'],
+  ['動詞','ウ段（ラ変は「り」）で言い切る。'],['形容詞','「し」で言い切る。'],['形容動詞','「なり」「たり」で言い切る。'],['副詞','おもに用言を修飾する。活用しない。'],['連体詞','体言を修飾する。活用しない。'],['助動詞','活用する付属語。'],['助詞','活用しない付属語。'],
+  ['未然形','まだそうなっていない形。「ず」「む」「ば（仮定）」が付く。'],['連用形','用言に続く形。「けり」「て」が付く。'],['終止形','言い切る形。「べし」「らむ」が付く。'],['連体形','体言に続く形。「ぞ・なむ・や・か」の結び。'],['已然形','すでにそうなった形。「ど・ども」「ば（確定）」が付く。「こそ」の結び。'],['命令形','命令して言い切る形。'] ] };
+})();
+
 /* ===== 波（1つ約5分） ===== */
 const MQ_LESSONS = [
   { id:'1-1', t:'式の展開', sub:'乗法公式', plan:['exp','exp','exp','exp','exp'], body:()=>`
@@ -2557,6 +2708,7 @@ const TERMS = {
   m1:M1.TERMS,
   m3:M3.TERMS.slice(0,8),
   m4:M3.TERMS.slice(8),
+  kb:KB.TERMS,
   d1:M7.TM[0], d2:M7.TM[1], d4:M7.TM[3], d5:M7.TM[4],
   z1:M6.TM[0], z2:M6.TM[1], z3:M6.TM[2], z4:M6.TM[3], z5:M6.TM[4],
   q1:M5.TM[0], q2:M5.TM[1], q3:M5.TM[2], q4:M5.TM[3], q5:M5.TM[4], q6:M5.TM[5],
@@ -2595,9 +2747,9 @@ const UNITS = {
   d2:{ no:'データの分析 2章', title:'データの散らばり', subject:'数学', course:'math', subj:4, lessons:M7.CH[1], cards:'d2', drill:'d2' },
   d4:{ no:'データの分析 4章', title:'相関', subject:'数学', course:'math', subj:4, lessons:M7.CH[3], cards:'d4', drill:'d4' },
   d5:{ no:'データの分析 5章', title:'仮説検定', subject:'数学', course:'math', subj:4, lessons:M7.CH[4], cards:'d5', drill:'d5' },
-  kb:{ no:'古文 3章', title:'古典文法', subject:'国語', course:'jpn', subj:1, lessons:[], show:[
-    { id:'1-1', sec:'1　品詞', sub:'準備中', t:'品詞分類', soon:true },
-    { id:'1-2', sub:'準備中', t:'活用形', soon:true },
+  kb:{ no:'古文 3章', title:'古典文法', subject:'国語', course:'jpn', subj:1, lessons:KB.LESSONS, cards:'kb', drill:'kb', show:[
+    KB.LESSONS[0],
+    KB.LESSONS[1],
     { id:'2-1', sec:'2　用言', sub:'準備中', t:'動詞', soon:true },
     { id:'2-2', sub:'準備中', t:'形容詞', soon:true },
     { id:'2-3', sub:'準備中', t:'形容動詞', soon:true },
