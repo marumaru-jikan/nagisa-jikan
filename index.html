@@ -6009,14 +6009,14 @@ function tideSVG(born){
   let rocks=''; for(let x=40;x<W;x+=300){ const r=seeded(x); rocks+=`<ellipse cx="${x}" cy="${(92+r()*8).toFixed(0)}" rx="22" ry="12"/><ellipse cx="${Math.min(W-38,x+282)}" cy="${(132+r()*16).toFixed(0)}" rx="18" ry="11"/>`; }
   let laps=''; for(let x=44;x<W-60;x+=160) laps+=`M${x} ${104+(x%3)*24}q20-6 40 0t40 0`;
   let back=`M0 50`; for(let x=0;x<W;x+=100) back+=` Q${x+50} ${30+((x/100)%3)*6} ${x+100} ${38+((x/100)%2)*6}`;
-  return `<div class="tidewrap${wide?' wide':''}"><svg class="tide" viewBox="0 0 ${W} 230" style="width:${(W/360*100).toFixed(1)}%" role="img" aria-label="潮だまり　生き物 ${n} ひき">
+  return `<div class="tidewrap${wide?' wide':''}"><svg class="tide" viewBox="0 0 ${W} 230" style="width:${(W/360*100).toFixed(1)}%" role="img" aria-label="潮だまり　仲間 ${n}">
   <defs><linearGradient id="tw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9FD3D2"/><stop offset="1" stop-color="#3E9A9C"/></linearGradient></defs>
   <rect width="${W}" height="230" fill="#D9C9A8"/>
   <path d="${back} V230H0Z" fill="#8A9894"/>
   <path d="${water}" fill="url(#tw)"/>
   <path class="lap" d="${laps}" stroke="#FFFFFF" stroke-opacity=".4" stroke-width="2" fill="none" stroke-linecap="round"/>
   <g fill="#8A9894">${rocks}</g>
-  ${st}${n?'':`<text x="180" y="150" text-anchor="middle" fill="#0F3E40" font-size="13">まだ生き物はいません</text>`}</svg></div>${wide?'<p class="tidehint">‹ 横にスクロールして潮だまりを見わたせます ›</p>':''}`;
+  ${st}${n?'':`<text x="180" y="150" text-anchor="middle" fill="#0F3E40" font-size="13">まだ仲間はいません</text>`}</svg></div>${wide?'<p class="tidehint">‹ 横にスクロールして潮だまりを見わたせます ›</p>':''}`;
 }
 const WAVE_I = `<svg class="wavei" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 10c2.5-3 5-3 7.5 0s5 3 7.5 0 3-2 5-1"/><path d="M2 16c2.5-3 5-3 7.5 0s5 3 7.5 0 3-2 5-1"/></svg>`;
 function poolFeed(arg){
@@ -6214,12 +6214,12 @@ function vRecord(){
 }
 function vPool(){
   const s=poolInit(), g=growOf(s.fed), got=new Set(s.born.map(t=>t.sp)), b=S.born?spOf(S.born):null, nextG=GROW.find(x=>x.at>s.fed);
-  return `<div class="stack"><div class="hello"><div class="eyebrow">潮だまり</div><h1>波を寄せて<br>生き物を呼ぼう</h1></div>
-  <div class="poolbox">${tideSVG(s.born)}<div class="poolcount"><span>潮だまりの生き物 <b class="num">${s.born.length}</b> ひき</span><span>図鑑 <b class="num">${got.size}</b> / ${SP.length}</span></div></div>
+  return `<div class="stack"><div class="hello"><div class="eyebrow">潮だまり</div><h1>波を寄せて<br>仲間を呼ぼう</h1></div>
+  <div class="poolbox">${tideSVG(s.born)}<div class="poolcount"><span>潮だまりの仲間 <b class="num">${s.born.length}</b></span><span>図鑑 <b class="num">${got.size}</b> / ${SP.length}</span></div></div>
   ${b?`<div class="panel born pop"><svg viewBox="-30 -30 60 60" class="bsv">${art(b.id)}</svg><div><p class="small muted">潮だまりにやってきた！</p><h3>${b.name}</h3><p class="small">${b.note}</p></div></div>`:''}
   <div class="panel grow"><div class="growtop"><div><p class="small muted">いまの潮だまり</p><h3>${g.n}</h3><p class="small">${g.d}</p></div>${stageSVG(s.fed)}</div>
     <div class="meter"><i style="width:${s.fed/POOL_NEED*100}%"></i></div>
-    <p class="small muted">${nextG?`あと <b class="num">${nextG.at-s.fed}</b> 波で「${nextG.n}」、`:''}あと <b class="num">${POOL_NEED-s.fed}</b> 波で生き物がやってきます。だれが来るかは、お楽しみ。</p>
+    <p class="small muted">${nextG?`あと <b class="num">${nextG.at-s.fed}</b> 波で「${nextG.n}」、`:''}あと <b class="num">${POOL_NEED-s.fed}</b> 波で仲間がやってきます。だれが来るかは、お楽しみ。</p>
     <div class="wavebal">${WAVE_I}<span>もっている波 <b class="num">${s.waves}</b></span></div>
     ${S.poolMsg?`<p class="poolmsg pop">${S.poolMsg}</p>`:''}
     <div class="two"><button class="btn" data-act="feed" data-arg="1" ${s.waves?'':'disabled'}>1つ寄せる</button><button class="btn ghost" data-act="feed" data-arg="all" ${s.waves?'':'disabled'}>まとめて寄せる</button></div>
