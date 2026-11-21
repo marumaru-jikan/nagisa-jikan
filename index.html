@@ -5976,7 +5976,7 @@ function rewardCard(rw){ const c=ALLC[rw.i];
 function art(id){ return `<image href="icons/${id}.png" x="-17" y="-17" width="34" height="34"/>`; }
 const POOL_NEED = 30;
 const GROW = [ {n:'さざ波', at:0, d:'足もとに、小さな波が寄せてきました。'}, {n:'潮が満ちてきた', at:12, d:'潮だまりに、水がたまりはじめました。'}, {n:'小さな影', at:22, d:'岩のかげで、だれかが動いています。もうすぐです。'} ];
-const SP = ZUKAN.map((c,i)=>({ id:'k'+String(i+1).padStart(2,'0'), name:c.name, note:c.note, obj:c.obj })).filter(x=>!x.obj);
+const SP = ZUKAN.map((c,i)=>({ id:'k'+String(i+1).padStart(2,'0'), name:c.name, note:c.note, obj:c.obj }));
 const SP_OLD = { kani:'k05', umiushi:'k11', yadokari:'k21', isogin:'k31', hitode:'k41', haze:'k61', fujitsubo:'k81', kamenote:'k88', tako:'k95', amefurashi:'k98' };
 const spOf = id => SP.find(x=>x.id===id) || SP[0];
 function poolInit(){
