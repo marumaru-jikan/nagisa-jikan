@@ -6209,7 +6209,6 @@ function vRecord(){
   <div class="panel stack"><h3>この4週間</h3><div class="days">${cells}</div></div>
   <div class="panel"><div class="kv"><span>解いた問題</span><b class="num">${R.answered}問</b></div><div class="kv"><span>正答率</span><b class="num">${acc}%</b></div><div class="kv"><span>連続した日</span><b class="num">${streak()}日</b></div></div>
   ${coll}${viewer}
-  <div class="panel stack"><h3>小瓶の手紙　<span class="num">${R.bottles.length}</span></h3>${R.bottles.length?R.bottles.map(b=>`<div class="letter" style="display:block;text-align:left"><span class="small" style="opacity:.75">${esc(b.name)}　${b.d.replace(/-/g,'.')}</span><br>${esc(BOTTLE_MSGS[b.m]||'')}</div>`).join(''):'<p class="small muted">1つの項目をぜんぶ終えると、小瓶が流れてきます。</p>'}</div>
   ${units.length?units.map(([uid,u])=>`<div class="panel"><h3 style="margin-bottom:6px">${u.subject}　${u.no}　${u.title}</h3>${u.lessons.map(l=>`<div class="kv"><span>${l.id}　${l.t}</span>${lTag(uid,l.id)}</div>`).join('')}</div>`).join(''):'<p class="small muted">波（5分の学習）を終えると、ここに記録が並びます。</p>'}</div>`;
 }
 function vPool(){
