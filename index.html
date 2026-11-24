@@ -76,6 +76,17 @@ p{margin:0}
 .list{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;background:none;padding:14px 16px;border-top:1px solid var(--line)}
 .item:first-child{border-top:0}
+.sbar{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:11px 16px;color:var(--muted);font:inherit}
+.sbar svg,.sfield svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.sfield{display:flex;align-items:center;gap:8px;background:var(--surface);border:1.5px solid var(--teal);border-radius:999px;padding:4px 6px 4px 14px;color:var(--teal)}
+.sfield input{flex:1;min-width:0;border:0;background:none;font:inherit;font-size:16px;padding:8px 0;color:inherit;outline:none}
+.sfield input,.sfield input:focus{border:0!important;box-shadow:none!important;outline:none!important;background:none!important;padding:8px 0!important;border-radius:0!important}
+.sfield button{border:0;background:none;color:var(--muted);font-size:1.1rem;padding:4px 8px}
+.shit mark{background:#FFE7A8;color:inherit;border-radius:3px;padding:0 1px}
+.shit .path{font-size:.72rem;color:var(--muted)}
+.shit .snip{font-size:.8rem;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-top:2px;overflow:hidden}
+.schips{display:flex;flex-wrap:wrap;gap:6px}
+.schips button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font:inherit;font-size:.8rem}
 .item[disabled]{opacity:.5;cursor:default}
 .item .body{flex:1;min-width:0}
 .item .chev{color:var(--muted)}
@@ -6107,6 +6118,7 @@ function vHome(){
   return `<div class="stack" style="padding-top:8px"><div class="shore">${heroArt()}<div class="txt"><span class="name">渚時間</span><h1>${greet()}${R.name?'、'+esc(R.name)+'さん':''}</h1><p>今日も5分だけ。<br>のんびり潮待ち。</p></div></div>
   <div class="stats"><div class="stat"><b>${R.days.length}</b><span>学習した日</span></div><div class="stat"><b>${streak()}</b><span>連続した日</span></div><div class="stat"><b>${R.answered}</b><span>解いた問題${R.answered?'（'+acc+'%）':''}</span></div></div>
   <button class="continue" data-act="lesson" data-arg="${n.id}" data-uid="${uid}"><span><small>続きから　${u.subject}・${u.title}（${doneCount(uid)}/${u.lessons.length}）</small><strong>${n.id}　${n.t}</strong></span><span class="go" aria-hidden="true">→</span></button>
+  <button class="sbar" data-act="go" data-arg="search">${SICON}<span>波や用語を検索</span></button>
   ${CATALOG.map(g=>`<h2>${g.group}</h2><div class="subjects">${g.courses.map(c=>{ const r=readyCount(c);
     return `<button class="subj" data-act="course" data-arg="${c.id}"><span class="k">${c.k}</span><b>${c.name}</b><span class="small muted">${c.note}</span><span class="small ${r?'':'muted'}">${r?'公開中 '+r+'章':c.subjects.some(x=>x.go)?c.subjects.filter(x=>x.go).map(x=>x.name).join('・')+'は海月時間へ':'準備中'}</span></button>`; }).join('')}</div>`).join('')}
   <button class="item panel" data-act="go" data-arg="install"><span class="body"><b>ホーム画面に追加</b><br><span class="small muted">アプリのようにアイコンから開けます</span></span><span class="chev">›</span></button></div>`;
@@ -6271,7 +6283,59 @@ async function renderPdf(){ const P=S.pdf, box=document.getElementById('pdfpages
       cv.width=vp.width; cv.height=vp.height; cv.className='pdfpage'; cv.style.width=W+'px'; box.appendChild(cv); await pg.render({ canvasContext:cv.getContext('2d'), viewport:vp }).promise; } }
   catch(e){ if(tok===P.tok) box.innerHTML='<p class="small muted" style="padding:24px;text-align:center">PDFを読みこめませんでした。下のボタンから開いてください。</p>'; } }
 
-const VIEWS={ setup:vSetup, home:vHome, course:vCourse, subject:vSubject, unit:vUnit, lesson:vLesson, cards:vCards, quiz:vQuiz, result:vResult, record:vRecord, settings:vSettings, install:vInstall, drill:vDrill, pdf:vPdf, pool:vPool, goto:vGoto };
+/* ===== 検索 ===== */
+const SICON='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>';
+const snorm = s => String(s||'').normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60)).replace(/\s+/g,'');
+const stext = h => String(h||'').replace(/<rt>[\s\S]*?<\/rt>|<rp>[\s\S]*?<\/rp>|<style[\s\S]*?<\/style>|<script[\s\S]*?<\/script>/g,'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/&[a-z#0-9]+;/g,'').replace(/\s+/g,' ').trim();
+let SIDX=null;
+function searchIndex(){
+  if(SIDX) return SIDX; SIDX=[]; const seen=new Set();
+  CATALOG.forEach(g=>g.courses.forEach(c=>c.subjects.forEach((sb,si)=>(sb.units||[]).forEach((un,ui)=>{
+    const uid=un.ready, u=uid&&UNITS[uid]; if(!u||seen.has(uid)) return; seen.add(uid);
+    const path=`${c.name} ▶ ${sb.name} ▶ ${u.no}　${u.title}`;
+    u.lessons.forEach(l=>{ if(l.soon) return; let body=''; const su=S.uid; S.uid=uid; try{ body=stext(l.body()); }catch(e){} S.uid=su;
+      const head=[l.id,l.t,l.sub,l.sec].filter(Boolean).join(' ');
+      SIDX.push({k:'l',uid,id:l.id,t:l.t,sub:l.sub||'',path,course:c.id,subj:si,head,body,nh:snorm(head+' '+u.title+' '+sb.name+' '+c.name),nb:snorm(body)}); });
+    (TERMS[u.cards]||[]).forEach(([term,def],i)=>{ const a=stext(term), b=stext(def);
+      SIDX.push({k:'t',uid,i,t:a,sub:b,path,course:c.id,subj:si,head:a,body:b,nh:snorm(a),nb:snorm(b)}); });
+  }))));
+  return SIDX;
+}
+function snip(text, q){
+  const n=snorm(q); if(!n) return '';
+  // 元の文字列上で位置を探す（正規化した1文字ずつ対応づけ）
+  const map=[]; let ns=''; for(let i=0;i<text.length;i++){ const x=snorm(text[i]); for(const ch of x){ ns+=ch; map.push(i); } }
+  const p=ns.indexOf(n); if(p<0) return esc(text.slice(0,60));
+  const a=map[p], b=map[p+n.length-1]+1, s=Math.max(0,a-10), e=Math.min(text.length,b+50);
+  return (s>0?'…':'')+esc(text.slice(s,a))+'<mark>'+esc(text.slice(a,b))+'</mark>'+esc(text.slice(b,e))+(e<text.length?'…':'');
+}
+function searchHits(q){
+  const words=String(q||'').split(/[\s　]+/).map(snorm).filter(Boolean); if(!words.length) return [];
+  const hits=[];
+  searchIndex().forEach(x=>{ let sc=0;
+    for(const w of words){ const h=x.nh.includes(w), b=x.nb.includes(w); if(!h&&!b) return; sc+=(h?10:0)+(b?1:0)+(snorm(x.t).includes(w)?10:0); }
+    hits.push([sc,x]); });
+  return hits.sort((a,b)=>b[0]-a[0]).map(h=>h[1]);
+}
+function searchResults(q){
+  if(!String(q||'').trim()) return `<p class="small muted">章や波のタイトル、本文、用語カードの中から探せます。</p>
+    <div class="schips">${['再読文字','助動詞','敬語','因数分解','命題','接続詞'].map(w=>`<button data-act="sq" data-arg="${w}">${w}</button>`).join('')}</div>`;
+  const hs=searchHits(q), L=hs.filter(x=>x.k==='l'), T=hs.filter(x=>x.k==='t'), w=String(q).trim().split(/[\s　]+/)[0];
+  if(!hs.length) return `<p class="small muted">「${esc(q)}」は見つかりませんでした。ことばを短くするか、別のことばで試してみてください。</p>`;
+  const row=(x,j)=>{ const inT=snorm(x.t).includes(snorm(w)), sn=x.k==='l'?(inT?esc(x.sub):snip(x.body,w)):snip(x.t+'　'+x.sub,w);
+    return x.k==='l'
+      ? `<button class="item shit" data-act="shit" data-arg="${j}"><span class="lid ${R.lessons[lkey(x.uid,x.id)]?'done':''}">${esc(x.id)}</span><span class="body"><span class="path">${esc(x.path)}</span><br><b>${inT?snip(x.t,w):esc(x.t)}</b><span class="snip">${sn}</span></span><span class="chev">›</span></button>`
+      : `<button class="item shit" data-act="shit" data-arg="${j}"><span class="lid">用</span><span class="body"><span class="path">${esc(x.path)}　用語カード</span><br><b>${snip(x.t,w)||esc(x.t)}</b><span class="snip">${esc(x.sub)}</span></span><span class="chev">›</span></button>`; };
+  S.shits=[...L.slice(0,60),...T.slice(0,30)];
+  return `<p class="small muted">波 ${L.length}件${T.length?`　用語 ${T.length}件`:''}</p>
+  ${L.length?`<div class="list">${L.slice(0,60).map((x,i)=>row(x,i)).join('')}</div>`:''}
+  ${T.length?`<h3 style="margin-top:4px">用語カード</h3><div class="list">${T.slice(0,30).map((x,i)=>row(x,Math.min(L.length,60)+i)).join('')}</div>`:''}`;
+}
+function vSearch(){
+  return `${top('検索')}<div class="stack"><label class="sfield">${SICON}<input id="sq" type="text" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="ことばを入れて検索" value="${esc(S.sq||'')}" aria-label="検索ことば"><button data-act="sqclear" aria-label="消す" ${S.sq?'':'hidden'}>×</button></label>
+  <div id="sres" class="stack">${searchResults(S.sq)}</div></div>`;
+}
+const VIEWS={ setup:vSetup, home:vHome, course:vCourse, subject:vSubject, unit:vUnit, lesson:vLesson, cards:vCards, quiz:vQuiz, result:vResult, record:vRecord, settings:vSettings, install:vInstall, drill:vDrill, pdf:vPdf, pool:vPool, goto:vGoto, search:vSearch };
 function render(){
   app.innerHTML=VIEWS[S.view]();
   tabs.hidden = S.view==='setup';
@@ -6281,6 +6345,10 @@ function render(){
   if(c) c.addEventListener('change',e=>{ const v=normCode(e.target.value); if(CODE_RE.test(v)){ R.code=v; save(); } e.target.value=R.code; });
   if(n) n.addEventListener('input',e=>{ R.name=e.target.value.trim(); save(); });
   if (S.view==='pdf') renderPdf();
+  const sq=document.getElementById('sq');
+  if(sq){ if(S.sqFocus!==false) sq.focus(); S.sqFocus=true; let tm=null;
+    sq.addEventListener('input',e=>{ S.sq=e.target.value; clearTimeout(tm); tm=setTimeout(()=>{ document.getElementById('sres').innerHTML=searchResults(S.sq); const cl=document.querySelector('[data-act=sqclear]'); if(cl) cl.hidden=!S.sq; },120); });
+    sq.addEventListener('keydown',e=>{ if(e.key==='Enter') sq.blur(); }); }
   document.querySelectorAll('.tidewrap.wide').forEach(e=>{ e.style.scrollBehavior='auto'; e.scrollLeft=e.scrollWidth; e.style.scrollBehavior=''; });
 }
 function answerQ(picked){
@@ -6300,6 +6368,10 @@ document.addEventListener('click', e=>{
   else if(a==='viewCard'){ S.viewCard=+arg; render(); }
   else if(a==='closeCard'){ S.viewCard=null; render(); }
   else if(a==='go') go(arg);
+  else if(a==='sq'){ S.sq=arg; S.sqFocus=false; render(); }
+  else if(a==='sqclear'){ S.sq=''; render(); }
+  else if(a==='shit'){ const x=(S.shits||[])[+arg]; if(!x) return; S.uid=x.uid; S.course=x.course; S.subj=x.subj; S.sqFocus=false;
+    if(x.k==='l'){ S.lid=x.id; go('lesson'); } else go('unit'); }
   else if(a==='pdf') openPdf(arg);
   else if(a==='pdfTab'){ S.pdf.i=+arg; render(); }
   else if(a==='pdfZoom'){ S.pdf.z=S.pdf.z>1?1:1.8; render(); }
