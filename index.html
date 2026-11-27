@@ -117,6 +117,7 @@ p{margin:0}
 .venn .vl{font-style:italic;fill:var(--muted);font-size:16px}
 .feedback .venn .vbg,.hint .venn .vbg{fill:var(--surface)}
 .nline{display:block;width:100%;max-width:320px;margin:8px auto}.nline .nl{stroke:var(--ink);stroke-width:1.5}
+.rd{position:relative;display:inline-block}.rd::after{content:'';position:absolute;left:50%;top:.02em;width:.2em;height:.2em;margin-left:-.1em;border-radius:50%;background:currentColor}
 .nline .nt{font-family:"Times New Roman",serif;font-size:13px;text-anchor:middle;fill:var(--ink)}
 .pfig{display:block;width:100%;max-width:300px;margin:8px auto;overflow:hidden}
 .pfig .ax{stroke:var(--muted);stroke-width:1.2}.pfig .al{font-size:12px;fill:var(--muted);font-style:italic;font-family:"Times New Roman",serif}
@@ -982,7 +983,7 @@ const RK_LESSONS = [['科学の説明は変わる','本文の前半　問1',['rk
 const NF_LESSONS = novelLessons('nf','7',[['「普通」という言葉','本文のはじめ　問1'],['文化祭の絵','本文の前半　問2'],['図書館へ','本文の中ほど　問3'],['先生との会話と文化祭','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
 const NV_LESSONS = novelLessons('nv','5',[['駅での再会','本文の前半　問1'],['無人駅','本文の中ほど　問2'],['「簡単に言うなよ」','本文の中ほど　問3'],['特急に抜かされる','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
 const NW_LESSONS = novelLessons('nw','6',[['二番目という場所','本文のはじめ　問1'],['航平の欠場','本文の前半　問2'],['決勝のスタート','本文の中ほど　問3'],['リレーの前に','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
-const makeQs = plan => { const used={}; return plan.map(k=>{ { const m=/^(nv|nw|rk|nf|ai|mu|mj|bs|sl)(\d+)$/.exec(k); if(m) return nq2(m[1],+m[2]); } if(/^m1[A-Z]/.test(k)) return M1.G[k](); if(/^s[1-5][A-Z]/.test(k)) return M3.G[k](); if(/^f2[A-Z]/.test(k)) return M5.G[k](); if(/^t3[A-Z]/.test(k)) return M6.G[k](); if(/^d4[A-Z]/.test(k)) return M7.G[k](); if(/^kb[A-Z]/.test(k)) return KB.G[k](); if(k.startsWith('gm')) return mq(GM[+k.slice(2)]); if(k.startsWith('gk')) return gq(GQ[+k.slice(2)]); if(k.startsWith('cj')) return cq(CJ[+k.slice(2)]); if(k.startsWith('kj')) return kq(KJ[+k.slice(2)]); const P=POOL[k]; used[k]=used[k]||shuffle(P.map((_,i)=>i)); if(!used[k].length) used[k]=shuffle(P.map((_,i)=>i)); return fq(P[used[k].pop()]); }); };
+const makeQs = plan => { const used={}; return plan.map(k=>{ { const m=/^(nv|nw|rk|nf|ai|mu|mj|bs|sl)(\d+)$/.exec(k); if(m) return nq2(m[1],+m[2]); } if(/^m1[A-Z]/.test(k)) return M1.G[k](); if(/^n[2-4][A-Z]/.test(k)) return M2.G[k](); if(/^s[1-5][A-Z]/.test(k)) return M3.G[k](); if(/^f2[A-Z]/.test(k)) return M5.G[k](); if(/^t3[A-Z]/.test(k)) return M6.G[k](); if(/^d4[A-Z]/.test(k)) return M7.G[k](); if(/^kb[A-Z]/.test(k)) return KB.G[k](); if(k.startsWith('gm')) return mq(GM[+k.slice(2)]); if(k.startsWith('gk')) return gq(GQ[+k.slice(2)]); if(k.startsWith('cj')) return cq(CJ[+k.slice(2)]); if(k.startsWith('kj')) return kq(KJ[+k.slice(2)]); const P=POOL[k]; used[k]=used[k]||shuffle(P.map((_,i)=>i)); if(!used[k].length) used[k]=shuffle(P.map((_,i)=>i)); return fq(P[used[k].pop()]); }); };
 
 /* ===== 説明ページの部品 ===== */
 const rule = s => `<div class="rule">${s}</div>`;
@@ -1561,6 +1562,472 @@ return { G, LESSONS, TERMS:[
   ['降べきの順','次数の高い項から順にならべること。'],['展開','整式の積を、1つの整式（和の形）で表すこと。'],['因数分解','整式を、いくつかの整式の積の形にすること。展開の逆。'],['因数','積をつくっている1つ1つの式。'],
   ['たすき掛け','acx²＋(ad＋bc)x＋bd を、図を使って (ax＋b)(cx＋d) に因数分解する方法。'],['複2次式','ax⁴＋bx²＋c の形の式。x²＝X とおくと2次式になる。'] ] };
 })();
+/* ===== 数学Ⅰ 数と式 2章 実数・3章 平方根・4章 1次不等式（問題は毎回つくりかわります） ===== */
+const M2 = (() => {
+const nz = (a,b) => { let n=0; while(n===0) n=ri(a,b); return n; };
+const uniq = a => a.filter((v,i,s)=>s.indexOf(v)===i);
+const mi = t => typeof t==='string' ? t.replace(/-(?=\d)/g,'−') : t;
+function Q(prompt, expr, ans, wrongs, hint, explain, extra){
+  ans=mi(ans); const ch=uniq([ans, ...wrongs.filter(w=>w!=null&&w!=='').map(mi).filter(w=>w!==ans)]).slice(0,4);
+  return Object.assign({ raw:true, math:true, prompt:mi(prompt), expr:mi(expr), answer:ans, choices:shuffle(ch), words:ch.some(c=>c.replace(/<[^>]+>/g,'').length>9), hint:mi(hint), explain:mi(explain), long:true }, extra||{}); }
+const gcd = (a,b) => { a=Math.abs(a); b=Math.abs(b); while(b){ [a,b]=[b,a%b]; } return a||1; };
+const N = n => n<0 ? '−'+(-n) : String(n);
+const P = n => n<0 ? '('+N(n)+')' : String(n);
+const fr = (n,d) => { if(d<0){ n=-n; d=-d; } const g=gcd(n,d); n/=g; d/=g; return d===1 ? N(n) : `${n<0?'−':''}${Math.abs(n)}/${d}`; };
+const sg = (n,first) => n<0 ? '−'+(-n) : (first?'':'＋')+n;
+const ex = s => `<p class="ex mth">${s}</p>`;
+const exQ = (q,s) => `<div class="exq"><span class="exq-t">例題</span><p>${q}</p></div>`+ex(s);
+const tip = s => `<p class="small muted">${s}</p>`;
+const rul = s => `<div class="rule">${s}</div>`;
+const sum = arr => `<div class="signs mth">${arr.map(s=>`<div>${s}</div>`).join('')}</div>`;
+const L = (id,sec,t,sub,key,body,extra) => Object.assign({ id, sec, t, sub, plan:Array.isArray(key)?key:Array(5).fill(key), body }, extra||{});
+const T = (plan,desc) => L('まとめ','章末テスト','章末テスト',desc,plan[0],()=>`<section class="panel"><h3>章末テスト</h3><p>この章の内容から10問出題します。問題の順番は毎回かわります。</p></section>`, { test:true, plan });
+const SQF = [2,3,5,6,7,10,11,13,14,15];
+const isSq = n => n>=0 && Math.round(Math.sqrt(n))**2===n;
+const simp = n => { let o=1, i=n; for(let k=2;k*k<=i;k++) while(i%(k*k)===0){ i/=k*k; o*=k; } return [o,i]; };
+const rt = (o,i) => i===1 ? N(o) : `${o===1?'':o===-1?'−':N(o)}√${i}`;
+const rtS = n => { const [o,i]=simp(n); return rt(o,i); };
+/* a＋b√r */
+const sd = (a,b,r) => { if(!b) return N(a); const B=Math.abs(b), R=(B===1?'':B)+'√'+r; if(!a) return (b<0?'−':'')+R; return N(a)+(b<0?'−':'＋')+R; };
+/* (a＋b√r)/d を約分して */
+const sdf = (a,b,r,d) => { if(d<0){ a=-a; b=-b; d=-d; } const g=gcd(gcd(a,b),d); a/=g; b/=g; d/=g; if(d===1) return sd(a,b,r); return (a&&b?'('+sd(a,b,r)+')':sd(a,b,r))+'/'+d; };
+const pm = (b,first) => (b<0?'−':first?'':'＋')+(Math.abs(b)===1?'':Math.abs(b));
+/* 循環小数 */
+const rd = c => `<span class="rd">${c}</span>`;
+function decOf(n,d){ const ip=Math.floor(n/d); let r=n%d; const seen={}; let digs='';
+  while(r && seen[r]===undefined){ seen[r]=digs.length; r*=10; digs+=Math.floor(r/d); r%=d; }
+  return r ? { ip, pre:digs.slice(0,seen[r]), rep:digs.slice(seen[r]) } : { ip, pre:digs, rep:'' }; }
+const decH = ({ip,pre,rep}) => { if(!rep) return pre?`${ip}.${pre}`:String(ip); const R=rep.length===1?rd(rep):rd(rep[0])+rep.slice(1,-1)+rd(rep.slice(-1)); return `${ip}.${pre}${R}`; };
+const decLong = ({ip,pre,rep}) => `${ip}.${pre}${rep.repeat(Math.max(2,Math.ceil(6/rep.length)))}……`;
+/* 数直線（不等式の解） rays:[{v,lab,inc,dir:'r'|'l'}] */
+function nlr(rays, o={}){ const vs=rays.map(r=>r.v), lo=Math.min(...vs), hi=Math.max(...vs), sp=Math.max(hi-lo,1);
+  const X=v=>60+(v-lo)/sp*180, W=300; let g=`<line x1="10" y1="80" x2="${W-10}" y2="80" class="nl"/><text x="${W-8}" y="96" class="nt">x</text>`;
+  const cols=['var(--teal)','var(--accent)','#7a5bb5'];
+  rays.forEach((r,k)=>{ const x=X(r.v), h=22+k*16, c=cols[k%3], end=r.dir==='r'?W-16:16;
+    g+=`<path d="M${x} 80 L${x+(r.dir==='r'?6:-6)} ${80-h} L${end} ${80-h}" fill="none" stroke="${c}" stroke-width="2.5"/><circle cx="${x}" cy="80" r="4.5" fill="${r.inc?c:'var(--surface)'}" stroke="${c}" stroke-width="2"/>`; });
+  uniq(rays.map(r=>r.v+'|'+r.lab)).forEach(s=>{ const [v,l]=s.split('|'); g+=`<text x="${X(+v)}" y="98" class="nt">${l}</text>`; });
+  if(o.band) g+=`<rect x="${X(o.band[0])}" y="34" width="${X(o.band[1])-X(o.band[0])}" height="44" fill="var(--teal)" opacity=".10"/>`;
+  return `<svg class="nline" viewBox="0 0 ${W} 104" role="img" aria-label="数直線">${g}</svg>`; }
+/* 分数（有理数）の計算 */
+const Fr = (n,d=1) => { if(d<0){ n=-n; d=-d; } const g=gcd(n,d); return [n/g,d/g]; };
+const ft = f => fr(f[0],f[1]);
+const fv = f => f[0]/f[1];
+const OPS = { '＜':'＞', '＞':'＜', '≦':'≧', '≧':'≦' };
+const flip = op => OPS[op];
+const isUp = op => op==='＞'||op==='≧';
+const incl = op => op==='≦'||op==='≧';
+/* 解が x op p になる ax＋b op' cx＋d をつくる（p は分数 [n,m]） */
+function mkIneq(p, op, o={}){ for(let t=0;t<200;t++){ const m=p[1], k=pick(o.small?[1]:[1,1,2]); let a=nz(-5,6), c=nz(-4,5); if(o.noC) c=0;
+    if((a-c)%m!==0 && m>1){ a=c+pick([-1,1])*m*k; } if(a===c||a===0) continue; const diff=a-c, rhs=diff*p[0]/p[1]; if(!Number.isInteger(rhs)) continue;
+    const b=ri(-9,9), d=b+rhs; if(Math.abs(d)>30) continue; const shown = diff>0 ? op : flip(op);
+    const L1 = (a===1?'':a===-1?'−':N(a))+'x'+(b?sg(b):''), R1 = c ? (c===1?'':c===-1?'−':N(c))+'x'+(d?sg(d):'') : N(d);
+    return { txt:L1+shown+R1, a,b,c,d, diff, rhs, shown, op,
+      steps:`${c?`${(a===1?'':a===-1?'−':N(a))}x${c<0?'＋':'−'}${Math.abs(c)===1?'':Math.abs(c)}x${shown}${N(d)}${b?(b<0?'＋'+(-b):'−'+b):''}`:`${(a===1?'':a===-1?'−':N(a))}x${shown}${N(d)}${b?(b<0?'＋'+(-b):'−'+b):''}`}<br>${diff===1?'':diff===-1?'−':N(diff)}x${shown}${N(rhs)}${diff<0?'<br><span class="small">（負の数で割るので向きが変わる）</span>':''}<br>x${op}${ft(p)}` }; }
+  return mkIneq([p[0],p[1]],op,{small:true}); }
+const xop = (op,p) => `x${op}${ft(p)}`;
+/* 2つの解の共通部分 */
+function both(o1,p1,o2,p2){ const u1=isUp(o1), u2=isUp(o2), v1=fv(p1), v2=fv(p2);
+  if(u1&&u2){ if(v1>v2||(v1===v2&&!incl(o1))) return xop(o1,p1); return xop(o2,p2); }
+  if(!u1&&!u2){ if(v1<v2||(v1===v2&&!incl(o1))) return xop(o1,p1); return xop(o2,p2); }
+  const [lo,lop,hi,hop] = u1 ? [p1,o1,p2,o2] : [p2,o2,p1,o1]; const a=fv(lo), b=fv(hi);
+  if(a>b) return '解なし'; if(a===b) return incl(lop)&&incl(hop) ? `x＝${ft(lo)}` : '解なし';
+  return `${ft(lo)}${lop==='＞'?'＜':'≦'}x${hop}${ft(hi)}`; }
+const lowOp = op => op==='＞'?'＜':'≦';
+
+/* ========== 2章 実数 ========== */
+const RAT = [['0.75','有限小数なので 75/100＝3/4 と分数で表せる'],['−6','整数は −6/1 のように分数で表せる'],['4/9','分数そのもの'],['√16','√16＝4 なので整数'],['√(9/25)','√(9/25)＝3/5 なので分数'],['3.14','有限小数なので 314/100 と表せる'],['0',"0＝0/1"],[`0.${rd('2')}`,'循環小数は分数で表せる（0.2̇＝2/9）'],['−√4','−√4＝−2 なので整数'],['√0.09','√0.09＝0.3 なので有限小数']];
+const IRR = [['√5','√5 は2乗して5になる数で、分数では表せない'],['√12','√12＝2√3 で、分数では表せない'],['π','円周率 π は循環しない無限小数'],['1＋√2','有理数＋無理数 は無理数'],['√3/2','無理数÷2 は無理数'],['2π','有理数×無理数（0以外）は無理数'],['−√7','√7 は無理数なので −√7 も無理数'],['√0.9','0.9＝9/10 で、√0.9＝3/√10 となり分数では表せない']];
+const CLS = [['8','自然数'],['√25','自然数'],['−3','0 や負の整数'],['0','0 や負の整数'],['−√9','0 や負の整数'],['2/5','整数でない有理数'],['−0.6','整数でない有理数'],[`0.${rd('1')}`,'整数でない有理数'],['√(1/4)','整数でない有理数'],['√6','無理数'],['π','無理数'],['−√2','無理数']];
+const CLSW = { '自然数':'1, 2, 3, … と数えられる正の整数','0 や負の整数':'整数のうち、自然数でないもの','整数でない有理数':'分数で表せるが整数ではない数（有限小数・循環小数）','無理数':'分数で表せない数（循環しない無限小数）' };
+function cyc(){ for(;;){ const ip=pick([0,0,0,1,2]), p=pick([0,0,1]), k=pick([1,2,2,3]);
+  const kk=p?Math.min(k,2):k; const pre=Array.from({length:p},()=>ri(0,9)).join(''), rep=Array.from({length:kk},()=>ri(0,9)).join('');
+  if(/^(\d)\1*$/.test(rep)&&kk>1) continue; if(/^9+$/.test(rep)||/^0+$/.test(rep)) continue; if(kk===2&&rep[0]===rep[1]) continue; if(kk===3&&(rep[0]===rep[1]&&rep[1]===rep[2])) continue;
+  if(p&&pre.slice(-1)===rep.slice(-1)) continue;
+  const num=(+(pre+rep)-(+pre||0)), den=10**p*(10**kk-1); return { ip, pre, rep, p, k:kk, num, den }; } }
+const G = {
+  n2Kind(){ const wantIrr=Math.random()<.6, A=wantIrr?IRR:RAT, B=wantIrr?RAT:IRR, a=pick(A), bs=shuffle([...B]).slice(0,3);
+    return Q(wantIrr?'次のうち、<b>無理数</b>はどれ？':'次のうち、<b>有理数</b>はどれ？', '', a[0], bs.map(b=>b[0]),
+      '分数 m/n（m、n は整数、n≠0）の形で表せる数が有理数、表せない数が無理数です。√ がついていても、中が平方数なら有理数です。',
+      `<b>${a[0]}</b>：${a[1]}。<br>${bs.map(b=>`${b[0]}：${b[1]}。`).join('<br>')}`, { words:true }); },
+  n2Cls(){ const [x,c]=pick(CLS), ks=Object.keys(CLSW);
+    return Q(`<b>${x}</b> は、次のどれにあてはまる？`, '', c, ks.filter(k=>k!==c),
+      '√ や小数の形のときは、まず計算して、どんな数になるかを確かめます。',
+      `${x} は「<b>${c}</b>」にあてはまります。<br><span class="small">${c}：${CLSW[c]}</span>`, { words:true }); },
+  n2Dec(){ const ds=[3,6,7,9,11,12,15,22,27,33,37,8,16,20,40,24,44,45]; let d,n; do { d=pick(ds); n=ri(1,d-1); } while(gcd(n,d)!==1);
+    const D=decOf(n,d), ans=decH(D), w=[];
+    if(D.pre&&D.rep) w.push(decH({ip:D.ip,pre:'',rep:D.pre+D.rep}));
+    [[n,d+1],[n+1,d],[n,d-1],[n-1,d],[n+2,d],[n-2,d],[n,d+2],[n+3,d]].forEach(([a,b])=>{ if(a>0&&b>1&&a<b){ const E=decOf(a,b); if(E.rep.length<=6) w.push(decH(E)); } });
+    return Q('次の分数を小数で表すと？', fr(n,d), ans, shuffle(w),
+      '分子 ÷ 分母 の筆算をします。同じ余りが出たら、そこから先は同じ数字のくり返しです。',
+      `${n} ÷ ${d} ＝ ${D.rep?decLong(D):decH(D)}<br>${D.rep?`「${D.rep}」がくり返されるので、くり返しの最初と最後の数字に・をつけて <b>${ans}</b>`:`わり切れるので <b>${ans}</b>（有限小数）`}`); },
+  n2Fin(){ const finite = d => { let x=d; while(x%2===0) x/=2; while(x%5===0) x/=5; return x===1; };
+    let gn, gd; do { gd=pick([8,12,15,20,24,30,35,40,48,60,75,80,125]); gn=ri(1,gd-1); } while(!finite(Fr(gn,gd)[1]) || Fr(gn,gd)[1]===1);
+    const bad=[]; while(bad.length<3){ const bd=pick([3,6,7,9,11,12,14,15,18,21,22,30,45]); const bn=ri(1,bd-1); if(!finite(Fr(bn,bd)[1]) && !bad.includes(bn+'/'+bd)) bad.push(bn+'/'+bd); }
+    const ans=gn+'/'+gd, [rn,rdn]=Fr(gn,gd);
+    return Q('次の分数のうち、<b>有限小数</b>で表せるものはどれ？', '', ans, bad,
+      'まず<b>約分</b>します。既約分数の分母の素因数が <b>2 と 5 だけ</b>なら有限小数、それ以外の素因数があれば循環小数です。',
+      `${ans}${rdn!==gd?'＝'+rn+'/'+rdn+'（約分）':''}。分母 ${rdn} の素因数は 2 と 5 だけなので、有限小数になります（${decH(decOf(rn,rdn))}）。<br>${bad.map(b=>{ const [x,y]=b.split('/').map(Number), f=Fr(x,y); return `${b}${f[1]!==y?'＝'+f[0]+'/'+f[1]:''}：分母に 2・5 以外の素因数 → 循環小数`; }).join('<br>')}`); },
+  n2Frac(){ const c=cyc(), D={ip:c.ip,pre:c.pre,rep:c.rep}, f=Fr(c.ip*c.den+c.num,c.den), ans=ft(f);
+    const big=10**(c.p+c.k), small=10**c.p, Ibig=c.ip*big+ +(c.pre+c.rep), Ismall=c.ip*small+(+c.pre||0), tail=c.rep.repeat(3)+'……';
+    const w=[ft(Fr(c.ip*c.den+c.num+1, c.den)), ft(Fr((c.ip+1)*c.den+c.num, c.den)), ft(Fr(c.ip*10**c.k+ +c.rep, 10**c.k)), ft(Fr(c.ip*(big-1)+ +(c.pre+c.rep), big-1)), ft(Fr(c.ip*c.den*10+c.num, c.den*10))];
+    if(c.p) w.unshift(ft(Fr(c.ip*c.den+ +(c.pre+c.rep), c.den)), ft(Fr(c.ip*c.den/10+c.num, c.den/10)));
+    return Q('次の循環小数を分数で表すと？', decH(D), ans, w,
+      `x とおき、くり返しの1回分（${c.k}けた）だけ小数点をずらした数${c.p?'と、くり返しが小数点のすぐ後から始まる数':''}をつくって、ひき算をします。`,
+      `x＝${decLong(D)} とおくと<br>${big}x＝${Ibig}.${tail}<br>${c.p?`${small}x＝${Ismall}.${tail}<br>`:''}${big}x−${c.p?small:''}x＝${Ibig-Ismall}<br>${big-small}x＝${Ibig-Ismall}<br>x＝${Ibig-Ismall}/${big-small}${ans===(Ibig-Ismall)+'/'+(big-small)?'':'＝<b>'+ans+'</b>'}${ans===(Ibig-Ismall)+'/'+(big-small)?'（これ以上約分できない）':''}`); },
+  n2Abs(){ const t=ri(0,3);
+    if(t===0){ const a=nz(-9,9), b=nz(-9,9); const v=Math.abs(a)+Math.abs(b);
+      return Q('次の値を求めなさい。', `|${N(a)}|＋|${N(b)}|`, N(v), [N(a+b), N(Math.abs(a+b)), N(-v), N(Math.abs(a)-Math.abs(b)), N(v+1), N(v-1)], '絶対値は、原点からの距離。負の数の絶対値は、−をとった数です。', `|${N(a)}|＝${Math.abs(a)}、|${N(b)}|＝${Math.abs(b)}<br>${Math.abs(a)}＋${Math.abs(b)}＝<b>${v}</b>`); }
+    if(t===1){ const a=ri(1,6), b=ri(a+2,12), v=b-a;
+      return Q('次の値を求めなさい。', `|${a}−${b}|`, N(v), [N(-v), N(a+b), N(-(a+b)), N(v+1)], '先に中を計算してから、絶対値をとります。', `${a}−${b}＝${N(a-b)}<br>|${N(a-b)}|＝<b>${v}</b>`); }
+    if(t===2){ const a=nz(-9,-1); const v=-Math.abs(a);
+      return Q('次の値を求めなさい。', `−|${N(a)}|`, N(v), [N(-v), N(a*a), '0', N(v-1)], '|　| の外にある − は、絶対値をとったあとにつけます。', `|${N(a)}|＝${Math.abs(a)} なので　−|${N(a)}|＝<b>${N(v)}</b>`); }
+    const a=nz(-8,8), b=nz(-8,8); if(a===b) return G.n2Abs(); const v=Math.abs(a-b);
+    return Q(`数直線上の2点 A(${N(a)})、B(${N(b)}) の間の距離は？`, `AB＝?`, String(v), [String(Math.abs(a+b)), String(Math.abs(a)+Math.abs(b)===v?v+2:Math.abs(a)+Math.abs(b)), String(Math.abs(Math.abs(a)-Math.abs(b))===v?v-1:Math.abs(Math.abs(a)-Math.abs(b))), String(v+1), String(v+2)],
+      '2点 A(a)、B(b) の間の距離は |b−a| です。', `AB＝|${N(b)}−${P(a)}|＝|${N(b-a)}|＝<b>${v}</b>`); },
+  n2AbsR(){ let k; do { k=ri(2,40); } while(isSq(k)); const s=Math.sqrt(k), f=Math.floor(s);
+    if(Math.random()<.55){ const m=pick([f,f+1,f+1,f+2,f-1>0?f-1:f]), pos=s>m, ans=pos?`√${k}−${m}`:`${m}−√${k}`;
+      return Q('次の値を求めなさい。', `|√${k}−${m}|`, ans, [pos?`${m}−√${k}`:`√${k}−${m}`, `√${k}＋${m}`, `−√${k}−${m}`],
+        `√${k} がどのくらいの大きさか考えます。${f}²＝${f*f}、${f+1}²＝${(f+1)**2} なので、${f}＜√${k}＜${f+1}。`,
+        `${f}＜√${k}＜${f+1} なので、√${k}−${m} は${pos?'正':'負'}。<br>${pos?`|√${k}−${m}|＝<b>√${k}−${m}</b>`:`|√${k}−${m}|＝−(√${k}−${m})＝<b>${m}−√${k}</b>`}`); }
+    const m=f, n=f+1+ri(0,1), ans=N(n-m);
+    return Q('次の値を求めなさい。', `|√${k}−${m}|＋|√${k}−${n}|`, ans, [`2√${k}−${m+n}`, `${m+n}−2√${k}`, N(m-n)],
+      `まず ${f}＜√${k}＜${f+1} を確かめて、それぞれの中の符号を調べます。`,
+      `${m}＜√${k}＜${n} なので<br>√${k}−${m}＞0、√${k}−${n}＜0<br>|√${k}−${m}|＋|√${k}−${n}|<br>＝(√${k}−${m})−(√${k}−${n})<br>＝<b>${ans}</b>`); },
+  n2AbsX(){ const p=nz(-4,4), c=pick([2,3]), q=nz(-7,7); let k, xv, xs, isR=Math.random()<.5;
+    if(isR){ k=pick([2,3,5,6,7,10,11]); xv=Math.sqrt(k); xs=`√${k}`; } else { xv=nz(-4,4); xs=N(xv); }
+    const t1=xv+p, t2=c*xv-q, s1=t1>=0?1:-1, s2=t2>=0?1:-1; if(Math.abs(t1)<1e-9||Math.abs(t2)<1e-9) return G.n2AbsX();
+    const expr=`|x${sg(p)}|＋|${c}x${sg(-q)}|`;
+    const val = isR ? sd(s1*p - s2*q, s1+s2*c, k) : N(Math.abs(t1)+Math.abs(t2));
+    const wrong = (a,b) => isR ? sd(a*p - b*q, a+b*c, k) : N(a*t1+b*t2);
+    const inner1 = isR?`√${k}${sg(p)}`:N(t1), inner2 = isR?`${c}√${k}${sg(-q)}`:N(t2);
+    return Q(`x＝${xs} のとき、次の式の値は？`, expr, val, [wrong(-s1,s2), wrong(s1,-s2), wrong(-s1,-s2), wrong(1,1), isR?sd(s1*p - s2*q + 1, s1+s2*c, k):N(Math.abs(t1)+Math.abs(t2)+1), isR?sd(s1*p - s2*q - 2, s1+s2*c, k):N(Math.abs(t1)+Math.abs(t2)+2)],
+      `x＝${xs} を代入してから、|　| の中が正か負かを調べます。${isR?`√${k} はおよそ ${xv.toFixed(2)}。`:''}`,
+      `|${inner1}|＋|${inner2}|<br>${inner1} は${s1>0?'正':'負'}、${inner2} は${s2>0?'正':'負'}なので<br>＝${s1>0?`(${inner1})`:`−(${inner1})`}${s2>0?`＋(${inner2})`:`−(${inner2})`}<br>＝<b>${val}</b>`); },
+
+/* ========== 3章 平方根 ========== */
+  n3Root(){ const t=ri(0,4);
+    if(t===0){ const sq=Math.random()<.5, k=sq?pick([4,9,16,25,36,49,64,81,100,121,144]):pick(SQF.filter(x=>x<15)); const r=Math.round(Math.sqrt(k)), ans=sq?`±${r}`:`±√${k}`;
+      return Q(`${k} の平方根は？`, '', ans, sq?[String(r),`√${k}`,`±${k/2}`.replace('.5','.5'),`±${k}`]:[`√${k}`,`±${k*k}`,`−√${k}`,`±${k}`],
+        '2乗して a になる数が a の平方根。正の数の平方根は<b>正と負の2つ</b>あります。', `(${sq?r:'√'+k})²＝${k}、(−${sq?r:'√'+k})²＝${k} なので、${k} の平方根は <b>${ans}</b>`); }
+    if(t===1){ const m=ri(2,9);
+      return Q('次の値を求めなさい。', `√((−${m})²)`, String(m), [N(-m), `±${m}`, String(m*m)], '√ の中を先に計算します。(−a)² は正の数になります。', `√((−${m})²)＝√${m*m}＝<b>${m}</b><br><span class="small">√(a²)＝|a| なので、答えは必ず 0 以上です。</span>`); }
+    if(t===2){ const k=pick(SQF);
+      return Q('次の値を求めなさい。', `(−√${k})²`, String(k), [N(-k), `±${k}`, `√${k}`], '(−√a)²＝(−√a)×(−√a) です。負×負は正。', `(−√${k})²＝(−√${k})×(−√${k})＝<b>${k}</b>`); }
+    if(t===3){ const v=pick(['a','x']);
+      return Q(`${v}＜0 のとき、次の式の根号をはずすと？`, `√(${v}²)`, `−${v}`, [v, `±${v}`, `${v}²`], '√(a²)＝|a|。a が負のとき、|a|＝−a です。', `√(${v}²)＝|${v}|<br>${v}＜0 なので |${v}|＝<b>−${v}</b><br><span class="small">（−${v} は正の数です）</span>`); }
+    let k; do { k=ri(2,30); } while(isSq(k)); const f=Math.floor(Math.sqrt(k)), m=pick([f,f+1]), pos=Math.sqrt(k)>m, ans=pos?`√${k}−${m}`:`${m}−√${k}`;
+    return Q('次の式の根号をはずすと？', `√((${m}−√${k})²)`, ans, [pos?`${m}−√${k}`:`√${k}−${m}`, `±(${m}−√${k})`, `${m*m+k}`],
+      `√(A²)＝|A|。${f}＜√${k}＜${f+1} から、${m}−√${k} の符号を調べます。`, `√((${m}−√${k})²)＝|${m}−√${k}|<br>${m}−√${k} は${pos?'負':'正'}なので ＝<b>${ans}</b>`); },
+  n3Simp(){ const t=ri(0,2);
+    if(t===0){ const o=ri(2,6), i=pick([2,3,5,6,7]), n=o*o*i; if(n>200) return G.n3Simp();
+      return Q('次の数を a√b の形（b はできるだけ小さい自然数）にすると？', `√${n}`, rt(o,i), [rt(o+1,i), rt(o*o,i), rt(o,i*2), rt(o-1||o+2,i+1)],
+        '√ の中を「平方数 × ほかの数」に分けて、平方数を外に出します。', `√${n}＝√(${o*o}×${i})＝√(${o}²×${i})＝<b>${rt(o,i)}</b>`); }
+    if(t===1){ const a=pick([2,3,5,6]), b=pick([2,3,6,8,10,12,15,18]); const [o,i]=simp(a*b); if(a===b) return G.n3Simp(); const ans=rt(o,i);
+      return Q('次の計算をしなさい。', `√${a}×√${b}`, ans, [`√${a+b}`, rt(o+1,i), rt(o,i===1?2:i*2), String(a*b)],
+        '√a×√b＝√(ab)。最後に √ の中をできるだけ簡単にします。', `√${a}×√${b}＝√${a*b}${o>1?`＝√(${o*o}×${i})`:''}＝<b>${ans}</b>`); }
+    const b=pick([2,3,5,6]), k=pick([2,3,4,5,6]), a=b*k*k; const ans=String(k);
+    return Q('次の計算をしなさい。', `√${a}÷√${b}`, ans, [`√${k}`, String(k*k), `√${a-b}`, `${k}√${b}`],
+      '√a÷√b＝√(a/b)。', `√${a}÷√${b}＝√(${a}/${b})＝√${k*k}＝<b>${k}</b>`); },
+  n3Add(){ const r=pick([2,3,5,6,7]); const two=Math.random()<.35;
+    if(!two){ let ts, tot; do { ts=Array.from({length:3},()=>({ c:pick([1,1,2,3]), m:pick([1,2,2,3,4,5]), s:pick([1,1,-1]) })); ts[0].s=1; tot=ts.reduce((a,t)=>a+t.s*t.c*t.m,0); } while(!tot || ts.every(t=>t.m===1) || ts.some(t=>t.m*t.m*r>200) || new Set(ts.map(t=>t.m)).size<3);
+      const expr=ts.map((t,i)=>(t.s<0?'−':i?'＋':'')+(t.c===1?'':t.c)+'√'+(t.m*t.m*r)).join(''), mid=ts.map((t,i)=>(t.s<0?'−':i?'＋':'')+(t.c*t.m===1?'':t.c*t.m)+'√'+r).join('');
+      const w=[rt(tot+1,r), rt(-tot,r), rt(ts.reduce((a,t)=>a+t.c*t.m,0),r), `√${ts.reduce((a,t)=>a+t.s*t.c*t.m*t.m*r,0)}`];
+      return Q('次の計算をしなさい。', expr, rt(tot,r), w, '1つずつ a√b の形にすると、√ の中が同じ数になります。√ の中が同じものは、同類項のようにまとめられます。', `${expr}<br>＝${mid}<br>＝<b>${rt(tot,r)}</b>`); }
+    const r2=pick([2,3,5].filter(x=>x!==r&&x*r!==r*r)); const a=pick([2,3]), b=pick([1,2,3]), c=pick([2,3]), d=pick([1,2]);
+    const A=a*a*r, B=b*b*r, C=c*c*r2, D=d*d*r2; const cr=a+b, cr2=c-d; if(!cr2) return G.n3Add();
+    const expr=`√${A}${pm(1)}√${C}＋√${B}−√${D}`.replace(/√1(?!\d)/g,'1'), ans=`${rt(cr,r)}${cr2>0?'＋':'−'}${rt(Math.abs(cr2),r2)}`;
+    return Q('次の計算をしなさい。', expr, ans, [`${rt(cr,r)}${cr2>0?'−':'＋'}${rt(Math.abs(cr2),r2)}`, rt(cr+cr2, r), `${rt(cr+1,r)}${cr2>0?'＋':'−'}${rt(Math.abs(cr2),r2)}`, rt(cr*cr2||1, r*r2)],
+      'a√b の形にしてから、√ の中が同じものどうしをまとめます。√ の中がちがうものは、まとめられません。',
+      `＝${rt(a,r)}＋${rt(c,r2)}＋${rt(b,r)}−${rt(d,r2)}<br>＝<b>${ans}</b>`); },
+  n3Mul(){ const t=ri(0,3);
+    if(t===0){ const a=ri(1,5), r=pick([2,3,5,6,7,10,11]); if(a*a===r) return G.n3Mul(); const v=a*a-r;
+      return Q('次の計算をしなさい。', `(${a}＋√${r})(${a}−√${r})`, N(v), [N(a*a+r), N(a-r), sd(a*a-r,2*a,r), N(a*a-2*r), N(2*a-r)], '(a＋b)(a−b)＝a²−b² を使います。', `＝${a}²−(√${r})²＝${a*a}−${r}＝<b>${N(v)}</b>`); }
+    if(t===1){ const a=ri(1,4), b=pick([1,1,2]), r=pick([2,3,5,6,7]), s=pick([1,-1]); const A=a*a+b*b*r, B=2*a*b*s; const term=(b===1?'':b)+'√'+r;
+      return Q('次の計算をしなさい。', `(${a}${s>0?'＋':'−'}${term})²`, sd(A,B,r), [sd(a*a+b*b*r,0,r), sd(a*a+b*r,B,r), sd(A,-B,r), sd(a*a-b*b*r,B,r)],
+        '(a±b)²＝a²±2ab＋b² を使います。(√r)²＝r です。', `＝${a}²${s>0?'＋':'−'}2×${a}×${term}＋(${term})²<br>＝${a*a}${s>0?'＋':'−'}${2*a*b}√${r}＋${b*b*r}<br>＝<b>${sd(A,B,r)}</b>`); }
+    if(t===2){ const [p,q]=pick([[2,3],[2,5],[3,5],[3,2],[5,2],[5,3]]); const m=pick([1,2,3]), n=nz(-3,3); const A=m*p+n*q, B=n+m, pq=p*q; // (√p+√q)(m√p+n√q)
+      const ans=sd(A,B,pq), mt=(m===1?'':m)+'√'+p, nt=(Math.abs(n)===1?'':Math.abs(n))+'√'+q;
+      return Q('次の計算をしなさい。', `(√${p}＋√${q})(${mt}${n<0?'−':'＋'}${nt})`, ans, [sd(A,-B,pq), sd(m*p-n*q,B,pq), sd(A,B+1,pq), sd(m*p+n*q,m*n,pq)],
+        '分配法則で4つの積をつくります。√p×√p＝p、√p×√q＝√(pq)。', `＝${m===1?'':m}(√${p})²${pm(n)}√${p*q}＋${m===1?'':m}√${q*p}${pm(n)}(√${q})²<br>＝${m*p}${pm(n)}√${pq}＋${m===1?'':m}√${pq}${n<0?'−':'＋'}${Math.abs(n)*q}<br>＝<b>${ans}</b>`.replace(/(＋|−)√/g,'$1√').replace(/([＋−])1√/g,'$1√')); }
+    const a=pick([2,3,5,6]), b=pick([2,3,6,8,10,12].filter(x=>x!==a)), c=pick([2,3,5].filter(x=>x!==a&&x!==b)); if(c===undefined) return G.n3Mul();
+    const [o1,i1]=simp(a*b), [o2,i2]=simp(a*c); const ans=i1===i2?rt(o1+o2,i1):`${rt(o1,i1)}＋${rt(o2,i2)}`;
+    return Q('次の計算をしなさい。', `√${a}(√${b}＋√${c})`, ans, [`√${a*b+a*c}`, i1===i2?rt(o1+o2+1,i1):`${rt(o1,i1)}−${rt(o2,i2)}`, `√${a+b}＋√${a+c}`, i1===i2?rt(o1*o2,i1):`${rt(o1+1,i1)}＋${rt(o2,i2)}`],
+      '分配法則で √a をかけてから、√ の中を簡単にします。', `＝√${a*b}＋√${a*c}<br>＝<b>${ans}</b>`); },
+  n3Rat1(){ const t=ri(0,2);
+    if(t===0){ const r=pick([2,3,5,6,7]), k=pick([1,2,3,4,6,10,12].filter(x=>x!==r)); const g=gcd(k,r), c=k/g, d=r/g; const ans=d===1?rt(c,r):`${c===1?'':c}√${r}/${d}`;
+      return Q('次の数の分母を有理化すると？', `${k}/√${r}`, ans, [d===1?`${c}/${r}`:`${k}√${r}`, `√${r}/${k}`, `${k*r}/√${r}`.replace(/.*/, d===1?`${c+1}√${r}`:`${c===1?'':c}√${r}/${d*r}`), `${k}/${r}`],
+        '分母と分子に、同じ √ をかけます。(√r)²＝r。', `${k}/√${r}＝(${k}×√${r})/(√${r}×√${r})＝${k}√${r}/${r}${g>1?`<br>約分して ＝<b>${ans}</b>`:`＝<b>${ans}</b>`}`); }
+    if(t===1){ const r=pick([2,3,5]), m=pick([2,3]), k=pick([1,2,3,4,6,9]); const g=gcd(k,m*r), c=k/g, d=m*r/g; const ans=d===1?rt(c,r):`${c===1?'':c}√${r}/${d}`;
+      return Q('次の数の分母を有理化すると？', `${k}/(${m}√${r})`, ans, [`${c===1?'':c}√${r}/${d*m}`, `${k}√${r}/${m}`, `${m}√${r}/${k}`, d===1?`${c}/${r}`:`${c===1?'':c}√${r}/${m*r*m}`],
+        `分母の ${m} はそのまま。√${r} だけを有理化します。`, `${k}/(${m}√${r})＝${k}√${r}/(${m}×${r})＝${k}√${r}/${m*r}${g>1?`<br>約分して ＝<b>${ans}</b>`:`＝<b>${ans}</b>`}`); }
+    const [p,q]=pick([[2,3],[3,2],[5,2],[2,5],[3,5],[5,3],[7,2]]); const ans=`√${p*q}/${q}`;
+    return Q('次の数の分母を有理化すると？', `√${p}/√${q}`, ans, [`√${p*q}/${p}`, `√${p}/${q}`, `${p}√${q}/${q}`, `√${p*q}`],
+      `分母と分子に √${q} をかけます。`, `√${p}/√${q}＝(√${p}×√${q})/(√${q}×√${q})＝<b>${ans}</b>`); },
+  n3Rat2(){ const t=ri(0,2);
+    if(t===0){ for(;;){ const a=ri(1,4), r=pick([2,3,5,6,7,8,10,11,13,15]); const D=a*a-r; if(!D||isSq(r)||Math.abs(D)>6) continue; const k=pick([1,2,3,4,6]); const s=pick([1,-1]);
+      const ans=sdf(k*a, -s*k, r, D), den=`${a}${s>0?'＋':'−'}√${r}`, conj=`${a}${s>0?'−':'＋'}√${r}`;
+      return Q('次の数の分母を有理化すると？', `${k}/(${den})`, ans, [sdf(k*a, s*k, r, D), sdf(k*a,-s*k,r,a*a+r), sdf(k*a,-s*k,r,-D), sdf(k,-s*k,r,D)],
+        `分母が ${den} のときは、分母と分子に <b>${conj}</b> をかけます。(a＋b)(a−b)＝a²−b² で √ が消えます。`,
+        `＝${k}(${conj})/{(${den})(${conj})}<br>＝${k===1?'':k}(${conj})/(${a*a}−${r})<br>＝${k===1?'':k}(${conj})/${P(D)}<br>＝<b>${ans}</b>`); } }
+    if(t===1){ const [p,q]=pick([[3,2],[5,3],[5,2],[7,5],[6,2],[7,3]]); const A=p+q, B=2, d=p-q; const s=(gcd(B,d)>1||gcd(A,d)>1); const ans=sdf(A,B,p*q,d).replace(`√${p*q}`, rtS(p*q)); const [o,i]=simp(p*q); const a2=sdf(A,B*o,i,d);
+      return Q('次の数の分母を有理化すると？', `(√${p}＋√${q})/(√${p}−√${q})`, a2, [sdf(A,-B*o,i,d), sdf(A,B*o,i,p+q), sdf(p-q,B*o,i,d), sdf(A,o,i,d)],
+        `分母と分子に √${p}＋√${q} をかけます。分子は (√${p}＋√${q})² になります。`,
+        `＝(√${p}＋√${q})²/{(√${p})²−(√${q})²}<br>＝(${p}＋2√${p*q}＋${q})/(${p}−${q})<br>＝<b>${a2}</b>`); }
+    const [p,q]=pick([[3,2],[5,3],[5,2],[6,2],[7,5],[7,3]]); const k=pick([1,2,3,4,6]); const d=p-q, g=gcd(k,d), c=k/g, dd=d/g; const core=`√${p}−√${q}`; const ans=dd===1?(c===1?core:`${c}(${core})`):`${c===1?'':c}(${core})/${dd}`;
+    return Q('次の数の分母を有理化すると？', `${k}/(√${p}＋√${q})`, ans, [dd===1?(c===1?`√${p}＋√${q}`:`${c}(√${p}＋√${q})`):`${c===1?'':c}(√${p}＋√${q})/${dd}`, `${k}(${core})/${p+q}`, `${k}(${core})`, `(${core})/${k*d}`].filter(w=>w!==ans),
+      `分母と分子に √${p}−√${q} をかけます。`, `＝${k}(${core})/{(√${p})²−(√${q})²}<br>＝${k}(${core})/${d}${ans===k+'('+core+')/'+d?'':'<br>＝<b>'+ans+'</b>'}`); },
+  n3Sym(){ const t=ri(0,2);
+    if(t<2){ let a, r; do { a=ri(1,3); r=pick([2,3,5,6,7,10]); } while(a*a===r); const conjFrac = t===1 && a*a-r===1;
+      const s=2*a, p=a*a-r; const asks=[['x＋y',s,[s-1,2*a+2*r,a]],['xy',p,[a*a+r,-p,r-a]],['x²＋y²',s*s-2*p,[s*s-p,s*s+2*p,s*s]],['x³＋y³',s**3-3*p*s,[s**3-p*s,s**3+3*p*s,s**3]],['x²y＋xy²',p*s,[p+s,p*s+2,-p*s]]];
+      const [nm,v,ws]=pick(asks); const head = conjFrac ? `x＝1/(${a}−√${r})、y＝1/(${a}＋√${r})` : `x＝${a}＋√${r}、y＝${a}−√${r}`;
+      const how={ 'x＋y':`x＋y＝${s}`, 'xy':`xy＝${a*a}−${r}＝${N(p)}`, 'x²＋y²':`x²＋y²＝(x＋y)²−2xy＝${s}²−2×${P(p)}＝${N(v)}`, 'x³＋y³':`x³＋y³＝(x＋y)³−3xy(x＋y)<br>＝${s}³−3×${P(p)}×${s}＝${N(v)}`, 'x²y＋xy²':`x²y＋xy²＝xy(x＋y)＝${P(p)}×${s}＝${N(v)}` }[nm];
+      return Q(`${head} のとき、次の式の値は？`, nm, N(v), [...ws, v+1, v-2, -v].map(N),
+        `先に <b>x＋y</b> と <b>xy</b>（基本対称式）を求めて、式をそれで表します。${conjFrac?'x、y はそれぞれ分母を有理化しておきます。':''}`,
+        `${conjFrac?`x＝${a}＋√${r}、y＝${a}−√${r}（分母を有理化）<br>`:''}x＋y＝${s}、xy＝${N(p)}<br>${how.replace(N(v)+'', '<b>'+N(v)+'</b>').replace(/<b><\/b>/,'')}`); }
+    const [p,q]=pick([[3,2],[5,2],[5,3],[6,2],[7,3],[7,5]]); const ask=pick(['xy','x²＋y²']); const v=ask==='xy'?p-q:2*p+2*q;
+    return Q(`x＝√${p}＋√${q}、y＝√${p}−√${q} のとき、次の式の値は？`, ask, N(v), ask==='xy'?[N(p+q),N(q-p),`2√${p}`,N(p*q)]:[N(p+q),N(2*p-2*q),N(4*p),N(2*p+2*q+2)],
+      'x＋y と xy を先に求めます。', ask==='xy'?`xy＝(√${p})²−(√${q})²＝${p}−${q}＝<b>${v}</b>`:`x＋y＝2√${p}、xy＝${p}−${q}＝${p-q}<br>x²＋y²＝(x＋y)²−2xy＝${4*p}−${2*(p-q)}＝<b>${v}</b>`); },
+  n3Low(){ let a, r; do { a=nz(-3,3); r=pick([2,3,5,6,7]); } while(a*a===r); const e=pick([0,0,1,-1,2]); const b=-2*a+e, c=nz(-6,8);
+    // x²＝2ax−(a²−r)
+    const A=(2*a+b)*a + c - (a*a - r), B=(2*a+b); const ans=sd(A,B,r);
+    const xs=`${N(a)}${'＋'}√${r}`.replace(/^0＋/,''), f=`x²${b?(b<0?'−':'＋')+(Math.abs(b)===1?'':Math.abs(b))+'x':''}${sg(c)}`;
+    return Q(`x＝${a}＋√${r} のとき、次の式の値は？`.replace('＋−','−'), f, ans, [sd(A+2*(a*a-r),B,r), sd(A,-B,r), sd(A+1,B,r), sd(c+r,B,r), sd(A-2,B,r), sd(A,B+1,r)],
+      `x${a<0?'＋'+(-a):'−'+a}＝√${r} の両辺を2乗すると、x² を x の1次式で表せます（次数下げ）。`,
+      `x${a<0?'＋'+(-a):'−'+a}＝√${r} の両辺を2乗して<br>x²${a<0?'＋'+(-2*a):'−'+2*a}x＋${a*a}＝${r}　より　x²＝${N(2*a)}x${sg(r-a*a)}<br>${f}＝(${N(2*a)}x${sg(r-a*a)})${b?(b<0?'−':'＋')+(Math.abs(b)===1?'':Math.abs(b))+'x':''}${sg(c)}<br>＝${B?(B===1?'':B===-1?'−':N(B))+'x':''}${B?sg(r-a*a+c):'<b>'+N(r-a*a+c)+'</b>'}${B?`<br>x＝${N(a)}＋√${r} を代入して<br>＝<b>${ans}</b>`:''}`.replace(/＋−/g,'−')); },
+  n3Ip(){ let k; do { k=ri(3,60); } while(isSq(k)); const a=Math.floor(Math.sqrt(k)); const t=ri(0,3), why=`${a*a}＜${k}＜${(a+1)**2} より ${a}＜√${k}＜${a+1}`;
+    if(t===0) return Q(`√${k} の整数部分は？`, '', String(a), [String(a+1), String(a-1), String(Math.floor(k/2)), String(a+2)], 'n²＜k＜(n＋1)² となる整数 n を探します。', `${why}<br>整数部分は <b>${a}</b>`);
+    if(t===1) return Q(`√${k} の小数部分は？`, '', `√${k}−${a}`, [`√${k}−${a+1}`, `${a+1}−√${k}`, `0.${String(Math.sqrt(k)).split('.')[1].slice(0,2)}`], '小数部分＝（もとの数）−（整数部分）です。', `${why}<br>小数部分は <b>√${k}−${a}</b>`);
+    if(t===2){ const d=k-a*a; const ans=sdf(a*a, a, k, d).replace(/^\((.*)\)\/1$/,'$1');
+      return Q(`√${k} の整数部分を a、小数部分を b とするとき、a/b の値は？`, '', ans, [sdf(-a*a, a, k, d), sdf(a*a, a, k, k+a*a), sdf(a, a, k, d), `${a}/(√${k}−${a})`],
+        'a、b を求めてから、分母を有理化します。', `${why} なので a＝${a}、b＝√${k}−${a}<br>a/b＝${a}/(√${k}−${a})＝${a===1?'':a}(√${k}＋${a})/(${k}−${a*a})<br>＝<b>${ans}</b>`); }
+    const m=pick([a+1,a+2,a+3]); const v=m-Math.sqrt(k), ip=Math.floor(v);
+    return Q(`${m}−√${k} の整数部分は？`, '', String(ip), [String(ip+1), String(m-a), String(ip+2), String(ip-1), String(m)],
+      `${why}。各辺に −1 をかけてから ${m} を足します。`, `${a}＜√${k}＜${a+1}<br>−${a+1}＜−√${k}＜−${a}<br>${m-a-1}＜${m}−√${k}＜${m-a}<br>整数部分は <b>${ip}</b>`); },
+  n3Dbl(){ for(;;){ const a=ri(2,8), b=ri(1,a-1); const ab=a*b; if(isSq(ab)) continue; const [c,tt]=simp(ab); const s=pick([1,-1]);
+      const inner = c===1?`${a+b}${s>0?'＋':'−'}2√${ab}`:`${a+b}${s>0?'＋':'−'}${2*c}√${tt}`; const ra=rtS(a), rb=rtS(b); const ans=`${ra}${s>0?'＋':'−'}${rb}`;
+      if(isSq(a)&&isSq(b)) continue; const ansF = isSq(b)&&!isSq(a) ? `${ra}${s>0?'＋':'−'}${Math.sqrt(b)}` : isSq(a)? `${Math.sqrt(a)}${s>0?'＋':'−'}${rb}` : ans;
+      return Q('次の式の二重根号をはずして簡単にすると？', `√(${inner})`, ansF, [`${s>0?ra+'−'+rb:rb+'−'+ra}`.replace(/√1(?!\d)/g,'1').replace(/√4(?!\d)/,'2'), `√${a+b}＋√${ab}`, `${rtS(a+1)}${s>0?'＋':'−'}${rtS(b+1)}`, `√${a+b}${s>0?'＋':'−'}√${2*ab}`],
+        `${c>1?`まず ${2*c}√${tt}＝2√${ab} と変形します。`:''}<b>たして ${a+b}、かけて ${ab}</b> になる2数を探します。${s<0?'ひき算のときは、大きいほうを前にします。':''}`,
+        `${c>1?`${2*c}√${tt}＝2√${ab} なので<br>`:''}√(${a+b}${s>0?'＋':'−'}2√${ab})<br>＝√((${a}＋${b})${s>0?'＋':'−'}2√(${a}×${b}))<br>＝√${a}${s>0?'＋':'−'}√${b}<br>＝<b>${ansF}</b>`); } },
+
+/* ========== 4章 1次不等式 ========== */
+  n4Word(){ const t=ri(0,3);
+    if(t===0){ const a=ri(2,5), b=ri(1,9), c=ri(5,20), up=Math.random()<.5;
+      return Q('次の数量の関係を、不等式で表すと？', `x の ${a} 倍から ${b} をひいた数は、${c} より${up?'大きい':'小さい'}`, `${a}x−${b}${up?'＞':'＜'}${c}`, [`${a}x−${b}${up?'≧':'≦'}${c}`, `${a}(x−${b})${up?'＞':'＜'}${c}`, `${b}−${a}x${up?'＞':'＜'}${c}`, `${a}x−${b}${up?'＜':'＞'}${c}`],
+        '「より大きい」は ＞、「より小さい（未満）」は ＜。「以上」「以下」はその数をふくむので ≧、≦ です。', `x の ${a} 倍から ${b} をひいた数は ${a}x−${b}。「${c} より${up?'大きい':'小さい'}」は ${up?'＞':'＜'} なので <b>${a}x−${b}${up?'＞':'＜'}${c}</b>`); }
+    if(t===1){ const n=ri(3,8), box=pick([50,100,150]), tot=pick([800,1000,1200,1500]);
+      return Q('次の数量の関係を、不等式で表すと？', `1本 x 円のペンを ${n} 本買い、${box} 円のケースに入れてもらうと、代金は ${tot} 円以下になった`, `${n}x＋${box}≦${tot}`, [`${n}x＋${box}＜${tot}`, `${n}x＋${box}≧${tot}`, `${n}(x＋${box})≦${tot}`],
+        '「以下」はその数をふくむので ≦ です。', `代金は ${n}x＋${box}（円）。これが ${tot} 以下なので <b>${n}x＋${box}≦${tot}</b>`); }
+    if(t===2){ const a=nz(-5,0), b=ri(1,8);
+      return Q('次の数量の関係を、不等式で表すと？', `x は ${N(a)} 以上 ${b} 未満`, `${N(a)}≦x＜${b}`, [`${N(a)}＜x≦${b}`, `${N(a)}≦x≦${b}`, `${N(a)}＜x＜${b}`],
+        '「以上」は ≦（その数をふくむ）、「未満」は ＜（ふくまない）。', `x は ${N(a)} 以上 → ${N(a)}≦x、${b} 未満 → x＜${b}<br>まとめて <b>${N(a)}≦x＜${b}</b>`); }
+    const a=pick([2,3,4]), b=ri(2,9);
+    return Q('次の数量の関係を、不等式で表すと？', `x の 1/${a} に ${b} を加えた数は、x 以上である`, `x/${a}＋${b}≧x`, [`x/${a}＋${b}＞x`, `x/${a}＋${b}≦x`, `(x＋${b})/${a}≧x`],
+      '「以上」はその数をふくむので ≧ です。', `x の 1/${a} に ${b} を加えた数は x/${a}＋${b}。それが x 以上なので <b>x/${a}＋${b}≧x</b>`); },
+  n4Prop(){ const c=ri(1,9), k=ri(2,6);
+    const S=[[`a＋${c}`,`b＋${c}`,'＜'],[`a−${c}`,`b−${c}`,'＜'],[`${k}a`,`${k}b`,'＜'],[`−${k}a`,`−${k}b`,'＞'],[`a/${k}`,`b/${k}`,'＜'],[`−a/${k}`,`−b/${k}`,'＞'],[`${c}−${k}a`,`${c}−${k}b`,'＞']];
+    const four=shuffle([...S]).slice(0,4); const right=four[0]; const opts=four.map((s,i)=>i===0?`${s[0]}${s[2]}${s[1]}`:`${s[0]}${flip(s[2])}${s[1]}`);
+    return Q('a＜b のとき、<b>正しいもの</b>はどれ？', '', opts[0], opts.slice(1),
+      '両辺に同じ数をたしても、ひいても、正の数をかけても（割っても）向きは変わりません。<b>負の数</b>をかけたり割ったりすると、向きが逆になります。',
+      `<b>${opts[0]}</b> が正しい。<br>${four.slice(1).map(s=>`${s[0]}${flip(s[2])}${s[1]} は誤り。正しくは ${s[0]}${s[2]}${s[1]}`).join('<br>')}`, { words:true }); },
+  n4Lin(){ const op=pick(['＜','＞','≦','≧']); const p=Math.random()<.75?[nz(-6,6),1]:Fr(nz(-9,9),pick([2,3,4,5])); if(p[1]===1&&p[0]===0) return G.n4Lin(); const I=mkIneq(p,op);
+    const ans=xop(op,p);
+    return Q('次の1次不等式を解くと？', I.txt, ans, [xop(flip(op),p), xop(op,[-p[0],p[1]]), xop(flip(op),[-p[0],p[1]]), xop(op,Fr(I.rhs*I.diff||p[0]+1,1))],
+      'x の項を左辺、数の項を右辺に移項して ax＜b の形にします。x の係数が<b>負</b>のときは、割ると向きが逆になります。',
+      `${I.txt}<br>移項して　${I.steps}`); },
+  n4Lin2(){ const t=ri(0,2), op=pick(['＜','＞','≦','≧']);
+    if(t===0){ for(;;){ const a=pick([2,3,4,5]), p=nz(-4,4), b=nz(-5,6), q=nz(-9,9); const A=a-b, R=q+a*p; if(!A||!R&&Math.random()<.5) continue; const sol=Fr(R,A); const ans=xop(A>0?op:flip(op),sol);
+      const lhs=`${a}(x${sg(-p)})`, rhs=`${b===1?'':b===-1?'−':N(b)}x${sg(q)}`;
+      return Q('次の1次不等式を解くと？', `${lhs}${op}${rhs}`, ans, [xop(A>0?flip(op):op,sol), xop(A>0?op:flip(op),Fr(q-p,A)), xop(A>0?op:flip(op),Fr(-R,A)), xop(op,Fr(R+1,A))],
+        'まずかっこをはずしてから、移項します。', `かっこをはずして　${a}x${sg(-a*p)}${op}${rhs}<br>移項して　${A===1?'':A===-1?'−':N(A)}x${op}${N(R)}${A<0?'<br><span class="small">（負の数で割るので向きが変わる）</span>':''}<br><b>${ans}</b>`); } }
+    if(t===1){ for(;;){ const [m,n]=pick([[2,3],[3,2],[2,5],[3,4],[4,3],[2,4]]); const Lc=m*n/gcd(m,n); const p=nz(-3,3), q=nz(-3,3), r=nz(-2,2);
+      // (x＋p)/m − (x＋q)/n op r  → Lc/m (x+p) − Lc/n (x+q) op Lc r
+      const u=Lc/m, v=Lc/n, A=u-v, R=Lc*r - u*p + v*q; if(!A) continue; const sol=Fr(R,A), ans=xop(A>0?op:flip(op),sol);
+      const expr=`(x${sg(p)})/${m}−(x${q?sg(q):''})/${n}${op}${N(r)}`;
+      return Q('次の1次不等式を解くと？', expr, ans, [xop(A>0?flip(op):op,sol), xop(A>0?op:flip(op),Fr(r - p + q, A)), xop(A>0?op:flip(op),Fr(R+2*v*q,A)), xop(A>0?op:flip(op),Fr(-R,A)), xop(A>0?op:flip(op),Fr(R+1,A)), xop(A>0?flip(op):op,Fr(R-1,A))],
+        `両辺に分母の最小公倍数 ${Lc} をかけて、係数を整数にします。右辺にもかけるのを忘れずに。`,
+        `両辺に ${Lc} をかけて<br>${u===1?'':u}(x${sg(p)})−${v===1?'':v}(x${q?sg(q):''})${op}${N(Lc*r)}<br>${u===1?'':u}x${sg(u*p)}−${v===1?'':v}x${q?sg(-v*q):''}${op}${N(Lc*r)}<br>${A===1?'':A===-1?'−':N(A)}x${op}${N(R)}<br><b>${ans}</b>`); } }
+    for(;;){ const a=nz(-9,9), b=nz(-20,20), c=nz(-9,9), d=nz(-20,20); if(a===c) continue; const A=a-c, R=d-b; const sol=Fr(R,A); if(sol[1]>5) continue; const ans=xop(A>0?op:flip(op),sol);
+      const dd=x=>(x<0?'−':'')+(Math.abs(x)/10).toFixed(1).replace(/^0/,'0'); const expr=`${dd(a)}x${b<0?'−':'＋'}${(Math.abs(b)/10).toFixed(1)}${op}${dd(c)}x${d<0?'−':'＋'}${(Math.abs(d)/10).toFixed(1)}`;
+      return Q('次の1次不等式を解くと？', expr, ans, [xop(A>0?flip(op):op,sol), xop(A>0?op:flip(op),Fr(R,A*10)), xop(A>0?op:flip(op),Fr(-R,A)), xop(A>0?op:flip(op),Fr(d+b,A)), xop(A>0?op:flip(op),Fr(R+10,A)), xop(A>0?flip(op):op,Fr(R+10,A))],
+        '両辺に 10 をかけて、係数を整数にします。', `両辺に 10 をかけて<br>${a===1?'':a===-1?'−':N(a)}x${sg(b)}${op}${c===1?'':c===-1?'−':N(c)}x${sg(d)}<br>${A===1?'':A===-1?'−':N(A)}x${op}${N(R)}<br><b>${ans}</b>`); } },
+  n4Sys(){ for(;;){ const p=nz(-5,5), q=nz(-5,5); const o1=pick(['＞','≧','＜','≦']), o2=pick(['＞','≧','＜','≦']); if(isUp(o1)===isUp(o2)&&Math.random()<.6) continue; if(p===q) continue;
+      const ans=both(o1,[p,1],o2,[q,1]); if(ans==='解なし'&&Math.random()<.8) continue; const I1=mkIneq([p,1],o1), I2=mkIneq([q,1],o2);
+      const w=uniq([both(flip(o1),[p,1],o2,[q,1]), both(o1,[p,1],flip(o2),[q,1]), both(flip(o1),[p,1],flip(o2),[q,1]), '解なし', both(o1.replace('＞','≧').replace('＜','≦'),[p,1],o2.replace('≧','＞').replace('≦','＜'),[q,1])]).filter(x=>x!==ans);
+      const fig=nlr([{v:p,lab:N(p),inc:incl(o1),dir:isUp(o1)?'r':'l'},{v:q,lab:N(q),inc:incl(o2),dir:isUp(o2)?'r':'l'}]);
+      return Q('次の連立不等式を解くと？', `${I1.txt}<br>${I2.txt}`, ans, w,
+        'それぞれの不等式を解いて、数直線で<b>共通部分</b>を求めます。', `1つめ：${xop(o1,[p,1])}<br>2つめ：${xop(o2,[q,1])}${fig}共通部分は <b>${ans}</b>`); } },
+  n4ABC(){ for(;;){ const p=nz(-5,5), q=nz(-5,5); if(p===q) continue; const b1=nz(-3,4), b0=ri(-6,6); let a1=nz(-3,4), c1=nz(-3,4); if(a1===b1||c1===b1) continue;
+      const a0=b0-(a1-b1)*p; const c0=b0+(b1-c1)*q*-1; // B＜C ⇔ (b1−c1)x＜c0−b0 → x op q
+      const d1=a1-b1, d2=b1-c1; const o1=d1>0?'＜':'＞'; // A＜B ⇔ d1 x ＜ b0−a0 = d1 p
+      const o2=d2>0?'＜':'＞'; const C0=b0-d2*q; // (b1−c1)x ＜ C0... we want c0−b0 = d2*q → c0 = b0 + d2*q
+      const cc0=b0+d2*q; if(Math.abs(a0)>25||Math.abs(cc0)>25) continue; const ans=both(o1,[p,1],o2,[q,1]); if(ans==='解なし'&&Math.random()<.85) continue;
+      const lin=(a,b)=>`${a===1?'':a===-1?'−':N(a)}x${b?sg(b):''}`;
+      const w=uniq([both(flip(o1),[p,1],o2,[q,1]), both(o1,[p,1],flip(o2),[q,1]), both(flip(o1),[p,1],flip(o2),[q,1]), '解なし']).filter(x=>x!==ans);
+      return Q('次の不等式を解くと？', `${lin(a1,a0)}＜${lin(b1,b0)}＜${lin(c1,cc0)}`, ans, w,
+        'A＜B＜C は、「A＜B」と「B＜C」の連立不等式と同じです。', `${lin(a1,a0)}＜${lin(b1,b0)} から　${xop(o1,[p,1])}<br>${lin(b1,b0)}＜${lin(c1,cc0)} から　${xop(o2,[q,1])}${nlr([{v:p,lab:N(p),inc:false,dir:isUp(o1)?'r':'l'},{v:q,lab:N(q),inc:false,dir:isUp(o2)?'r':'l'}])}共通部分は <b>${ans}</b>`); } },
+  n4Int(){ for(;;){ const p=Fr(ri(-12,6),pick([1,2,3])), q=Fr(ri(-2,14),pick([1,2,3])); if(fv(p)>=fv(q)-1) continue; const o1=pick(['＞','≧']), o2=pick(['＜','≦']);
+      const I1=mkIneq(p,o1), I2=mkIneq(q,o2); const ints=[]; for(let x=Math.ceil(fv(p)-1);x<=Math.floor(fv(q)+1);x++){ const ok1=o1==='＞'?x>fv(p):x>=fv(p), ok2=o2==='＜'?x<fv(q):x<=fv(q); if(ok1&&ok2) ints.push(x); }
+      if(ints.length<1||ints.length>8) continue; const ans=both(o1,p,o2,q); const ask=pick(['n','max','min']);
+      const A = ask==='n' ? ints.length+'個' : ask==='max' ? N(ints[ints.length-1]) : N(ints[0]);
+      const W = ask==='n' ? [ints.length+1+'個', ints.length-1+'個', ints.length+2+'個'].filter(x=>x!=='0個') .concat([ints.length+3+'個']) : ask==='max' ? [N(ints[ints.length-1]+1), N(ints[ints.length-1]-1), N(ints[ints.length-1]+2), N(ints[ints.length-1]-2)] : [N(ints[0]-1), N(ints[0]+1), N(ints[0]-2), N(ints[0]+2)];
+      return Q(`次の連立不等式を満たす整数 x ${ask==='n'?'の個数':ask==='max'?'のうち、最大のもの':'のうち、最小のもの'}は？`, `${I1.txt}<br>${I2.txt}`, A, W,
+        'まず連立不等式を解きます。端の数が解にふくまれるか（＜ か ≦ か）に注意して、あてはまる整数を数えます。', `解は ${ans}<br>あてはまる整数は ${ints.map(N).join('、')}<br>答え：<b>${A}</b>`); } },
+  n4App(){ const t=ri(0,2);
+    if(t===0){ for(;;){ const P0=pick([120,130,150,160,180]), Q0=pick([60,70,80,90]), n=ri(10,20), B=pick([1500,1800,2000,2200,2500]); const top=B-Q0*n, d=P0-Q0; if(top<=0) continue; const mx=Math.floor(top/d); if(mx<1||mx>=n) continue;
+      return Q('りんごは最大で何個買える？', `1個 ${P0} 円のりんごと 1個 ${Q0} 円のみかんを、合わせて ${n} 個買います。代金を ${B} 円以下にするとき、りんごは最大で何個買えるか。`, `${mx}個`, [`${mx+1}個`, `${mx-1}個`, `${Math.floor(B/P0)}個`, `${mx+2}個`],
+        `りんごを x 個とすると、みかんは (${n}−x) 個。代金の式をつくって、不等式で表します。`,
+        `${P0}x＋${Q0}(${n}−x)≦${B}<br>${P0-Q0}x＋${Q0*n}≦${B}<br>${d}x≦${top}<br>x≦${fr(top,d)}${top%d?`（＝${(top/d).toFixed(2)}…）`:''}<br>x は整数なので、最大 <b>${mx}個</b>`, { words:true }); } }
+    if(t===1){ for(;;){ const A=pick([2000,3000,5000,8000]), Bm=pick([500,800,1000,1200,1500]), C=pick([12000,15000,20000,25000]); if(C<=A) continue; const v=(C-A)/Bm, k=Math.floor(v)+1;
+      return Q('貯金が目標をこえるのは何か月後から？', `今、貯金が ${A} 円あります。来月から毎月 ${Bm} 円ずつ貯金すると、貯金が ${C} 円をこえるのは何か月後からか。`, `${k}か月後`, [`${k-1}か月後`, `${k+1}か月後`, `${Math.ceil(C/Bm)}か月後`, `${k+2}か月後`],
+        'x か月後の貯金を式で表して、「こえる」は ＞ で不等式にします。', `${A}＋${Bm}x＞${C}<br>${Bm}x＞${C-A}<br>x＞${fr(C-A,Bm)}${(C-A)%Bm?`（＝${v.toFixed(2)}…）`:''}<br>${(C-A)%Bm?'':`x＝${v} のときは ${C} 円ちょうどで、「こえる」にはならないので<br>`}x は整数なので <b>${k}か月後</b>から`, { words:true }); } }
+    for(;;){ const p=pick([150,180,200,220,250]), q=p-pick([20,30,40,50]), s=pick([300,400,500,600]); const v=s/(p-q), k=Math.floor(v)+1;
+      return Q('何冊以上買うと、B店のほうが安い？', `同じノートが、A店では1冊 ${p} 円、B店では1冊 ${q} 円で売られていますが、B店では送料 ${s} 円がかかります。何冊以上買うと、B店のほうが安くなるか。`, `${k}冊以上`, [`${k-1}冊以上`, `${k+1}冊以上`, `${Math.ceil(s/q)}冊以上`, `${k+2}冊以上`],
+        'x 冊買うとして、「B店の代金＜A店の代金」を不等式にします。', `${q}x＋${s}＜${p}x<br>${s}＜${p-q}x<br>x＞${fr(s,p-q)}${s%(p-q)?`（＝${v.toFixed(2)}…）`:''}<br>x は整数なので <b>${k}冊以上</b>`, { words:true }); } },
+  n4Abs(){ const t=ri(0,4), a=nz(-6,6), b=ri(1,7);
+    if(t===0) return Q('次の方程式を解くと？', `|x${sg(-a)}|＝${b}`, `x＝${N(a-b)}, ${N(a+b)}`, [`x＝${N(-a-b)}, ${N(-a+b)}`, `x＝${N(a+b)}`, `x＝${N(-b)}, ${N(b)}`],
+      '|A|＝b（b＞0）なら A＝±b。', `x${sg(-a)}＝±${b}<br>x＝${N(a)}±${b}<br><b>x＝${N(a-b)}, ${N(a+b)}</b>`);
+    if(t===1||t===2){ const op=t===1?pick(['＜','≦']):pick(['＞','≧']); const lo=a-b, hi=a+b; const ans = t===1 ? `${N(lo)}${op}x${op}${N(hi)}` : `x${flip(op)}${N(lo)}, ${N(hi)}${flip(op)}x`;
+      const alt = t===1 ? `x${flip(op)}${N(lo)}, ${N(hi)}${flip(op)}x` : `${N(lo)}${flip(op)}x${flip(op)}${N(hi)}`;
+      return Q('次の不等式を解くと？', `|x${sg(-a)}|${op}${b}`, ans, [alt, t===1?`${N(-a-b)}${op}x${op}${N(-a+b)}`:`x${flip(op)}${N(-a-b)}, ${N(-a+b)}${flip(op)}x`, t===1?`x${op}${N(hi)}`:`x${op}${N(hi)}`],
+        `|A|${t===1?'＜':'＞'}b は、${t===1?'−b＜A＜b':'A＜−b または b＜A'}。数直線では、${N(a)} からの距離が ${b} ${t===1?'より近い':'より遠い'}ところです。`,
+        `${t===1?`−${b}${op}x${sg(-a)}${op}${b}`:`x${sg(-a)}${flip(op)}−${b}、${b}${flip(op)}x${sg(-a)}`}<br><b>${ans}</b>`); }
+    const c=pick([2,3]), d=nz(-7,7), e=ri(1,9); const s1=Fr(e-d,c), s2=Fr(-e-d,c); const op=pick(['＝','＜','＞']);
+    const ans = op==='＝' ? `x＝${ft(s2)}, ${ft(s1)}` : op==='＜' ? `${ft(s2)}＜x＜${ft(s1)}` : `x＜${ft(s2)}, ${ft(s1)}＜x`;
+    const w = op==='＝' ? [`x＝${ft(Fr(e+d,c))}, ${ft(Fr(-e+d,c))}`, `x＝${ft(s1)}`, `x＝${ft(Fr(e-d,1))}, ${ft(Fr(-e-d,1))}`] : op==='＜' ? [`x＜${ft(s2)}, ${ft(s1)}＜x`, `${ft(Fr(-e+d,c))}＜x＜${ft(Fr(e+d,c))}`, `x＜${ft(s1)}`] : [`${ft(s2)}＜x＜${ft(s1)}`, `x＜${ft(Fr(-e+d,c))}, ${ft(Fr(e+d,c))}＜x`, `x＞${ft(s1)}`];
+    return Q(`次の${op==='＝'?'方程式':'不等式'}を解くと？`, `|${c}x${sg(d)}|${op}${e}`, ans, w,
+      '中の式をひとまとまり（A）とみて、|A| の公式を使います。', op==='＝'?`${c}x${sg(d)}＝±${e}<br>${c}x＝${N(-d)}±${e}<br><b>${ans}</b>`:op==='＜'?`−${e}＜${c}x${sg(d)}＜${e}<br>${N(-e-d)}＜${c}x＜${N(e-d)}<br><b>${ans}</b>`:`${c}x${sg(d)}＜−${e}、${e}＜${c}x${sg(d)}<br>${c}x＜${N(-e-d)}、${N(e-d)}＜${c}x<br><b>${ans}</b>`); },
+  n4AbsC(){ for(;;){ const a=pick([1,2,3]), b=nz(-6,6), c=pick([1,2,-1,1]), d=ri(-4,8); if(c===a||c===-a) continue;
+      const x1=Fr(d-b,a-c), x2=Fr(-(b+d),a+c); const v1=a*fv(x1)+b>=0, v2=a*fv(x2)+b<0; if(!v1&&!v2) continue; if(Math.abs(fv(x1)-fv(x2))<1e-9) continue;
+      const sols=[]; if(v1) sols.push(x1); if(v2) sols.push(x2); sols.sort((p,q)=>fv(p)-fv(q)); const ans='x＝'+sols.map(ft).join(', ');
+      const allc=[x1,x2].sort((p,q)=>fv(p)-fv(q)); const w=uniq(['x＝'+allc.map(ft).join(', '), 'x＝'+ft(v1?x2:x1), 'x＝'+ft(Fr(-x1[0],x1[1])), sols.length===2?'x＝'+ft(sols[0]):'x＝'+ft(Fr(d+b,a+c)), 'x＝'+ft(Fr(-x2[0],x2[1])), '解なし']).filter(x=>x!==ans);
+      const A=`${a===1?'':a}x${sg(b)}`, R=`${c===1?'':c===-1?'−':c}x${d?sg(d):''}`, bd=Fr(-b,a);
+      return Q('次の方程式を解くと？', `|${A}|＝${R}`, ans, w,
+        `|　| の中が 0 以上か負かで<b>場合分け</b>します。出てきた解が、場合分けの条件を満たすか必ず確かめます。`,
+        `(i) x≧${ft(bd)} のとき　${A}＝${R} より x＝${ft(x1)}<br>　→ 条件を${v1?'満たす':'満たさない'}<br>(ii) x＜${ft(bd)} のとき　−(${A})＝${R} より x＝${ft(x2)}<br>　→ 条件を${v2?'満たす':'満たさない'}<br>答え：<b>${ans}</b>`); } },
+  n4Lit(){ const t=ri(0,3);
+    if(t===0){ const b=nz(-9,9), op=pick(['＞','＜']); return Q('a＜0 のとき、次の不等式を解くと？', `ax${op}${N(b)}`, `x${flip(op)}${N(b)}/a`, [`x${op}${N(b)}/a`, `x${flip(op)}a/${P(b)}`, `x${op}${N(b)}a`],
+      'a は負の数。負の数で割ると、不等号の向きが変わります。', `a＜0 なので、両辺を a で割ると向きが変わり<br><b>x${flip(op)}${N(b)}/a</b>`); }
+    if(t===1){ const k=ri(1,5); return Q(`a＜${k} のとき、次の不等式を解くと？`, `(a−${k})x＞a−${k}`, 'x＜1', ['x＞1', 'x＞a', 'x＜a−'+k], `a＜${k} なので a−${k}＜0。負の数で割ります。`, `a−${k}＜0 なので、両辺を a−${k} で割ると向きが変わり <b>x＜1</b>`); }
+    if(t===2){ const b=ri(1,9); return Q('a＝0 のとき、次の不等式の解は？', `ax＞${b}`, '解はない', ['すべての実数', `x＞${b}`, 'x＞0'], 'a＝0 を代入すると、0×x＞b の形になります。', `0×x＞${b} すなわち 0＞${b}<br>これは x がどんな数でも成り立たないので <b>解はない</b>`); }
+    const b=ri(1,9); return Q('a＝0 のとき、次の不等式の解は？', `ax＞−${b}`, 'すべての実数', ['解はない', `x＞−${b}`, 'x＜0'], 'a＝0 を代入すると、0×x＞−b の形になります。', `0×x＞−${b} すなわち 0＞−${b}<br>これは x がどんな数でもつねに成り立つので <b>すべての実数</b>`); },
+};
+
+/* ---------- 説明ページ ---------- */
+const DEC = (n,d) => decH(decOf(n,d));
+const C2 = [
+  L('1-1','1　実数','有理数と無理数','分数で表せるか','n2Kind',()=>`
+    <section class="panel"><h3>有理数</h3><p>m、n を整数（n≠0）として、<b>分数 m/n の形で表せる数</b>を<b>有理数</b>といいます。整数も −5＝−5/1 のように表せるので有理数です。</p>${rul('整数・有限小数・循環小数 → 分数で表せる → 有理数')}</section>
+    <section class="panel"><h3>無理数</h3><p>√2＝1.41421356…、π＝3.14159… のように、<b>循環しない無限小数</b>は分数で表せません。これを<b>無理数</b>といいます。</p>
+    <table class="dtab"><tr><th colspan="3">実数</th></tr><tr><td rowspan="3"><b>有理数</b></td><td>整数</td><td>−2、0、7</td></tr><tr><td>有限小数</td><td>0.25、−1.6</td></tr><tr><td>循環小数</td><td>0.${rd('3')}、0.${rd('1')}${rd('8')}</td></tr><tr><td><b>無理数</b></td><td colspan="2">√3、√10、π</td></tr></table>
+    ${tip('√ がついていても、√36＝6 のように中が平方数なら有理数です。')}</section>`, ['n2Kind','n2Cls','n2Kind','n2Cls','n2Kind']),
+  L('1-2',null,'分数を小数で表す','有限小数と循環小数','n2Dec',()=>`
+    <section class="panel"><h3>わり算で小数にする</h3><p>分数は「分子÷分母」で小数になります。わり切れれば<b>有限小数</b>、わり切れなければ、ある所から同じ数字の並びがくり返す<b>循環小数</b>になります。</p>
+    ${exQ('5/12 を小数で表しなさい。',`5÷12＝0.41666……<br>6 がくり返すので　5/12＝${DEC(5,12)}`)}
+    ${exQ('4/37 を小数で表しなさい。',`4÷37＝0.108108108……<br>「108」がくり返すので　4/37＝${DEC(4,37)}`)}
+    ${tip('循環小数は、くり返す部分の<b>最初と最後</b>の数字の上に・をつけて表します。')}</section>
+    <section class="panel"><h3>有限小数になる分数</h3>${rul('既約分数の分母の素因数が 2 と 5 だけ → 有限小数')}<p class="small">たとえば 7/40 は 40＝2³×5 なので有限小数（0.175）。9/24 は約分すると 3/8 なので有限小数です。</p></section>`, ['n2Dec','n2Dec','n2Fin','n2Dec','n2Fin']),
+  L('1-3',null,'循環小数を分数で表す','10倍・100倍してひく','n2Frac',()=>`
+    <section class="panel"><h3>考え方</h3>${rul('x とおく → くり返しの1回分だけ小数点をずらす → ひき算でくり返し部分を消す')}
+    ${exQ(`0.${rd('4')}${rd('5')} を分数で表しなさい。`,`x＝0.454545…… とおくと<br>100x＝45.454545……<br>100x−x＝45<br>99x＝45　より　x＝45/99＝5/11`)}
+    ${exQ(`0.2${rd('7')} を分数で表しなさい。`,`x＝0.2777…… とおくと<br>100x＝27.777……<br>10x＝2.777……<br>100x−10x＝25<br>90x＝25　より　x＝25/90＝5/18`)}
+    ${tip('くり返しが小数点のすぐ後から始まらないときは、小数点を2回ずらした式どうしをひきます。')}</section>`),
+  L('2-1','2　絶対値','数直線と絶対値','原点からの距離','n2Abs',()=>`
+    <section class="panel"><h3>数直線</h3><p>直線上の点に実数を1つずつ対応させたものを<b>数直線</b>といい、0 に対応する点を<b>原点</b> O といいます。点 A に実数 a が対応するとき、A(a) と書きます。</p></section>
+    <section class="panel"><h3>絶対値</h3><p>原点 O から点 A(a) までの<b>距離</b>を、a の<b>絶対値</b>といい、|a| と書きます。</p>${rul('a≧0 のとき　|a|＝a<br>a＜0 のとき　|a|＝−a')}
+    ${exQ('|−8|、|6−11| の値を求めなさい。','|−8|＝8<br>|6−11|＝|−5|＝5')}
+    ${rul('2点 A(a)、B(b) 間の距離　AB＝|b−a|')}${exQ('2点 A(−3)、B(4) の間の距離を求めなさい。','AB＝|4−(−3)|＝|7|＝7')}${tip('|a| は距離なので、つねに 0 以上です。')}</section>`),
+  L('2-2',null,'根号をふくむ絶対値','中の符号を調べる','n2AbsR',()=>`
+    <section class="panel"><h3>考え方</h3>${rul('| | の中が正 → そのままはずす<br>| | の中が負 → −をつけてはずす')}
+    ${exQ('|√10−3| の値を求めなさい。','3²＝9、4²＝16 なので　3＜√10＜4<br>√10−3＞0 だから　|√10−3|＝√10−3')}
+    ${exQ('|2−√6| の値を求めなさい。','2²＝4＜6 なので　2＜√6<br>2−√6＜0 だから　|2−√6|＝−(2−√6)＝√6−2')}
+    ${tip('√k の大きさは、k をはさむ平方数（1、4、9、16、25、…）で調べます。')}</section>`),
+  L('2-3',null,'絶対値をふくむ式の値','代入してから符号を調べる','n2AbsX',()=>`
+    <section class="panel"><h3>手順</h3>${rul('① x の値を代入する<br>② それぞれの | | の中が正か負か調べる<br>③ 絶対値をはずして計算する')}
+    ${exQ('x＝√3 のとき、|x−1|＋|2x−5| の値を求めなさい。','√3 はおよそ 1.73<br>√3−1＞0、2√3−5＜0（2√3≒3.46）<br>|√3−1|＋|2√3−5|<br>＝(√3−1)−(2√3−5)<br>＝4−√3')}${tip('負になる | | をはずすときは、かっこごと − をつけます。')}</section>`),
+  T(['n2Kind','n2Cls','n2Dec','n2Fin','n2Frac','n2Frac','n2Abs','n2AbsR','n2AbsR','n2AbsX'],'実数の10問'),
+];
+const C3 = [
+  L('1-1','1　平方根','平方根とは','2乗して a になる数','n3Root',()=>`
+    <section class="panel"><h3>平方根</h3><p>2乗して a になる数を、a の<b>平方根</b>といいます。正の数 a の平方根は正と負の2つあり、まとめて <b>±√a</b> と書きます。0 の平方根は 0 だけです。</p>${exQ('7 と 36 の平方根を答えなさい。','7 の平方根は ±√7<br>36 の平方根は ±6')}</section>
+    <section class="panel"><h3>平方根の性質</h3>${rul('(√a)²＝a、(−√a)²＝a<br>√(a²)＝|a|')}${exQ('√((−4)²)、 a＜0 のときの √(a²) を求めなさい。','√((−4)²)＝√16＝4<br>a＜0 なので　√(a²)＝|a|＝−a')}${tip('√(a²)＝a としてしまうのはよくあるまちがい。a が負のときは −a です。')}</section>`),
+  L('1-2',null,'根号をふくむ数の変形','√ の中を簡単に','n3Simp',()=>`
+    <section class="panel"><h3>積と商</h3>${rul('a＞0、b＞0、k＞0 のとき<br>√a×√b＝√(ab)　　√a÷√b＝√(a/b)<br>√(k²a)＝k√a')}
+    ${exQ('√45 を a√b の形にしなさい。','√45＝√(3²×5)＝3√5')}${exQ('√6×√15 を計算しなさい。','√6×√15＝√90＝√(3²×10)＝3√10')}${exQ('√98÷√2 を計算しなさい。','√98÷√2＝√49＝7')}
+    ${tip('√ の中は、できるだけ小さい自然数にしておきます。')}</section>`),
+  L('2-1','2　根号をふくむ式の計算','加法・減法','√ の中が同じものをまとめる','n3Add',()=>`
+    <section class="panel"><h3>考え方</h3>${rul('m√a＋n√a＝(m＋n)√a')}<p>√ の中が同じものは、文字式の同類項（2x＋3x＝5x）と同じようにまとめられます。</p>
+    ${exQ('√27＋√75−√12 を計算しなさい。','＝3√3＋5√3−2√3<br>＝6√3')}${exQ('√8＋√18−√20 を計算しなさい。','＝2√2＋3√2−2√5<br>＝5√2−2√5')}${tip('√2 と √5 のように中がちがうものは、それ以上まとめられません。')}</section>`),
+  L('2-2',null,'乗法・展開','乗法公式を使う','n3Mul',()=>`
+    <section class="panel"><h3>使う公式</h3>${sum(['(a＋b)²＝a²＋2ab＋b²','(a−b)²＝a²−2ab＋b²','(a＋b)(a−b)＝a²−b²','(√a)²＝a'])}
+    ${exQ('(3＋√2)(3−√2) を計算しなさい。','＝3²−(√2)²＝9−2＝7')}${exQ('(√3−2)² を計算しなさい。','＝(√3)²−2×√3×2＋2²<br>＝3−4√3＋4＝7−4√3')}${exQ('(√2＋√5)(2√2−√5) を計算しなさい。','＝2×2−√10＋2√10−5<br>＝−1＋√10')}</section>`),
+  L('2-3',null,'分母の有理化(1)','分母が √a のとき','n3Rat1',()=>`
+    <section class="panel"><h3>分母の有理化</h3><p>分母に根号をふくまない形に変形することを、<b>分母を有理化する</b>といいます。</p>${rul('a/√b ＝ (a×√b)/(√b×√b) ＝ a√b/b')}
+    ${exQ('6/√3 の分母を有理化しなさい。','6/√3＝6√3/3＝2√3')}${exQ('5/(2√5) の分母を有理化しなさい。','5/(2√5)＝5√5/(2×5)＝√5/2')}${tip('最後に約分できないか確かめます。')}</section>`),
+  L('2-4',null,'分母の有理化(2)','分母が a＋√b のとき','n3Rat2',()=>`
+    <section class="panel"><h3>考え方</h3>${rul('分母が a＋√b → 分母・分子に a−√b をかける<br>分母が a−√b → 分母・分子に a＋√b をかける')}<p>(a＋√b)(a−√b)＝a²−b となり、√ が消えます。</p>
+    ${exQ('2/(3−√7) の分母を有理化しなさい。','＝2(3＋√7)/{(3−√7)(3＋√7)}<br>＝2(3＋√7)/(9−7)<br>＝3＋√7')}${exQ('(√6＋√2)/(√6−√2) の分母を有理化しなさい。','＝(√6＋√2)²/(6−2)<br>＝(8＋2√12)/4＝(8＋4√3)/4<br>＝2＋√3')}</section>`),
+  L('3-1','3　式の値','対称式の値','x＋y と xy を使う','n3Sym',()=>`
+    <section class="panel"><h3>対称式</h3><p>x と y を入れかえても同じになる式を<b>対称式</b>といいます。対称式は、<b>x＋y と xy（基本対称式）</b>で表すことができます。</p>
+    ${sum(['x²＋y²＝(x＋y)²−2xy','x³＋y³＝(x＋y)³−3xy(x＋y)','x²y＋xy²＝xy(x＋y)','1/x＋1/y＝(x＋y)/xy'])}
+    ${exQ('x＝3＋√5、y＝3−√5 のとき、x²＋y² の値を求めなさい。','x＋y＝6、xy＝9−5＝4<br>x²＋y²＝6²−2×4＝28')}${tip('x と y をそのまま2乗するより、計算がずっと楽になります。')}</section>`),
+  L('3-2',null,'次数下げ','x² を1次式で表す','n3Low',()=>`
+    <section class="panel"><h3>考え方</h3>${rul('x＝a＋√b → x−a＝√b → 両辺を2乗 → x² を x の1次式で表す')}
+    ${exQ('x＝2＋√3 のとき、x²−4x＋5 の値を求めなさい。','x−2＝√3 の両辺を2乗して<br>x²−4x＋4＝3　よって x²−4x＝−1<br>x²−4x＋5＝−1＋5＝4')}${tip('x² をそのまま計算してもよいのですが、次数を下げると √ の計算が少なくなります。')}</section>`),
+  L('3-3',null,'整数部分と小数部分','n≦x＜n＋1','n3Ip',()=>`
+    <section class="panel"><h3>整数部分・小数部分</h3>${rul('n≦x＜n＋1 となる整数 n が x の整数部分<br>小数部分＝x−（整数部分）')}
+    ${exQ('√13 の整数部分 a と小数部分 b を求めなさい。','9＜13＜16 より 3＜√13＜4<br>a＝3、b＝√13−3')}${exQ('6−√5 の整数部分を求めなさい。','2＜√5＜3<br>−3＜−√5＜−2<br>3＜6−√5＜4　より整数部分は 3')}${tip('小数部分 b は「0.6」のような小数ではなく、√13−3 のように式で答えます。')}</section>`),
+  L('研-1','研究　二重根号','二重根号をはずす','たして a＋b、かけて ab','n3Dbl',()=>`
+    <section class="panel"><h3>公式</h3>${rul('√((a＋b)＋2√(ab))＝√a＋√b<br>√((a＋b)−2√(ab))＝√a−√b（a＞b＞0）')}<p>両辺を2乗すると確かめられます。√ の中の「2√○」の部分を見て、<b>たして a＋b、かけて ab</b> になる2数を探します。</p>
+    ${exQ('√(7＋2√10) を簡単にしなさい。','たして 7、かけて 10 → 5 と 2<br>√(7＋2√10)＝√5＋√2')}${exQ('√(11−4√7) を簡単にしなさい。','4√7＝2√28 なので<br>たして 11、かけて 28 → 7 と 4<br>√(11−2√28)＝√7−√4＝√7−2')}${tip('ひき算のときは、答えが正になるように大きいほうを前にします。')}</section>`),
+  T(['n3Root','n3Simp','n3Add','n3Mul','n3Mul','n3Rat1','n3Rat2','n3Sym','n3Ip','n3Low'],'平方根の10問'),
+];
+const C4 = [
+  L('1-1','1　不等式','不等式で表す','以上・以下・未満','n4Word',()=>`
+    <section class="panel"><h3>不等号</h3><table class="dtab"><tr><th>ことば</th><th>不等式</th></tr><tr><td>a は b より大きい</td><td>a＞b</td></tr><tr><td>a は b より小さい（未満）</td><td>a＜b</td></tr><tr><td>a は b 以上</td><td>a≧b</td></tr><tr><td>a は b 以下</td><td>a≦b</td></tr></table>
+    ${exQ('1個 x 円のパンを4個と、120円の牛乳を1本買うと、代金は 700 円未満だった。これを不等式で表しなさい。','4x＋120＜700')}${tip('「以上」「以下」はその数をふくみます（＝が入る）。')}</section>`),
+  L('1-2',null,'不等式の性質','負の数をかけると向きが変わる','n4Prop',()=>`
+    <section class="panel"><h3>不等式の性質</h3>${rul('a＜b のとき<br>① a＋c＜b＋c、a−c＜b−c<br>② c＞0 なら　ac＜bc、a/c＜b/c<br>③ c＜0 なら　ac＞bc、a/c＞b/c')}
+    <p>③ がいちばん大切です。たとえば 2＜5 の両辺に −1 をかけると −2 と −5 になり、大小が<b>逆</b>になります。</p>
+    ${exQ('a＜b のとき、5−2a と 5−2b の大小を答えなさい。','a＜b の両辺に −2 をかけて　−2a＞−2b<br>両辺に 5 をたして　5−2a＞5−2b')}</section>`),
+  L('2-1','2　1次不等式','1次不等式の解き方','移項して ax＜b','n4Lin',()=>`
+    <section class="panel"><h3>手順</h3>${rul('① x の項を左辺、数の項を右辺に移項<br>② ax＜b の形に整理<br>③ 両辺を a で割る（a＜0 なら向きが逆）')}
+    ${exQ('5x−3＞2x＋9 を解きなさい。','5x−2x＞9＋3<br>3x＞12<br>x＞4')}${exQ('x＋4≦3x−2 を解きなさい。','x−3x≦−2−4<br>−2x≦−6<br>x≧3　（−2 で割るので向きが変わる）')}</section>`),
+  L('2-2',null,'かっこ・分数・小数をふくむ不等式','係数を整数にする','n4Lin2',()=>`
+    <section class="panel"><h3>くふう</h3>${rul('かっこ → はずす<br>分数 → 分母の最小公倍数をかける<br>小数 → 10 や 100 をかける')}
+    ${exQ('2(x−4)＜5x＋1 を解きなさい。','2x−8＜5x＋1<br>−3x＜9<br>x＞−3')}${exQ('(x＋1)/2−(x−2)/3≧1 を解きなさい。','両辺に 6 をかけて<br>3(x＋1)−2(x−2)≧6<br>3x＋3−2x＋4≧6<br>x≧−1')}${tip('分母をはらうとき、右辺の数にもかけるのを忘れないように。')}</section>`),
+  L('2-3',null,'連立不等式','共通部分を求める','n4Sys',()=>`
+    <section class="panel"><h3>考え方</h3>${rul('それぞれの不等式を解く → 数直線で共通部分')}
+    ${exQ('次の連立不等式を解きなさい。<br>3x−1＞x＋3<br>2x＋5≧4x−3','1つめ：2x＞4 より x＞2<br>2つめ：−2x≧−8 より x≦4')}${nlr([{v:2,lab:'2',inc:false,dir:'r'},{v:4,lab:'4',inc:true,dir:'l'}],{band:[2,4]})}${ex('共通部分は　2＜x≦4')}
+    ${tip('● はその数をふくむ、○ はふくまないことを表します。共通部分がないときは「解なし」です。')}</section>`),
+  L('2-4',null,'A＜B＜C の形','2つに分けて連立','n4ABC',()=>`
+    <section class="panel"><h3>考え方</h3>${rul('A＜B＜C ⇔ A＜B かつ B＜C')}
+    ${exQ('x−4＜2x−1＜x＋5 を解きなさい。','x−4＜2x−1 より −x＜3、x＞−3<br>2x−1＜x＋5 より x＜6<br>共通部分は　−3＜x＜6')}${tip('A＜C を使うのではなく、B を2回使って2つの不等式にします。')}</section>`),
+  L('3-1','3　不等式の利用','整数解','端の数に注意','n4Int',()=>`
+    <section class="panel"><h3>考え方</h3>${rul('① 連立不等式を解く<br>② 数直線で、範囲にふくまれる整数を数える')}
+    ${exQ('連立不等式 2x＋1＞−4、3x−2≦7 を満たす整数 x をすべて求めなさい。','2x＞−5 より x＞−5/2（＝−2.5）<br>3x≦9 より x≦3<br>−5/2＜x≦3 を満たす整数は −2、−1、0、1、2、3')}${tip('分数の端は、小数になおすとわかりやすくなります。')}</section>`),
+  L('3-2',null,'文章題','x を決めて不等式をつくる','n4App',()=>`
+    <section class="panel"><h3>手順</h3>${rul('① 求めるものを x とおく<br>② 数量の関係を不等式で表す<br>③ 解いて、問題に合う答え（整数など）を選ぶ')}
+    ${exQ('1個 90 円のおにぎりと 1個 150 円のパンを合わせて 12 個買い、代金を 1500 円以下にしたい。パンは最大で何個買えるか。','パンを x 個とすると<br>150x＋90(12−x)≦1500<br>60x≦420　より　x≦7<br>パンは最大 7 個')}</section>`),
+  L('4-1','4　絶対値をふくむ方程式・不等式','|A| の方程式・不等式','距離で考える','n4Abs',()=>`
+    <section class="panel"><h3>公式（c＞0）</h3>${rul('|A|＝c ⇔ A＝±c<br>|A|＜c ⇔ −c＜A＜c<br>|A|＞c ⇔ A＜−c または c＜A')}
+    ${exQ('|x−2|＜5 を解きなさい。','−5＜x−2＜5<br>−3＜x＜7')}${exQ('|2x＋1|≧3 を解きなさい。','2x＋1≦−3、3≦2x＋1<br>x≦−2、1≦x')}${tip('|x−a| は「x と a の距離」。|x−2|＜5 は「2 からの距離が 5 より小さい」と読めます。')}</section>`),
+  L('4-2',null,'場合分けで解く','| | の中の符号で分ける','n4AbsC',()=>`
+    <section class="panel"><h3>考え方</h3>${rul('| | の中が 0 以上 → そのままはずす<br>| | の中が負 → −( ) にしてはずす<br>→ 出た解が場合分けの条件に合うか確かめる')}
+    ${exQ('|x−3|＝2x を解きなさい。','(i) x≧3 のとき　x−3＝2x より x＝−3<br>　x≧3 を満たさないので不適<br>(ii) x＜3 のとき　−(x−3)＝2x より x＝1<br>　x＜3 を満たす<br>よって　x＝1')}${tip('| | の外にも x があるときは、公式ではなく場合分けで解きます。')}</section>`),
+  L('研-1','研究　文字係数の不等式','文字係数の1次不等式','a の符号で場合分け','n4Lit',()=>`
+    <section class="panel"><h3>ax＞b の解</h3>${rul('a＞0 のとき　x＞b/a<br>a＜0 のとき　x＜b/a<br>a＝0 のとき　0＞b なら すべての実数、0≦b なら 解なし')}
+    ${exQ('a＜1 のとき、(a−1)x＞2(a−1) を解きなさい。','a−1＜0 なので、両辺を a−1 で割ると向きが変わり<br>x＜2')}${tip('文字で割るときは、その文字が正か負か 0 かを必ず考えます。')}</section>`),
+  T(['n4Word','n4Prop','n4Lin','n4Lin','n4Lin2','n4Sys','n4ABC','n4Int','n4Abs','n4AbsC'],'1次不等式の10問'),
+];
+const TM = [
+  [['有理数','分数 m/n（m、n は整数、n≠0）で表せる数。整数・有限小数・循環小数。'],['無理数','分数で表せない数。循環しない無限小数。√2、π など。'],['実数','有理数と無理数を合わせた数。'],['循環小数','ある所から同じ数字の並びがくり返す無限小数。'],['有限小数','小数点以下が有限のけたで終わる小数。'],['絶対値','数直線上で、原点からの距離。|a| と書く。']],
+  [['平方根','2乗して a になる数。正の数 a の平方根は ±√a。'],['√(a²)','|a| に等しい。a＜0 なら −a。'],['分母の有理化','分母に根号をふくまない形にすること。'],['対称式','x と y を入れかえても同じになる式。x＋y、xy で表せる。'],['整数部分','n≦x＜n＋1 を満たす整数 n。'],['二重根号','√ の中に √ がある形。√(a＋b＋2√ab)＝√a＋√b。']],
+  [['不等式','数量の大小関係を、不等号を使って表した式。'],['不等式の性質','負の数をかけたり割ったりすると、不等号の向きが変わる。'],['1次不等式','移項して整理すると ax＞b などの形になる不等式。'],['連立不等式','いくつかの不等式を同時に満たす x の範囲を求める。共通部分。'],['|A|＜c','−c＜A＜c（c＞0）。'],['|A|＞c','A＜−c または c＜A（c＞0）。']],
+];
+return { G, CH:[C2,C3,C4], TM };
+})();
+
 /* ===== 数学Ⅰ 集合と命題（問題は毎回つくりかわります） ===== */
 const M3 = (() => {
 const nz = (a,b) => { let n=0; while(n===0) n=ri(a,b); return n; };
@@ -5823,6 +6290,7 @@ const BC_LESSONS = [
 /* ===== 用語カード ===== */
 const TERMS = {
   m1:M1.TERMS,
+  r2:M2.TM[0], r3:M2.TM[1], r4:M2.TM[2],
   m3:M3.TERMS.slice(0,8),
   m4:M3.TERMS.slice(8),
   kb:KB.TERMS,
@@ -5848,6 +6316,9 @@ const UNITS = {
   gk:{ no:'国', title:'語句高校レベル', subject:'国語', course:'jpn', subj:4, lessons:GK_LESSONS, cards:'gk', drill:'gk' },
   cj:{ no:'文法 2章', title:'接続詞', subject:'国語', course:'jpn', subj:5, lessons:CJ_LESSONS, cards:'cj', drill:'cj' },
   hk:{ no:'国', title:'漢字高校レベル', subject:'国語', course:'jpn', subj:4, lessons:KJ_LESSONS, cards:'hk', drill:'hk' },
+  r2:{ no:'数と式 2章', title:'実数', subject:'数学', course:'math', subj:0, lessons:M2.CH[0], cards:'r2', drill:'r2' },
+  r3:{ no:'数と式 3章', title:'平方根', subject:'数学', course:'math', subj:0, lessons:M2.CH[1], cards:'r3', drill:'r3' },
+  r4:{ no:'数と式 4章', title:'1次不等式', subject:'数学', course:'math', subj:0, lessons:M2.CH[2], cards:'r4', drill:'r4' },
   m3:{ no:'集合と論理 1章', title:'集合', subject:'数学', course:'math', subj:1, lessons:M3.LESSONS.filter(l=>/^1-/.test(l.id)), cards:'m3', drill:'m3' },
   m4:{ no:'集合と論理 2章', title:'命題と論理', subject:'数学', course:'math', subj:1, lessons:M3.LESSONS.filter(l=>!/^1-/.test(l.id)), cards:'m4', drill:'m4' },
   q1:{ no:'2次関数 1章', title:'関数とグラフ', subject:'数学', course:'math', subj:2, lessons:M5.CH[0], cards:'q1', drill:'q1' },
@@ -5932,7 +6403,7 @@ const CATALOG = [
     { id:'jpn', name:'国語', k:'国', note:'現代文・古文・漢文', subjects:[
       K('現代文','現',{ t:'現代文基礎', go:'海月時間 ▶ 国語 ▶ 読解' },{ t:'論説『科学との向き合い方』', ready:'rk' },{ t:'論説『AI時代に考える力とは』', ready:'ai' },{ t:'論説『音楽はなぜ人の心を動かすのか』', ready:'mu' },{ t:'小説『各駅停車』', ready:'nv' },{ t:'小説『2番目の走者』', ready:'nw' },{ t:'小説『普通の教室』', ready:'nf' },{ t:'会話文『多数決は本当に公平か』', ready:'mj' },{ t:'会話文『便利な社会は幸せな社会か』', ready:'bs' },{ t:'資料問題『睡眠と現代社会』', ready:'sl' }), K('古文','古',{ t:'古文基礎', go:'海月時間 ▶ 国語 ▶ 古文' },'古典単語',{ t:'古典文法', ready:'kb' },'古文読解','『更級日記』','『？？？』','『？？？』'), K('漢文','漢',{ t:'漢文基礎', go:'海月時間 ▶ 国語 ▶ 漢文' },{ t:'句法', ready:'kk' },'漢文読解','『？？？』','『？？？』','『？？？』'), { name:'融合問題', k:'融', units:[] }, K('漢字・語句','字',{ t:'基礎漢字', go:'海月時間 ▶ 国語 ▶ 漢字' },{ t:'漢字高校レベル', ready:'hk' },{ t:'言葉の基礎', go:'海月時間 ▶ 国語 ▶ 言葉' },{ t:'語句高校レベル', ready:'gk' }), K('文法','法',{ t:'基礎文法', go:'海月時間 ▶ 国語 ▶ 文法' },{ t:'接続詞', ready:'cj' }), KAKO ] },
     { id:'math', name:'数学', k:'数', note:'数学Ⅰ', subjects:[
-      K('数と式','式',{ t:'式の展開と因数分解', ready:'m1' },'実数','平方根','1次不等式'), K('集合と論理','論',{ t:'集合', ready:'m3' },{ t:'命題と論理', ready:'m4' }), K('2次関数','関',{ t:'関数とグラフ', ready:'q1' },{ t:'2次関数の最大・最小', ready:'q2' },{ t:'2次関数の決定', ready:'q3' },{ t:'2次方程式', ready:'q4' },{ t:'グラフと x軸・直線', ready:'q5' },{ t:'2次不等式', ready:'q6' }), K('図形と計量','図',{ t:'三角比', ready:'z1' },{ t:'三角比の拡張', ready:'z2' },{ t:'正弦定理・余弦定理', ready:'z3' },{ t:'図形の面積', ready:'z4' },{ t:'空間図形', ready:'z5' }), K('データの分析','デ',{ t:'データの整理と代表値', ready:'d1' },{ t:'データの散らばり', ready:'d2' },'変量変換',{ t:'相関', ready:'d4' },{ t:'仮説検定', ready:'d5' }), KAKO ] },
+      K('数と式','式',{ t:'式の展開と因数分解', ready:'m1' },{ t:'実数', ready:'r2' },{ t:'平方根', ready:'r3' },{ t:'1次不等式', ready:'r4' }), K('集合と論理','論',{ t:'集合', ready:'m3' },{ t:'命題と論理', ready:'m4' }), K('2次関数','関',{ t:'関数とグラフ', ready:'q1' },{ t:'2次関数の最大・最小', ready:'q2' },{ t:'2次関数の決定', ready:'q3' },{ t:'2次方程式', ready:'q4' },{ t:'グラフと x軸・直線', ready:'q5' },{ t:'2次不等式', ready:'q6' }), K('図形と計量','図',{ t:'三角比', ready:'z1' },{ t:'三角比の拡張', ready:'z2' },{ t:'正弦定理・余弦定理', ready:'z3' },{ t:'図形の面積', ready:'z4' },{ t:'空間図形', ready:'z5' }), K('データの分析','デ',{ t:'データの整理と代表値', ready:'d1' },{ t:'データの散らばり', ready:'d2' },'変量変換',{ t:'相関', ready:'d4' },{ t:'仮説検定', ready:'d5' }), KAKO ] },
     { id:'eng', name:'英語', k:'英', note:'文法・読解', subjects:[
       { name:'文法', k:'文', go:'海月時間 ▶ 英語 ▶ 文法', units:[] }, K('語い・会話文','語','単語・熟語','会話文'), K('読解','読','短い英文','長文読解'), KAKO ] },
     { id:'geo', name:'地理', k:'理', note:'地理総合', subjects:[
