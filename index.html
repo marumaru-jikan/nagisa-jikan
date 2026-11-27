@@ -6395,6 +6395,19 @@ const UNITS = {
   const num=l=>/^\d+-\d+$/.test(String(l.id)), min=Math.min(...u.lessons.filter(num).map(l=>+String(l.id).split('-')[0])); if(!(min>1)) return;
   u.lessons.forEach(l=>{ if(!num(l)) return; const [a,b]=String(l.id).split('-'); l.id=(a-min+1)+'-'+b; if(l.sec) l.sec=l.sec.replace(/^(\d+)(　)/,(m,n,s)=>(n-min+1)+s); }); });
 
+/* 数学：章の中の波を通し番号に（2-1 → 1-6 のように「章-何番目」） */
+(() => { const moved={};
+  Object.entries(UNITS).forEach(([uid,u])=>{ if(u.course!=='math') return; const m=/(\d+)章/.exec(u.no||''); if(!m) return; const ch=m[1];
+    const all=u.show||u.lessons, map={}; let n=0;
+    all.forEach(l=>{ if(!/^\d+-\d+$/.test(String(l.id))) return; const nid=ch+'-'+(++n); map[l.id]=nid; l.id=nid; });
+    const fix=s=>typeof s!=='string'?s:s.split(/(<[^>]*>)/).map(t=>t[0]==='<'?t:t.replace(/(^|[^\d.\-])(\d+-\d+)(?![\d])/g,(x,a,b)=>a+(map[b]||b))).join('');
+    all.forEach(l=>{ const b=l.body; if(typeof b==='function') l.body=(...x)=>fix(b(...x)); l.sub=fix(l.sub); });
+    moved[uid]=map; });
+  if(!R.renum2){ const old={...R.lessons};
+    Object.entries(moved).forEach(([uid,map])=>{ Object.keys(map).forEach(o=>delete R.lessons[uid+':'+o]); Object.entries(map).forEach(([o,nw])=>{ if(old[uid+':'+o]) R.lessons[uid+':'+nw]=old[uid+':'+o]; }); });
+    R.renum2=1; save(); }
+})();
+
 const U = (...t) => t.map(x => typeof x === 'string' ? { t:x } : x);
 const K = (name, k, ...units) => ({ name, k, units:U(...units) });
 const KAKO = { name:'過去問', k:'過', units:[] };
