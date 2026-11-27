@@ -2958,6 +2958,16 @@ const G = {
     const S={1:'1',4:'2',9:'3',16:'4',2:'1.4',8:'2.8',18:'4.2'}[v], m=mean(a);
     return Q(`このデータの標準偏差 s は？${[2,8,18].includes(v)?'（√2＝1.4 とする）':''}`, list(a), S, [String(v), D(v/2), [2,8,18].includes(v)?D(Number(S)+1.4):D(Number(S)+1), D(Math.sqrt(v)*2), ...['1','1.4','2','2.8','3','4','4.2'].filter(x=>x!==S)],
       '標準偏差＝√（分散）。まず分散を求めます。', `平均値 ${D(m)}、偏差²：${a.map(x=>D((x-m)**2)).join('，')}<br>分散 s²＝${D(v)}<br>s＝√${D(v)}＝<b>${S}</b>`); },
+  d4Trans(){ const t=ri(0,3), a=pick([2,3,4,5,-2,-3,10]), b=pick([1,3,5,-4,-10,20]), A=a<0?'−'+(-a):String(a), Bs=b<0?'−'+(-b):'＋'+b, y=`y＝${A}x${Bs}`;
+    if(t===0){ const m=ri(3,20); return Q(`変量 x の平均値が ${m} のとき、${y} とする変量 y の平均値は？`, y, D(a*m+b), [D(a*m), D(m+b), D(a*(m+b)), D(-a*m+b)],
+      '平均値は、x と同じ式で変わります。ȳ＝ax̄＋b', `ȳ＝${A}×${m}${Bs}＝<b>${D(a*m+b)}</b>`); }
+    if(t===1){ const v=pick([4,9,16,25,36,64,2,5]); return Q(`変量 x の分散が ${v} のとき、${y} とする変量 y の分散は？`, y, D(a*a*v), [D(a*v), D(a*a*v+b), D(Math.abs(a)*v), D(a*a*v+b*b)],
+      '分散は a² 倍になります。b（たした数）は散らばりに関係しません。s<sub>y</sub>²＝a²s<sub>x</sub>²', `s<sub>y</sub>²＝(${a<0?'('+A+')':A})²×${v}＝${a*a}×${v}＝<b>${D(a*a*v)}</b>`); }
+    if(t===2){ const s=ri(2,9); return Q(`変量 x の標準偏差が ${s} のとき、${y} とする変量 y の標準偏差は？`, y, D(Math.abs(a)*s), [D(a*s)===D(Math.abs(a)*s)?D(a*a*s):D(a*s), D(Math.abs(a)*s+b), D(a*a*s), D(s+Math.abs(b))],
+      '標準偏差は |a| 倍になります。標準偏差は負になりません。s<sub>y</sub>＝|a|s<sub>x</sub>', `s<sub>y</sub>＝|${A}|×${s}＝<b>${D(Math.abs(a)*s)}</b>${a<0?'<br><span class="small">a が負でも、標準偏差は |a| 倍（正の数）です。</span>':''}`); }
+    const m=ri(3,20), s=ri(2,6), ans=`平均値 ${D(a*m+b)}、標準偏差 ${D(Math.abs(a)*s)}`;
+    return Q(`変量 x の平均値が ${m}、標準偏差が ${s} のとき、${y} とする変量 y の平均値と標準偏差は？`, y, ans, [`平均値 ${D(a*m+b)}、標準偏差 ${D(Math.abs(a)*s+b)}`, `平均値 ${D(a*m)}、標準偏差 ${D(Math.abs(a)*s)}`, `平均値 ${D(a*m+b)}、標準偏差 ${D(a*a*s)}`, `平均値 ${D(m+b)}、標準偏差 ${D(s)}`],
+      '平均値は ax̄＋b、標準偏差は |a| 倍。b は標準偏差に関係しません。', `ȳ＝${A}×${m}${Bs}＝${D(a*m+b)}<br>s<sub>y</sub>＝|${A}|×${s}＝${D(Math.abs(a)*s)}<br><b>${ans}</b>`, { words:true }); },
   /* 9 散布図 */
   d4Scat(){ const t=pick(['正','負','なし']), r={正:pick([.75,.9]),負:-pick([.75,.9]),なし:pick([0,.05,-.05])}[t], A={正:'正の相関がある',負:'負の相関がある',なし:'相関はほとんどない'};
     return Q('この散布図から読み取れることは？', scat(mkScat(r)), A[t], Object.values(A).filter(x=>x!==A[t]).concat(['x と y は等しい']),
@@ -3025,7 +3035,13 @@ const C2 = [
     <section class="panel"><h3>公式</h3>${rul('s²＝（x² の平均値）−（x の平均値）²')}${exQ('x の平均値が 7、x² の平均値が 53 のとき、分散を求めなさい。','s²＝53−7²＝53−49＝4')}</section>`),
   L('8-1','8　標準偏差','標準偏差','√分散','d4Sd',()=>`
     <section class="panel"><h3>標準偏差</h3>${rul('s＝√（分散）')}${exQ('次のデータの標準偏差を求めなさい。（√2＝1.4）<br>4，2，1，1，4，2，0','4，2，1，1，4，2，0（平均 2）<br>偏差²：4，0，1，1，4，0，4　合計 14<br>s²＝2　s＝√2≒1.4')}${tip('標準偏差は、もとのデータと同じ単位で散らばりを表します。')}</section>`),
-  T(['d4Quart','d4Quart','d4Box','d4Box','d4Out','d4Var','d4Var','d4Var2','d4Sd','d4Sd'],'データの散らばりの10問'),
+  L('9-1','9　変量変換','変量変換','y＝ax＋b の平均・分散・標準偏差','d4Trans',()=>`
+    <section class="panel"><h3>変量変換の公式</h3><p>変量 x の値をすべて a 倍して b を加えた変量を y＝ax＋b とすると、平均・分散・標準偏差は次のように変わります。</p>
+    <table class="dtab"><tr><th></th><th>x</th><th>y＝ax＋b</th></tr><tr><td>平均値</td><td>x̄</td><td><b>ȳ＝ax̄＋b</b></td></tr><tr><td>分散</td><td>s<sub>x</sub>²</td><td><b>s<sub>y</sub>²＝a²s<sub>x</sub>²</b></td></tr><tr><td>標準偏差</td><td>s<sub>x</sub></td><td><b>s<sub>y</sub>＝|a|s<sub>x</sub></b></td></tr></table>
+    ${tip('b（全体に加えた数）は、データ全体を平行に動かすだけなので、散らばり（分散・標準偏差）は変わりません。')}</section>
+    <section class="panel"><h3>例</h3>${exQ('変量 x の平均値が 10、分散が 4 である。y＝3x−4 とするとき、y の平均値・分散・標準偏差を求めなさい。','a＝3、b＝−4 の場合<br>ȳ＝3×10−4＝26<br>s<sub>y</sub>²＝3²×4＝36<br>s<sub>y</sub>＝|3|×2＝6')}
+    ${exQ('変量 x の標準偏差が 5 である。y＝−2x＋7 とするとき、y の標準偏差を求めなさい。','s<sub>y</sub>＝|−2|×5＝10')}${tip('a が負のときも、標準偏差は |a| 倍で、負の数にはなりません。分散は a² 倍なので、符号を気にしなくてよいです。')}</section>`),
+  T(['d4Quart','d4Box','d4Box','d4Out','d4Var','d4Var2','d4Sd','d4Sd','d4Trans','d4Trans'],'データの散らばりの10問'),
 ];
 const C4 = [
   L('9-1','9　散布図','散布図','正・負・相関なし','d4Scat',()=>`
@@ -3047,7 +3063,7 @@ const C5 = [
 ];
 const TM=[
   [['度数分布表','データを階級に分けて、度数をまとめた表。'],['相対度数','度数 ÷ 度数の合計'],['平均値','合計 ÷ 個数'],['中央値','小さい順に並べた真ん中の値。'],['最頻値','いちばん多く出てくる値。']],
-  [['四分位数','データを4等分する値。Q1、Q2（中央値）、Q3。'],['四分位範囲','Q3−Q1'],['箱ひげ図','最小値・Q1・中央値・Q3・最大値で表す図。'],['外れ値','Q1−1.5×四分位範囲 以下、Q3＋1.5×四分位範囲 以上の値。'],['分散','偏差の2乗の平均。'],['標準偏差','分散の正の平方根。']],
+  [['四分位数','データを4等分する値。Q1、Q2（中央値）、Q3。'],['変量変換','y＝ax＋b のとき ȳ＝ax̄＋b、sy²＝a²sx²、sy＝|a|sx。'],['四分位範囲','Q3−Q1'],['箱ひげ図','最小値・Q1・中央値・Q3・最大値で表す図。'],['外れ値','Q1−1.5×四分位範囲 以下、Q3＋1.5×四分位範囲 以上の値。'],['分散','偏差の2乗の平均。'],['標準偏差','分散の正の平方根。']],
   [],
   [['散布図','2つの変量を点で表した図。'],['相関係数','共分散 ÷ (x の標準偏差 × y の標準偏差)。−1〜1。'],['共分散','x の偏差 × y の偏差 の平均。']],
   [['仮説検定','仮説を立て、確率をもとに正しいかどうかを判断する方法。'],['基準となる確率','0.05 や 0.01 など。これより小さい確率のことは「めったに起こらない」と考える。']],
@@ -6334,8 +6350,8 @@ const UNITS = {
   z5:{ no:'図形と計量 5章', title:'空間図形', subject:'数学', course:'math', subj:3, lessons:M6.CH[4], cards:'z5', drill:'z5' },
   d1:{ no:'データの分析 1章', title:'データの整理と代表値', subject:'数学', course:'math', subj:4, lessons:M7.CH[0], cards:'d1', drill:'d1' },
   d2:{ no:'データの分析 2章', title:'データの散らばり', subject:'数学', course:'math', subj:4, lessons:M7.CH[1], cards:'d2', drill:'d2' },
-  d4:{ no:'データの分析 4章', title:'相関', subject:'数学', course:'math', subj:4, lessons:M7.CH[3], cards:'d4', drill:'d4' },
-  d5:{ no:'データの分析 5章', title:'仮説検定', subject:'数学', course:'math', subj:4, lessons:M7.CH[4], cards:'d5', drill:'d5' },
+  d4:{ no:'データの分析 3章', title:'相関', subject:'数学', course:'math', subj:4, lessons:M7.CH[3], cards:'d4', drill:'d4' },
+  d5:{ no:'データの分析 4章', title:'仮説検定', subject:'数学', course:'math', subj:4, lessons:M7.CH[4], cards:'d5', drill:'d5' },
   kb:{ no:'古文 3章', title:'古典文法', subject:'国語', course:'jpn', subj:1, lessons:KB.LESSONS, cards:'kb', drill:'kb', show:[
     KB.LESSONS.find(l=>l.id==='1-1'),
     KB.LESSONS.find(l=>l.id==='1-2'),
@@ -6404,6 +6420,7 @@ const UNITS = {
     const fix=s=>typeof s!=='string'?s:s.split(/(<[^>]*>)/).map(t=>t[0]==='<'?t:t.replace(/(^|[^\d.\-])(\d+-\d+)(?![\d])/g,(x,a,b)=>a+(map[b]||b))).join('');
     all.forEach(l=>{ const b=l.body; if(typeof b==='function') l.body=(...x)=>fix(b(...x)); l.sub=fix(l.sub); });
     moved[uid]=map; });
+  if(!R.renum3){ ['d4:4-','d5:5-'].forEach(pf=>{ const nw=pf[0]+pf[1]+':'+(+pf[3]-1)+'-'; Object.keys(R.lessons).filter(k=>k.startsWith(pf)).forEach(k=>{ R.lessons[nw+k.slice(pf.length)]=R.lessons[k]; delete R.lessons[k]; }); }); R.renum3=1; save(); }
   if(!R.renum2){ const old={...R.lessons};
     Object.entries(moved).forEach(([uid,map])=>{ Object.keys(map).forEach(o=>delete R.lessons[uid+':'+o]); Object.entries(map).forEach(([o,nw])=>{ if(old[uid+':'+o]) R.lessons[uid+':'+nw]=old[uid+':'+o]; }); });
     R.renum2=1; save(); }
@@ -6417,7 +6434,7 @@ const CATALOG = [
     { id:'jpn', name:'国語', k:'国', note:'現代文・古文・漢文', subjects:[
       K('現代文','現',{ t:'現代文基礎', go:'海月時間 ▶ 国語 ▶ 読解' },{ t:'論説『科学との向き合い方』', ready:'rk' },{ t:'論説『AI時代に考える力とは』', ready:'ai' },{ t:'論説『音楽はなぜ人の心を動かすのか』', ready:'mu' },{ t:'小説『各駅停車』', ready:'nv' },{ t:'小説『2番目の走者』', ready:'nw' },{ t:'小説『普通の教室』', ready:'nf' },{ t:'会話文『多数決は本当に公平か』', ready:'mj' },{ t:'会話文『便利な社会は幸せな社会か』', ready:'bs' },{ t:'資料問題『睡眠と現代社会』', ready:'sl' }), K('古文','古',{ t:'古文基礎', go:'海月時間 ▶ 国語 ▶ 古文' },'古典単語',{ t:'古典文法', ready:'kb' },'古文読解','『更級日記』','『？？？』','『？？？』'), K('漢文','漢',{ t:'漢文基礎', go:'海月時間 ▶ 国語 ▶ 漢文' },{ t:'句法', ready:'kk' },'漢文読解','『？？？』','『？？？』','『？？？』'), { name:'融合問題', k:'融', units:[] }, K('漢字・語句','字',{ t:'基礎漢字', go:'海月時間 ▶ 国語 ▶ 漢字' },{ t:'漢字高校レベル', ready:'hk' },{ t:'言葉の基礎', go:'海月時間 ▶ 国語 ▶ 言葉' },{ t:'語句高校レベル', ready:'gk' }), K('文法','法',{ t:'基礎文法', go:'海月時間 ▶ 国語 ▶ 文法' },{ t:'接続詞', ready:'cj' }), KAKO ] },
     { id:'math', name:'数学', k:'数', note:'数学Ⅰ', subjects:[
-      K('数と式','式',{ t:'式の展開と因数分解', ready:'m1' },{ t:'実数', ready:'r2' },{ t:'平方根', ready:'r3' },{ t:'1次不等式', ready:'r4' }), K('集合と論理','論',{ t:'集合', ready:'m3' },{ t:'命題と論理', ready:'m4' }), K('2次関数','関',{ t:'関数とグラフ', ready:'q1' },{ t:'2次関数の最大・最小', ready:'q2' },{ t:'2次関数の決定', ready:'q3' },{ t:'2次方程式', ready:'q4' },{ t:'グラフと x軸・直線', ready:'q5' },{ t:'2次不等式', ready:'q6' }), K('図形と計量','図',{ t:'三角比', ready:'z1' },{ t:'三角比の拡張', ready:'z2' },{ t:'正弦定理・余弦定理', ready:'z3' },{ t:'図形の面積', ready:'z4' },{ t:'空間図形', ready:'z5' }), K('データの分析','デ',{ t:'データの整理と代表値', ready:'d1' },{ t:'データの散らばり', ready:'d2' },'変量変換',{ t:'相関', ready:'d4' },{ t:'仮説検定', ready:'d5' }), KAKO ] },
+      K('数と式','式',{ t:'式の展開と因数分解', ready:'m1' },{ t:'実数', ready:'r2' },{ t:'平方根', ready:'r3' },{ t:'1次不等式', ready:'r4' }), K('集合と論理','論',{ t:'集合', ready:'m3' },{ t:'命題と論理', ready:'m4' }), K('2次関数','関',{ t:'関数とグラフ', ready:'q1' },{ t:'2次関数の最大・最小', ready:'q2' },{ t:'2次関数の決定', ready:'q3' },{ t:'2次方程式', ready:'q4' },{ t:'グラフと x軸・直線', ready:'q5' },{ t:'2次不等式', ready:'q6' }), K('図形と計量','図',{ t:'三角比', ready:'z1' },{ t:'三角比の拡張', ready:'z2' },{ t:'正弦定理・余弦定理', ready:'z3' },{ t:'図形の面積', ready:'z4' },{ t:'空間図形', ready:'z5' }), K('データの分析','デ',{ t:'データの整理と代表値', ready:'d1' },{ t:'データの散らばり', ready:'d2' },{ t:'相関', ready:'d4' },{ t:'仮説検定', ready:'d5' }), KAKO ] },
     { id:'eng', name:'英語', k:'英', note:'文法・読解', subjects:[
       { name:'文法', k:'文', go:'海月時間 ▶ 英語 ▶ 文法', units:[] }, K('語い・会話文','語','単語・熟語','会話文'), K('読解','読','短い英文','長文読解'), KAKO ] },
     { id:'geo', name:'地理', k:'理', note:'地理総合', subjects:[
@@ -6827,7 +6844,7 @@ const DLV = [
   { lv:2, name:'やどかり', sp:'k21', kind:'w', n:5, desc:'基本レベルの記述問題　5問' },
   { lv:3, name:'かに', sp:'k05', kind:'c', n:8, desc:'高認レベルの選択問題　8問' },
   { lv:4, name:'魚', sp:'k66', kind:'w', n:5, desc:'高認レベルの記述問題　5問' },
-  { lv:5, name:'ウミウシ', sp:'k11', kind:'c', n:3, desc:'共通テストレベルの選択問題　3問' },
+  { lv:5, name:'ウミウシ', sp:'k11', kind:'c', n:3, desc:'共通テストレベルの大問　1題' },
 ];
 const duniq = a => a.filter((v,i,s)=>s.indexOf(v)===i);
 const MARK = ['①','②','③','④','⑤','⑥'];
