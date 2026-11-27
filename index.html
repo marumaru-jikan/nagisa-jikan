@@ -6658,7 +6658,7 @@ function vUnit(){
   const u=CU(), uid=S.uid, T=TERMS[u.cards]||[], kn=(R.known[uid]||[]).length, hasPdf=Object.keys(PDF).some(k=>k.startsWith(u.drill+'-')&&PDF[k].q)||hasMDrill(uid);
   return `${top(u.no+'　'+u.title)}<div class="stack"><p class="muted small">${u.lessons.length?`${u.lessons.length<10?u.lessons.length+"つ":u.lessons.length}の波　1つ約5分。上から順に進めるのがおすすめです。ぜんぶクリアすると小瓶の手紙が届きます。`:"この章の目次です。波は準備ができたものから公開します。"}</p><div class="list">
   ${(u.show||u.lessons).map(l=>l.soon?`${l.sec?`<div class="secrow">${l.sec}</div>`:''}<div class="item" style="opacity:.55"><span class="lid">${l.id}</span><span class="body"><b>${l.t}</b><br><span class="small muted">準備中</span></span></div>`:`${l.sec?`<div class="secrow">${l.sec}</div>`:''}<button class="item" data-act="lesson" data-arg="${l.id}"><span class="lid ${R.lessons[lkey(uid,l.id)]?'done':''}">${l.id}</span><span class="body"><b>${l.t}</b><br><span class="small muted">${l.sub}</span></span>${lTag(uid,l.id)}<span class="chev">›</span></button>`).join('')}
-  ${hasPdf?`<button class="item" data-act="go" data-arg="drill"><span class="lid">▶</span><span class="body"><b>演習問題</b><br><span class="small muted">${hasMDrill(uid)?'Lv1 貝 〜 Lv5 ウミウシ':'PDF・Lv1〜Lv5'}</span></span><span class="chev">›</span></button>`:''}
+  ${hasPdf?`<button class="item" data-act="go" data-arg="drill"><span class="lid">▶</span><span class="body"><b>演習問題</b><br><span class="small muted">${hasMDrill(uid)?'Lv1 貝 〜 Lv5 ウミウシ':GJ.includes(uid)?'PDF・通して解く問題':'PDF・Lv1〜Lv5'}</span></span><span class="chev">›</span></button>`:''}
   </div>${T.length?`<div class="list"><button class="item" data-act="cards"><span class="body"><b>用語カード</b><br><span class="small muted">用語の確認 ${T.length}枚</span></span><span class="tag ${kn===T.length?'done':kn?'mid':''}">${kn}/${T.length}</span><span class="chev">›</span></button></div>`:''}</div>`;
 }
 function vLesson(){
@@ -6762,6 +6762,8 @@ const STAGES = [
 ];
 function vDrill(){
   if(hasMDrill(S.uid)) return vDrillM();
+  if(GJ.includes(S.uid)){ const u=CU(); return `${top(u.title+'　演習問題')}<div class="stack"><p class="small muted">「通して解く」と同じ問題を、記述式のプリント（PDF）にしました。本文を読んで、自分の言葉で答えを書こう。印刷しても、画面で解いても大丈夫です。</p>
+  <div class="panel stack"><h3>演習問題</h3><p class="small">本文全体　記述式　問1〜問${UNITS[S.uid].lessons.find(l=>l.t==='通して解く').plan.length}</p><div class="row"><button class="btn pdfbtn" data-act="pdf" data-arg="all|0">プリント（PDF）</button><button class="btn ghost pdfbtn" data-act="pdf" data-arg="all|1">解答・解説</button></div></div></div>`; }
   const u=CU();
   return `${top(u.no+'　'+u.title+'　演習問題')}<div class="stack"><p class="small muted">この章の演習問題（PDF）です。印刷しても、画面で解いても大丈夫です。Lv1から順にレベルが上がります。</p>
   <div class="ladder">${STAGES.map(s=>{ const p=PDF[u.drill+'-lv'+s.lv]||{};
@@ -6772,7 +6774,8 @@ const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
 let pdfLibP=null;
 const loadScript = src => new Promise((ok,ng)=>{ const s=document.createElement('script'); s.src=src; s.onload=ok; s.onerror=ng; document.head.appendChild(s); });
 function pdfLib(){ if(!pdfLibP) pdfLibP=loadScript(PDFJS+'pdf.min.js').then(()=>{ pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+'pdf.worker.min.js'; return pdfjsLib; }).catch(e=>{ pdfLibP=null; throw e; }); return pdfLibP; }
-function openPdf(arg){ const [lv,i]=arg.split('|'), u=CU(), st=(hasMDrill(S.uid)?DLV:STAGES).find(s=>s.lv===+lv), p=PDF[u.drill+'-lv'+lv]||{};
+function openPdf(arg){ if(arg.startsWith('all|')){ const u=CU(), p=PDF[u.drill+'-all']; S.pdf={ title:'演習問題', list:[{label:'問題',url:p.q},{label:'解答・解説',url:p.a}], i:+arg.split('|')[1], z:1, tok:0 }; go('pdf'); return; }
+  const [lv,i]=arg.split('|'), u=CU(), st=(hasMDrill(S.uid)?DLV:STAGES).find(s=>s.lv===+lv), p=PDF[u.drill+'-lv'+lv]||{};
   S.pdf={ title:`Lv${lv} ${st.name}`, list:[{label:'問題',url:p.q},{label:'解答・解説',url:p.a}], i:+i, z:1, tok:0 }; go('pdf'); }
 function vPdf(){ const P=S.pdf;
   return `${top(CU().title+'　'+P.title)}<div class="stack"><div class="pdfbar"><div class="pdfseg">${P.list.map((x,i)=>`<button class="${i===P.i?'on':''}" data-act="pdfTab" data-arg="${i}">${x.label}</button>`).join('')}</div>
@@ -6973,6 +6976,7 @@ function drillMake(uid, lv){ const K=drillKeys(uid), st=DLV[lv-1];
     if(want && (WRITEBAD.test(q.prompt) || !q.answer)) continue; const sig=q.prompt+q.expr; if(seen.has(sig)) continue; seen.add(sig); out.push(q); }
   return out; }
 ['m1','r2','r3','r4','m3','m4','q1','q2','q3','q4','q5','q6','z1','z2','z3','z4','z5','d1','d2','d4','d5'].forEach(u=>[1,2,3,4,5].forEach(l=>{ PDF[u+'-lv'+l]={ q:`pdf/${u}-lv${l}.pdf`, a:`pdf/${u}-lv${l}-ans.pdf` }; }));
+const GJ = ['rk','ai','mu','nv','nw','nf','mj','bs','sl']; GJ.forEach(u=>{ PDF[u+'-all']={ q:`pdf/${u}-all.pdf`, a:`pdf/${u}-all-ans.pdf` }; });
 const drillRec = (uid,lv) => (R.drill||{})[uid+':'+lv];
 function vDrillM(){ const u=CU(), uid=S.uid;
   return `${top(u.no+'　'+u.title+'　演習問題')}<div class="stack"><p class="small muted">この章の演習問題（PDF）です。印刷しても、画面で解いても大丈夫です。Lv1 から順にレベルが上がります。解き終わったら「解答・解説」で答え合わせをしよう。</p>
