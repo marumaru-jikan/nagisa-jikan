@@ -6638,10 +6638,10 @@ function vGoto(){
   <button class="btn ghost wide" data-act="back">章の一覧へ戻る</button></div>`;
 }
 function vUnit(){
-  const u=CU(), uid=S.uid, T=TERMS[u.cards]||[], kn=(R.known[uid]||[]).length, hasPdf=Object.keys(PDF).some(k=>k.startsWith(u.drill+'-')&&PDF[k].q);
+  const u=CU(), uid=S.uid, T=TERMS[u.cards]||[], kn=(R.known[uid]||[]).length, hasPdf=Object.keys(PDF).some(k=>k.startsWith(u.drill+'-')&&PDF[k].q)||hasMDrill(uid);
   return `${top(u.no+'　'+u.title)}<div class="stack"><p class="muted small">${u.lessons.length?`${u.lessons.length<10?u.lessons.length+"つ":u.lessons.length}の波　1つ約5分。上から順に進めるのがおすすめです。ぜんぶクリアすると小瓶の手紙が届きます。`:"この章の目次です。波は準備ができたものから公開します。"}</p><div class="list">
   ${(u.show||u.lessons).map(l=>l.soon?`${l.sec?`<div class="secrow">${l.sec}</div>`:''}<div class="item" style="opacity:.55"><span class="lid">${l.id}</span><span class="body"><b>${l.t}</b><br><span class="small muted">準備中</span></span></div>`:`${l.sec?`<div class="secrow">${l.sec}</div>`:''}<button class="item" data-act="lesson" data-arg="${l.id}"><span class="lid ${R.lessons[lkey(uid,l.id)]?'done':''}">${l.id}</span><span class="body"><b>${l.t}</b><br><span class="small muted">${l.sub}</span></span>${lTag(uid,l.id)}<span class="chev">›</span></button>`).join('')}
-  ${hasPdf?`<button class="item" data-act="go" data-arg="drill"><span class="lid">▶</span><span class="body"><b>演習問題</b><br><span class="small muted">PDF・Lv1〜Lv5</span></span><span class="chev">›</span></button>`:''}
+  ${hasPdf?`<button class="item" data-act="go" data-arg="drill"><span class="lid">▶</span><span class="body"><b>演習問題</b><br><span class="small muted">${hasMDrill(uid)?'Lv1 貝 〜 Lv5 ウミウシ':'PDF・Lv1〜Lv5'}</span></span><span class="chev">›</span></button>`:''}
   </div>${T.length?`<div class="list"><button class="item" data-act="cards"><span class="body"><b>用語カード</b><br><span class="small muted">用語の確認 ${T.length}枚</span></span><span class="tag ${kn===T.length?'done':kn?'mid':''}">${kn}/${T.length}</span><span class="chev">›</span></button></div>`:''}</div>`;
 }
 function vLesson(){
@@ -6744,6 +6744,7 @@ const STAGES = [
   { lv:5, name:'水平線', desc:'大学入試の入口', icon:'<path d="M4 28h40"/><path d="M14 28a10 10 0 0 1 20 0"/><path d="M24 10v4M12 15l3 3M36 15l-3 3"/>' },
 ];
 function vDrill(){
+  if(hasMDrill(S.uid)) return vDrillM();
   const u=CU();
   return `${top(u.no+'　'+u.title+'　演習問題')}<div class="stack"><p class="small muted">この章の演習問題（PDF）です。印刷しても、画面で解いても大丈夫です。Lv1から順にレベルが上がります。</p>
   <div class="ladder">${STAGES.map(s=>{ const p=PDF[u.drill+'-lv'+s.lv]||{};
@@ -6820,7 +6821,165 @@ function vSearch(){
   return `${top('検索')}<div class="stack"><label class="sfield">${SICON}<input id="sq" type="text" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="ことばを入れて検索" value="${esc(S.sq||'')}" aria-label="検索ことば"><button data-act="sqclear" aria-label="消す" ${S.sq?'':'hidden'}>×</button></label>
   <div id="sres" class="stack">${searchResults(S.sq)}</div></div>`;
 }
-const VIEWS={ setup:vSetup, home:vHome, course:vCourse, subject:vSubject, unit:vUnit, lesson:vLesson, cards:vCards, quiz:vQuiz, result:vResult, record:vRecord, settings:vSettings, install:vInstall, drill:vDrill, pdf:vPdf, pool:vPool, goto:vGoto, search:vSearch };
+/* ===== 演習問題（数学）　Lv1 貝〜Lv5 ウミウシ ===== */
+const DLV = [
+  { lv:1, name:'貝', sp:'k59', kind:'c', n:8, desc:'基本レベルの選択問題　8問' },
+  { lv:2, name:'やどかり', sp:'k21', kind:'w', n:5, desc:'基本レベルの記述問題　5問' },
+  { lv:3, name:'かに', sp:'k05', kind:'c', n:8, desc:'高認レベルの選択問題　8問' },
+  { lv:4, name:'魚', sp:'k66', kind:'w', n:5, desc:'高認レベルの記述問題　5問' },
+  { lv:5, name:'ウミウシ', sp:'k11', kind:'c', n:3, desc:'共通テストレベルの選択問題　3問' },
+];
+const duniq = a => a.filter((v,i,s)=>s.indexOf(v)===i);
+const MARK = ['①','②','③','④','⑤','⑥'];
+/* 共通テストレベル（各章3問・オリジナル問題）：[問題, [選択肢], 正解の番号, 解説] */
+const CT = {
+  m1:[
+    ['太郎さんは (x＋1)(x＋2)(x＋3)(x＋4) を展開するのに、かける組み合わせをくふうした。<br>(x＋1)(x＋4)＝x²＋5x＋4、(x＋2)(x＋3)＝x²＋5x＋6 となり、共通な部分 x²＋5x を M とおくと、式は (M＋4)(M＋6) となる。<br>この式を展開したときの <b>x² の係数</b>はどれか。', ['35','25','10','24'], 0, '(M＋4)(M＋6)＝M²＋10M＋24<br>M²＝(x²＋5x)²＝x⁴＋10x³＋25x²<br>10M＝10x²＋50x<br>x² の項は 25x²＋10x²＝35x²'],
+    ['花子さんは「連続する2つの奇数の積に 1 を加えると、ある整数の2乗になる」ことに気づいた。<br>n を整数として、2つの奇数を 2n−1、2n＋1 と表すとき、(2n−1)(2n＋1)＋1 はどのように表せるか。', ['(2n)²','(2n＋1)²','(n＋1)²','(2n−1)²'], 0, '(2n−1)(2n＋1)＋1＝4n²−1＋1＝4n²＝(2n)²<br>2つの奇数の間にある偶数 2n の2乗になります。（例：7×9＋1＝64＝8²）'],
+    ['a²−b²＋4b−4 を因数分解したい。<br>太郎：「b をふくむ項をまとめると、−(b²−4b＋4)＝−(b−2)² になるね。」<br>この考えを使って因数分解した結果はどれか。', ['(a＋b−2)(a−b＋2)','(a＋b＋2)(a−b−2)','(a−b＋2)²','(a＋b−2)(a−b−2)'], 0, 'a²−(b²−4b＋4)＝a²−(b−2)²<br>2乗−2乗の形なので<br>＝{a＋(b−2)}{a−(b−2)}＝(a＋b−2)(a−b＋2)'],
+  ],
+  r2:[
+    ['0.<span class="rd">1</span><span class="rd">2</span>＋0.<span class="rd">3</span> を1つの分数で表すとどれか。', ['5/11','5/33','4/11','1/2'], 0, '0.<span class="rd">1</span><span class="rd">2</span>＝12/99＝4/33、0.<span class="rd">3</span>＝3/9＝1/3＝11/33<br>4/33＋11/33＝15/33＝5/11'],
+    ['数直線上を動く点 P(x) がある。P から点 A(−1) までの距離と、点 B(5) までの距離の和が 8 になるとき、x の値をすべて求めると、どれか。', ['x＝−2, 6','x＝−1, 5','x＝−3, 7','x＝2, −6'], 0, '|x＋1|＋|x−5|＝8<br>x＜−1 のとき −(x＋1)−(x−5)＝8 → x＝−2<br>−1≦x≦5 のとき 6＝8 となり解なし<br>5＜x のとき (x＋1)＋(x−5)＝8 → x＝6<br>（AB＝6 なので、P は線分 AB の外側にあります）'],
+    ['有理数と無理数について、2人が話している。<br>太郎：「有理数と無理数の和は、必ず無理数になる。」<br>花子：「無理数と無理数の積は、必ず無理数になる。」<br>2人の発言について正しいものはどれか。', ['太郎さんだけ正しい','花子さんだけ正しい','2人とも正しい','2人とも誤り'], 0, '太郎：r＋a（r は有理数、a は無理数）が有理数 s なら a＝s−r が有理数になって矛盾。だから正しい。<br>花子：√2×√2＝2 は有理数。反例があるので誤り。'],
+  ],
+  r3:[
+    ['A判の用紙（A4、A3 など）は、長い辺を半分に折ると、もとの紙と同じ形（相似）になるように作られている。<br>短い辺を 1 としたときの長い辺の長さを x とすると、x はどれか。', ['√2','2','√3','3/2'], 0, '半分に折ると、長い辺 1、短い辺 x/2 になる。相似なので x：1＝1：x/2<br>x²/2＝1 より x²＝2、x＞0 なので x＝√2'],
+    ['x＝(√3＋1)/(√3−1)、y＝(√3−1)/(√3＋1) のとき、x²−xy＋y² の値はどれか。', ['13','14','15','16'], 0, '有理化すると x＝2＋√3、y＝2−√3<br>x＋y＝4、xy＝1<br>x²−xy＋y²＝(x＋y)²−3xy＝16−3＝13'],
+    ['(√5＋1)/(√5−1) の整数部分はどれか。', ['2','3','1','4'], 0, '分母を有理化すると<br>(√5＋1)²/(5−1)＝(6＋2√5)/4＝(3＋√5)/2<br>2＜√5＜3 より 5/2＜(3＋√5)/2＜3<br>整数部分は 2'],
+  ],
+  r4:[
+    ['スマートフォンの料金プランが2つある。<br>プランA：月額 1500 円に、使ったデータ 1GB ごとに 300 円が加わる<br>プランB：月額 3000 円で使いほうだい<br>使うデータ量を x GB（整数）とする。プランB のほうが安くなるのは、何GB 以上使うときか。', ['6GB 以上','5GB 以上','4GB 以上','10GB 以上'], 0, '1500＋300x＞3000 より 300x＞1500、x＞5<br>x は整数なので 6GB 以上。<br>（5GB ちょうどのときは、どちらも 3000 円で同じです）'],
+    ['連立不等式 x＞a、2x−1＜7 を満たす整数が、ちょうど 2 個となるような定数 a の値の範囲はどれか。', ['1≦a＜2','1＜a≦2','1＜a＜2','2≦a＜3'], 0, '2x−1＜7 より x＜4<br>整数がちょうど2個 → 3 と 2 だけがふくまれる<br>2 はふくまれ、1 はふくまれない条件は 1≦a＜2<br>（a＝1 のとき x＞1 なので 1 はふくまれません）'],
+    ['不等式 |x−3|＜2x を解くとどれか。', ['x＞1','x＞3','1＜x＜3','x＞−3'], 0, '(i) x≧3 のとき x−3＜2x → x＞−3。x≧3 と合わせて x≧3<br>(ii) x＜3 のとき 3−x＜2x → x＞1。合わせて 1＜x＜3<br>(i)(ii) を合わせて x＞1'],
+  ],
+  m3:[
+    ['100 以下の自然数のうち、3 の倍数でも 4 の倍数でもないものは何個あるか。', ['50 個','42 個','58 個','34 個'], 0, '3 の倍数 33 個、4 の倍数 25 個、12 の倍数 8 個<br>3 または 4 の倍数は 33＋25−8＝50 個<br>どちらでもないものは 100−50＝50 個'],
+    ['あるクラス 40 人のうち、自転車で通学する人は 25 人、バスで通学する人は 18 人、両方を使う人は 6 人いる。<br>自転車もバスも使わない人は何人か。', ['3 人','6 人','9 人','15 人'], 0, 'どちらかを使う人は 25＋18−6＝37 人<br>どちらも使わない人は 40−37＝3 人'],
+    ['全体集合 U＝{1, 2, 3, …, 10} の部分集合 A＝{2 の倍数}、B＝{3 の倍数} について、<span style="text-decoration:overline">A</span>∩<span style="text-decoration:overline">B</span> の要素の個数はどれか。', ['3 個','4 個','2 個','7 個'], 0, '<span style="text-decoration:overline">A</span>∩<span style="text-decoration:overline">B</span>＝<span style="text-decoration:overline">A∪B</span>（ド・モルガンの法則）<br>A∪B＝{2, 3, 4, 6, 8, 9, 10} の7個<br>補集合は {1, 5, 7} の 3 個'],
+  ],
+  m4:[
+    ['x は実数とする。「x²＝4」は「x＝2」であるための何か。', ['必要条件であるが十分条件ではない','十分条件であるが必要条件ではない','必要十分条件である','必要条件でも十分条件でもない'], 0, 'x＝2 ⇒ x²＝4 は真。<br>x²＝4 ⇒ x＝2 は偽（反例 x＝−2）。<br>「x²＝4」は必要条件であるが十分条件ではない。'],
+    ['「整数 n について、n² が偶数ならば n は偶数である」を証明するのに、対偶を使うことにした。証明すべき対偶はどれか。', ['n が奇数ならば n² は奇数である','n が偶数ならば n² は偶数である','n² が奇数ならば n は奇数である','n² が偶数ならば n は奇数である'], 0, '「p ならば q」の対偶は「q でないならば p でない」。<br>n が奇数 n＝2k＋1 なら n²＝2(2k²＋2k)＋1 で奇数。対偶が真なので、もとの命題も真。'],
+    ['実数 a、b についての命題「a²＞b² ならば a＞b」は偽である。反例になっているものはどれか。', ['a＝−3、b＝1','a＝3、b＝1','a＝2、b＝−1','a＝1、b＝0'], 0, '反例は「a²＞b² を満たすのに、a＞b を満たさないもの」。<br>a＝−3、b＝1 は a²＝9＞1＝b² だが a＜b。'],
+  ],
+  q1:[
+    ['放物線 y＝2x²−8x＋5 を、x 軸方向に −1、y 軸方向に 3 だけ平行移動した放物線の方程式はどれか。', ['y＝2x²−4x＋2','y＝2x²−12x＋20','y＝2x²−4x＋8','y＝2x²−8x＋8'], 0, 'y＝2(x−2)²−3 の頂点 (2, −3) が (1, 0) に移る。<br>y＝2(x−1)²＝2x²−4x＋2'],
+    ['放物線 y＝x²−4x＋1 を、原点に関して対称移動した放物線の方程式はどれか。', ['y＝−x²−4x−1','y＝−x²＋4x−1','y＝x²＋4x＋1','y＝−x²−4x＋1'], 0, '原点対称では x を −x、y を −y にする。<br>−y＝(−x)²−4(−x)＋1 → y＝−x²−4x−1'],
+    ['2次関数 y＝ax²＋bx＋c のグラフは<b>上に凸</b>で、頂点は<b>第1象限</b>にあり、y 軸との交点の y 座標は<b>負</b>である。a、b、c の符号の組み合わせはどれか。', ['a＜0、b＞0、c＜0','a＜0、b＜0、c＜0','a＞0、b＜0、c＜0','a＜0、b＞0、c＞0'], 0, '上に凸 → a＜0<br>軸 x＝−b/2a＞0 で a＜0 → b＞0<br>y 切片 c＜0'],
+  ],
+  q2:[
+    ['長さ 20 m のロープで、まっすぐな壁を1辺として利用し、長方形の囲いをつくる（壁の側にはロープを使わない）。囲いの面積の最大値はどれか。', ['50 m²','100 m²','25 m²','40 m²'], 0, '壁に垂直な辺を x m とすると、もう1辺は (20−2x) m<br>S＝x(20−2x)＝−2(x−5)²＋50<br>x＝5 のとき最大 50 m²'],
+    ['2次関数 y＝x²−4x＋3（a≦x≦a＋2）の最小値が −1 となるような定数 a の範囲はどれか。', ['0≦a≦2','0＜a＜2','a≧2','a≦0'], 0, 'y＝(x−2)²−1。最小値が −1 になるのは、頂点の x＝2 が範囲にふくまれるとき。<br>a≦2≦a＋2 より 0≦a≦2'],
+    ['ある店では、1個 100 円の品物が1日に 200 個売れる。値段を 10 円上げるごとに、売れる個数が 10 個ずつ減るという。1日の売上金額を最大にする値段はどれか。', ['150 円','200 円','120 円','100 円'], 0, '10x 円上げると (100＋10x)(200−10x)<br>＝−100(x²−10x−200)＝−100(x−5)²＋22500<br>x＝5 のとき最大 → 150 円'],
+  ],
+  q3:[
+    ['頂点が点 (1, −2) で、点 (3, 6) を通る放物線をグラフとする2次関数はどれか。', ['y＝2x²−4x','y＝2x²＋4x','y＝4x²−8x＋2','y＝x²−2x−1'], 0, 'y＝a(x−1)²−2 とおく。(3, 6) を通るので 4a−2＝6、a＝2<br>y＝2(x−1)²−2＝2x²−4x'],
+    ['x 軸と 2 点 (−1, 0)、(3, 0) で交わり、y 軸と点 (0, 6) で交わる放物線をグラフとする2次関数はどれか。', ['y＝−2x²＋4x＋6','y＝2x²−4x−6','y＝−2x²−4x＋6','y＝−x²＋2x＋6'], 0, 'y＝a(x＋1)(x−3) とおく。x＝0 で −3a＝6、a＝−2<br>y＝−2(x＋1)(x−3)＝−2x²＋4x＋6'],
+    ['グラフが 3 点 (0, 1)、(1, 2)、(2, 7) を通る2次関数はどれか。', ['y＝2x²−x＋1','y＝x²＋1','y＝2x²＋x−1','y＝3x²−2x＋1'], 0, 'y＝ax²＋bx＋c とおくと c＝1、a＋b＋1＝2、4a＋2b＋1＝7<br>a＋b＝1、2a＋b＝3 より a＝2、b＝−1'],
+  ],
+  q4:[
+    ['2次方程式 2x²−3x−1＝0 の解はどれか。', ['x＝(3±√17)/4','x＝(−3±√17)/4','x＝(3±√17)/2','x＝(3±√1)/4'], 0, '解の公式で x＝{3±√(9＋8)}/4＝(3±√17)/4'],
+    ['2次方程式 x²＋2kx＋k＋6＝0 が重解をもつような定数 k の値はどれか。', ['k＝−2, 3','k＝2, −3','k＝3','k＝−2'], 0, 'D/4＝k²−(k＋6)＝k²−k−6＝(k−3)(k＋2)＝0<br>k＝−2, 3'],
+    ['縦 20 m、横 30 m の長方形の土地に、同じ幅の道を縦と横に1本ずつ通し、残りを畑にする。畑の面積を 504 m² にするには、道の幅を何 m にすればよいか。', ['2 m','3 m','4 m','48 m'], 0, '道をはしに寄せて考えると (20−x)(30−x)＝504<br>x²−50x＋96＝0、(x−2)(x−48)＝0<br>0＜x＜20 なので x＝2'],
+  ],
+  q5:[
+    ['放物線 y＝x²−2x＋k が x 軸と異なる2点で交わるような定数 k の範囲はどれか。', ['k＜1','k＞1','k≦1','k＜−1'], 0, 'D/4＝1−k＞0 より k＜1'],
+    ['放物線 y＝x² と直線 y＝2x＋3 の共有点の座標はどれか。', ['(−1, 1)、(3, 9)','(1, 1)、(−3, 9)','(−1, 1)','(3, 9)'], 0, 'x²＝2x＋3、x²−2x−3＝0、(x＋1)(x−3)＝0<br>x＝−1 のとき y＝1、x＝3 のとき y＝9'],
+    ['放物線 y＝x²−4x＋1 が x 軸から切り取る線分の長さはどれか。', ['2√3','√3','4','2'], 0, 'x²−4x＋1＝0 より x＝2±√3<br>長さは (2＋√3)−(2−√3)＝2√3'],
+  ],
+  q6:[
+    ['2次不等式 x²−x−6≦0 を満たす整数 x は何個あるか。', ['6 個','4 個','5 個','7 個'], 0, '(x＋2)(x−3)≦0 より −2≦x≦3<br>整数は −2、−1、0、1、2、3 の 6 個'],
+    ['すべての実数 x について x²＋2kx＋k＋2＞0 が成り立つような定数 k の範囲はどれか。', ['−1＜k＜2','k＜−1, 2＜k','−2＜k＜1','−1≦k≦2'], 0, 'グラフが x 軸と共有点をもたなければよい。<br>D/4＝k²−k−2＝(k＋1)(k−2)＜0 より −1＜k＜2'],
+    ['周の長さが 20 m の長方形の花だんをつくる。面積を 21 m² 以上にするには、1辺の長さ x m をどの範囲にすればよいか。', ['3≦x≦7','x≧3','3＜x＜7','x≦7'], 0, 'もう1辺は (10−x) m。x(10−x)≧21<br>x²−10x＋21≦0、(x−3)(x−7)≦0 より 3≦x≦7'],
+  ],
+  z1:[
+    ['道路の「勾配 8%」とは、水平に 100 m 進むと 8 m 上がることを表す。勾配 8% の坂を、水平距離で 250 m 進むと、何 m 上がるか。', ['20 m','8 m','25 m','16 m'], 0, '傾きの角を θ とすると tanθ＝8/100<br>高さ＝250×tanθ＝250×0.08＝20 m'],
+    ['θ は鋭角で sinθ＝3/5 のとき、tanθ の値はどれか。', ['3/4','4/3','4/5','3/5'], 0, 'cos²θ＝1−9/25＝16/25、cosθ＞0 より cosθ＝4/5<br>tanθ＝sinθ/cosθ＝3/4'],
+    ['木から水平に 10 m はなれた地点に立ち、木の先端を見上げたら、見上げる角が 30° だった。目の高さを 1.5 m とすると、木の高さはおよそ何 m か。（√3＝1.73 とする）', ['約 7.3 m','約 18.8 m','約 6.5 m','約 10.2 m'], 0, '目の高さより上の部分は 10×tan30°＝10/√3≒5.77 m<br>5.77＋1.5≒7.3 m'],
+  ],
+  z2:[
+    ['cos120°＋sin150° の値はどれか。', ['0','1','−1','√3'], 0, 'cos120°＝−cos60°＝−1/2<br>sin150°＝sin30°＝1/2<br>和は 0'],
+    ['0°≦θ≦180° で sinθ＋cosθ＝1/2 のとき、sinθcosθ の値はどれか。', ['−3/8','3/8','−3/4','1/4'], 0, '両辺を2乗すると 1＋2sinθcosθ＝1/4<br>sinθcosθ＝−3/8'],
+    ['0°≦θ≦180° のとき、方程式 2cos²θ−cosθ−1＝0 を解くとどれか。', ['θ＝0°, 120°','θ＝60°, 180°','θ＝120°','θ＝0°, 60°'], 0, '(2cosθ＋1)(cosθ−1)＝0<br>cosθ＝−1/2 → θ＝120°<br>cosθ＝1 → θ＝0°'],
+  ],
+  z3:[
+    ['△ABC で a＝7、b＝5、c＝3 のとき、角 A の大きさはどれか。', ['120°','60°','150°','135°'], 0, 'cosA＝(b²＋c²−a²)/2bc＝(25＋9−49)/30＝−1/2<br>A＝120°'],
+    ['△ABC で a＝6、A＝30° のとき、外接円の半径 R はどれか。', ['6','3','12','6√3'], 0, '正弦定理 a/sinA＝2R より 6/(1/2)＝2R<br>R＝6'],
+    ['川をはさんだ2地点 A、B の距離を求めたい。A と同じ岸に C をとり、AC＝100 m、∠BAC＝75°、∠BCA＝45° を測った。AB の長さはどれか。', ['100√6/3 m','50√6 m','100√2 m','50√2 m'], 0, '∠ABC＝180°−75°−45°＝60°<br>正弦定理 AB/sin45°＝100/sin60°<br>AB＝100×(√2/2)÷(√3/2)＝100√2/√3＝100√6/3（約 81.6 m）'],
+  ],
+  z4:[
+    ['△ABC で b＝4、c＝5、A＝60° のとき、面積はどれか。', ['5√3','10√3','10','5'], 0, 'S＝(1/2)bc sinA＝(1/2)×4×5×(√3/2)＝5√3'],
+    ['3辺の長さが 5、6、7 の三角形の面積はどれか。', ['6√6','12√6','3√6','15'], 0, '長さ 7 の辺の向かいの角を θ とすると cosθ＝(25＋36−49)/60＝1/5<br>sinθ＝√(1−1/25)＝2√6/5<br>S＝(1/2)×5×6×2√6/5＝6√6'],
+    ['3辺の長さが 5、6、7 の三角形の内接円の半径 r はどれか。（面積は 6√6）', ['2√6/3','√6','√6/2','4√6/3'], 0, 'S＝(1/2)r(a＋b＋c) より 6√6＝(1/2)×r×18<br>r＝6√6/9＝2√6/3'],
+  ],
+  z5:[
+    ['1辺の長さが 6 の正四面体の高さはどれか。', ['2√6','3√3','2√3','√6'], 0, '頂点から底面に下ろした垂線の足は、底面の正三角形の外心。<br>外接円の半径 R＝6/(2sin60°)＝2√3<br>高さ＝√(6²−(2√3)²)＝√24＝2√6'],
+    ['直方体 ABCD−EFGH で AB＝4、AD＝3、AE＝12 のとき、対角線 AG の長さはどれか。', ['13','19','5','√153'], 0, 'AG＝√(4²＋3²＋12²)＝√169＝13'],
+    ['塔の真下の地点 H と同じ水平面上に、2地点 A、B がある。A から塔の頂上を見上げる角は 45°、B から見上げる角は 30° で、∠AHB＝90°、AB＝20 m である。塔の高さはどれか。', ['10 m','20 m','10√3 m','10√2 m'], 0, '塔の高さを h とすると AH＝h、BH＝h/tan30°＝√3h<br>三平方の定理 AB²＝AH²＋BH²＝4h²<br>400＝4h² より h＝10'],
+  ],
+  d1:[
+    ['次のデータは、10 人の小テストの得点である。<br>3, 5, 6, 6, 7, 9, 10, 10, 10, 14<br>このデータについて正しいものはどれか。', ['平均値と中央値は等しい','中央値と最頻値は等しい','平均値は最頻値より大きい','最頻値は 6 点である'], 0, '平均値＝80/10＝8、中央値＝(7＋9)/2＝8、最頻値＝10<br>平均値と中央値がどちらも 8 で等しい。'],
+    ['次の度数分布表から平均値を求めると、何分か。（各階級の値は階級値で考える）<br>0分以上10分未満：2人、10〜20分：5人、20〜30分：8人、30〜40分：5人', ['23 分','25 分','20 分','21 分'], 0, '階級値 5、15、25、35 を使って<br>(5×2＋15×5＋25×8＋35×5)/20＝460/20＝23 分'],
+    ['10 人のテストの平均点は 60 点だった。あとから 1 人が受けたところ 82 点だった。11 人の平均点は何点か。', ['62 点','71 点','61 点','64 点'], 0, '合計は 600＋82＝682 点<br>682÷11＝62 点'],
+  ],
+  d2:[
+    ['データ 2, 4, 6, 8, 10 の標準偏差はどれか。', ['2√2','8','4','√2'], 0, '平均 6、偏差の2乗は 16, 4, 0, 4, 16<br>分散＝40/5＝8、標準偏差＝√8＝2√2'],
+    ['変量 x の平均値が 50、分散が 16 である。y＝2x＋10 とするとき、y の標準偏差はどれか。', ['8','32','18','64'], 0, 'x の標準偏差は 4。y＝ax＋b の標準偏差は |a| 倍になる。<br>2×4＝8（＋10 は散らばりに関係しない）'],
+    ['次の 11 個のデータの四分位範囲はどれか。<br>1, 3, 4, 6, 7, 8, 10, 12, 13, 15, 20', ['9','8','10','19'], 0, '中央値は 6番目の 8<br>Q1 は前半 1, 3, 4, 6, 7 の中央値 4、Q3 は後半 10, 12, 13, 15, 20 の中央値 13<br>四分位範囲＝13−4＝9'],
+  ],
+  d4:[
+    ['2つの変量の散布図で、点が右上がりの直線のまわりに集まっていた。相関係数として最も適当なものはどれか。', ['0.9','−0.9','0.1','1.5'], 0, '右上がり → 正の相関。直線に近いほど 1 に近い。<br>相関係数は −1 以上 1 以下なので 1.5 はありえない。'],
+    ['変量 x、y の標準偏差がそれぞれ 4、5 で、共分散が −12 のとき、相関係数はどれか。', ['−0.6','0.6','−0.48','−2.4'], 0, 'r＝(共分散)/(x の標準偏差×y の標準偏差)＝−12/(4×5)＝−0.6'],
+    ['ある地域で、月ごとのアイスクリームの売上と水難事故の件数に、強い正の相関があった。この結果の解釈として最も適当なものはどれか。', ['気温などの別の要因が、両方に関係している可能性がある','アイスクリームを食べると水難事故が起こりやすくなる','水難事故が増えるとアイスクリームが売れる','相関があるので、必ず原因と結果の関係がある'], 0, '相関があっても、因果関係があるとはかぎらない。<br>夏に気温が上がると、アイスも売れ、水遊びも増える。このような別の要因（第3の変数）を考える。'],
+  ],
+  d5:[
+    ['1枚のコインを 10 回投げたら、表が 9 回以上出た。コインに偏りがないとすると、10 回中 9 回以上表が出る確率はどれか。', ['11/1024','1/1024','10/1024','1/2'], 0, '9回：₁₀C₉＝10 通り、10回：1 通り<br>(10＋1)/2¹⁰＝11/1024（約 1.1%）'],
+    ['仮説検定の考え方として正しいものはどれか。（基準は 5%）', ['「偏りがない」と仮定して、実際の結果が起こる確率が 5% 未満なら、仮定は正しくないと判断する','「偏りがある」と仮定して、確率が 5% 以上なら、偏りがあると判断する','確率が 5% 以上なら、「偏りがない」ことが証明される','確率が 5% 未満なら、必ず偏りがある'], 0, '主張と反対の仮説（帰無仮説）を立て、その下で結果が起こる確率が基準より小さければ、仮説を捨てる。<br>5% 以上でも「偏りがない」と証明されたわけではなく、「判断できない」だけです。'],
+    ['新しいお茶 A と今までのお茶 B を 20 人に飲み比べてもらったら、15 人が A をよいと答えた。どちらも同じくらい好まれる（確率 1/2）と仮定すると、20 人中 15 人以上が A を選ぶ確率は約 2.1% である。基準を 5% とするとき、結論として正しいものはどれか。', ['A のほうが好まれると判断してよい','A のほうが好まれるとは判断できない','B のほうが好まれると判断してよい','2.1% は小さすぎるので計算をやり直す'], 0, '「同じくらい好まれる」と仮定すると、起こる確率は 2.1%＜5%。<br>めったに起こらないことが起きたので、仮定を捨て、A のほうが好まれると判断する。'],
+  ],
+};
+/* 章の生成キー */
+const drillKeys = uid => { const u=UNITS[uid]; const ls=(u.lessons||[]).filter(l=>!l.test&&!l.soon&&l.plan&&l.plan.length);
+  const tests=(u.lessons||[]).filter(l=>l.test).flatMap(l=>l.plan);
+  return { main:ls.map(l=>l.plan[0]), all:duniq(ls.flatMap(l=>l.plan)), test:duniq(tests.length?tests:ls.flatMap(l=>l.plan)) }; };
+const hasMDrill = uid => { const u=UNITS[uid]; return u && u.course==='math' && drillKeys(uid).main.length>0; };
+const spread = (arr,n) => { if(!arr.length) return []; if(arr.length<=n){ const out=[]; for(let i=0;i<n;i++) out.push(arr[i%arr.length]); return out; } return Array.from({length:n},(_,i)=>arr[Math.floor((i+0.5)*arr.length/n)]); };
+const WRITEBAD = /どれ|選べ|正しいもの|あてはまる|適当|図の|次のうち|〜④/;
+const genQ = k => { try { return makeQs([k])[0]; } catch(e){ return null; } };
+function drillMake(uid, lv){ const K=drillKeys(uid), st=DLV[lv-1];
+  if(lv===5) return (CT[uid]||[]).map(([q,c,a,e])=>{ const ord=shuffle(c.map((_,i)=>i)); return { prompt:q, expr:'', choices:ord.map(i=>c[i]), answer:c[a], explain:e, ct:true }; });
+  const want = st.kind==='w';
+  const pool = lv<=2 ? (lv===1?spread(K.main,st.n):spread(K.main.slice(0,Math.max(st.n,Math.ceil(K.main.length*.7))),st.n)) : shuffle([...K.test]).concat(shuffle([...K.all]));
+  const out=[], seen=new Set(); let i=0, guard=0;
+  while(out.length<st.n && guard++<200){ const k=pool[i++ % pool.length]; const q=genQ(k); if(!q) continue;
+    if(want && (WRITEBAD.test(q.prompt) || !q.answer)) continue; const sig=q.prompt+q.expr; if(seen.has(sig)) continue; seen.add(sig); out.push(q); }
+  return out; }
+const drillRec = (uid,lv) => (R.drill||{})[uid+':'+lv];
+function vDrillM(){ const u=CU(), uid=S.uid;
+  return `${top(u.no+'　'+u.title+'　演習問題')}<div class="stack"><p class="small muted">Lv1 から順にレベルが上がります。選択問題はその場で採点、記述問題は紙に解いてから解答を見て、自分で○×をつけます。問題は毎回つくりかわります（Lv5 をのぞく）。</p>
+  <div class="ladder">${DLV.map(s=>{ const r=drillRec(uid,s.lv), ok=s.lv<5||(CT[uid]||[]).length;
+    return `<div class="rung"><img class="stage" src="icons/${s.sp}.png" alt="" style="stroke:none"><div class="body"><div class="row" style="gap:8px"><span class="tag">Lv${s.lv}</span><b class="sname">${s.name}</b>${r?`<span class="tag ${r.best===r.total?'done':'mid'}">最高 ${r.best}/${r.total}</span>`:''}</div><p class="small">${s.desc}</p>
+    ${ok?`<div class="row"><button class="btn pdfbtn" data-act="dstart" data-arg="${s.lv}">${s.kind==='w'?'問題を解く':'挑戦する'}</button></div>`:'<span class="small muted">準備中</span>'}</div></div>`; }).join('')}</div></div>`; }
+function vDq(){ const D=S.dr, st=DLV[D.lv-1], n=D.qs.length;
+  if(D.done){ const all=D.score===n;
+    return `${top('Lv'+D.lv+'　'+st.name)}<div class="stack"><div class="panel result pop" style="text-align:center"><img src="icons/${st.sp}.png" alt="" style="width:84px;height:84px;margin:0 auto"><div class="big num">${D.score}/${n}</div><h2>${all?'ぜんぶ正解！':D.score>=Math.ceil(n*.6)?'よくできました':'もう一度ためしてみよう'}</h2>${D.best?'<p class="small" style="color:var(--teal);font-weight:700">自己ベスト更新！</p>':''}</div>
+    ${D.wrong.length?`<div class="panel stack"><h3>まちがえた問題</h3>${D.wrong.map(q=>`<div class="exq"><p>${q.prompt}${q.expr?'<br><span class="mth">'+q.expr+'</span>':''}</p></div><p class="ex mth" style="font-size:.95rem">答え：${q.answer}<br>${q.explain}</p>`).join('')}</div>`:''}
+    <div class="two"><button class="btn ghost" data-act="back">演習問題へ</button><button class="btn" data-act="dstart" data-arg="${D.lv}">もう一度</button></div></div>`; }
+  const q=D.qs[D.i], ans=D.picked!=null, w=st.kind==='w';
+  const head=`<div class="qhead"><span class="num small muted">${D.i+1} / ${n}</span><span class="num small muted">${w?'○':'正解'} ${D.score}</span></div><div class="meter"><i style="width:${Math.round(D.i/n*100)}%"></i></div>`;
+  const box=`<div class="qbox pop" ${q.ct?'style="text-align:left"':''}><div class="prompt" ${q.ct?'style="font-size:1rem;color:var(--ink);line-height:1.9"':''}>${D.lv===3&&!q.ct?'次の①〜④のうちから、正しいものを一つ選べ。<br>':''}${q.prompt}</div>${q.expr?`<div class="expr long mth">${q.expr}</div>`:''}</div>`;
+  if(w) return `${top('Lv'+D.lv+'　'+st.name+'（記述）')}<div class="stack">${head}${box}
+    ${D.show?`<div class="feedback pop"><span class="verdict">答え　<span class="mth">${q.answer}</span></span><p class="mth">${q.explain}</p></div>
+      <p class="small muted" style="text-align:center">自分の答えと解き方を確かめて、○か×をつけよう</p><div class="two"><button class="btn ghost" data-act="dself" data-arg="0">× まちがえた</button><button class="btn" data-act="dself" data-arg="1">○ できた</button></div>`
+    :`<p class="small muted">紙とえんぴつで、途中の式も書いて解いてみよう。</p><button class="btn wide" data-act="dshow">解答・解説を見る</button>`}</div>`;
+  return `${top('Lv'+D.lv+'　'+st.name)}<div class="stack">${head}${box}
+  <div class="choices words">${q.choices.map((c,i)=>{ let cls=''; if(ans){ if(c===q.answer) cls='ok'; else if(c===D.picked) cls='ng'; } return `<button class="choice ${cls} mth" style="text-align:left" data-act="dpick" data-arg="${esc(c)}" ${ans?'disabled':''}><b style="margin-right:6px">${MARK[i]}</b>${c}</button>`; }).join('')}</div>
+  ${ans?`<div class="feedback ${D.picked===q.answer?'ok':'ng'} pop"><span class="verdict">${D.picked===q.answer?'正解！':'惜しい！ 答えは '+MARK[q.choices.indexOf(q.answer)]+' '+q.answer}</span><p>${q.explain}</p></div><button class="btn wide" data-act="dnext">${D.i+1<n?'次の問題 →':'結果を見る'}</button>`:''}</div>`; }
+function drillNext(){ const D=S.dr; if(D.i+1<D.qs.length){ D.i++; D.picked=null; D.show=false; render(); window.scrollTo(0,0); return; }
+  D.done=true; R.drill=R.drill||{}; const k=S.uid+':'+D.lv, old=R.drill[k]; D.best=!old||D.score>old.best; if(D.best) R.drill[k]={best:D.score,total:D.qs.length}; markDay(); save(); render(); window.scrollTo(0,0); }
+
+const VIEWS={ setup:vSetup, home:vHome, course:vCourse, subject:vSubject, unit:vUnit, lesson:vLesson, cards:vCards, quiz:vQuiz, result:vResult, record:vRecord, settings:vSettings, install:vInstall, drill:vDrill, pdf:vPdf, pool:vPool, goto:vGoto, search:vSearch, dq:vDq };
 function render(){
   app.innerHTML=VIEWS[S.view]();
   tabs.hidden = S.view==='setup';
@@ -6858,6 +7017,11 @@ document.addEventListener('click', e=>{
   else if(a==='shit'){ const x=(S.shits||[])[+arg]; if(!x) return; S.uid=x.uid; S.course=x.course; S.subj=x.subj; S.sqFocus=false;
     if(x.k==='l'){ S.lid=x.id; go('lesson'); } else go('unit'); }
   else if(a==='pdf') openPdf(arg);
+  else if(a==='dstart'){ S.dr={ lv:+arg, qs:drillMake(S.uid,+arg), i:0, picked:null, score:0, wrong:[], show:false }; if(S.view==='dq'){ render(); window.scrollTo(0,0); } else go('dq'); }
+  else if(a==='dpick'){ const D=S.dr, q=D.qs[D.i]; D.picked=arg; if(arg===q.answer) D.score++; else D.wrong.push(q); render(); }
+  else if(a==='dnext') drillNext();
+  else if(a==='dshow'){ S.dr.show=true; render(); }
+  else if(a==='dself'){ const D=S.dr; if(arg==='1') D.score++; else D.wrong.push(D.qs[D.i]); drillNext(); }
   else if(a==='pdfTab'){ S.pdf.i=+arg; render(); }
   else if(a==='pdfZoom'){ S.pdf.z=S.pdf.z>1?1:1.8; render(); }
   else if(a==='course'){ S.course=arg; go('course'); }
