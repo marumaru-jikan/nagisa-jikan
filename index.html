@@ -6400,6 +6400,7 @@ const UNITS = {
   Object.entries(UNITS).forEach(([uid,u])=>{ if(u.course!=='math') return; const m=/(\d+)章/.exec(u.no||''); if(!m) return; const ch=m[1];
     const all=u.show||u.lessons, map={}; let n=0;
     all.forEach(l=>{ if(!/^\d+-\d+$/.test(String(l.id))) return; const nid=ch+'-'+(++n); map[l.id]=nid; l.id=nid; });
+    all.forEach(l=>{ if(l.sec) l.sec=l.sec.replace(/^\d+\s*　/,''); });
     const fix=s=>typeof s!=='string'?s:s.split(/(<[^>]*>)/).map(t=>t[0]==='<'?t:t.replace(/(^|[^\d.\-])(\d+-\d+)(?![\d])/g,(x,a,b)=>a+(map[b]||b))).join('');
     all.forEach(l=>{ const b=l.body; if(typeof b==='function') l.body=(...x)=>fix(b(...x)); l.sub=fix(l.sub); });
     moved[uid]=map; });
