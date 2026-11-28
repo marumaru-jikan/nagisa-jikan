@@ -983,7 +983,7 @@ const RK_LESSONS = [['科学の説明は変わる','本文の前半　問1',['rk
 const NF_LESSONS = novelLessons('nf','7',[['「普通」という言葉','本文のはじめ　問1'],['文化祭の絵','本文の前半　問2'],['図書館へ','本文の中ほど　問3'],['先生との会話と文化祭','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
 const NV_LESSONS = novelLessons('nv','5',[['駅での再会','本文の前半　問1'],['無人駅','本文の中ほど　問2'],['「簡単に言うなよ」','本文の中ほど　問3'],['特急に抜かされる','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
 const NW_LESSONS = novelLessons('nw','6',[['二番目という場所','本文のはじめ　問1'],['航平の欠場','本文の前半　問2'],['決勝のスタート','本文の中ほど　問3'],['リレーの前に','本文の終わり　問4・問5'],['通して解く','本文全体　問1〜問5']]);
-const makeQs = plan => { const used={}; return plan.map(k=>{ { const m=/^(nv|nw|rk|nf|ai|mu|mj|bs|sl)(\d+)$/.exec(k); if(m) return nq2(m[1],+m[2]); } if(/^m1[A-Z]/.test(k)) return M1.G[k](); if(/^n[2-4][A-Z]/.test(k)) return M2.G[k](); if(/^s[1-5][A-Z]/.test(k)) return M3.G[k](); if(/^f2[A-Z]/.test(k)) return M5.G[k](); if(/^t3[A-Z]/.test(k)) return M6.G[k](); if(/^d4[A-Z]/.test(k)) return M7.G[k](); if(/^kb[A-Z]/.test(k)) return KB.G[k](); if(k.startsWith('gm')) return mq(GM[+k.slice(2)]); if(k.startsWith('gk')) return gq(GQ[+k.slice(2)]); if(k.startsWith('cj')) return cq(CJ[+k.slice(2)]); if(k.startsWith('kj')) return kq(KJ[+k.slice(2)]); const P=POOL[k]; used[k]=used[k]||shuffle(P.map((_,i)=>i)); if(!used[k].length) used[k]=shuffle(P.map((_,i)=>i)); return fq(P[used[k].pop()]); }); };
+const makeQs = plan => { const used={}; return plan.map(k=>{ { const m=/^(nv|nw|rk|nf|ai|mu|mj|bs|sl)(\d+)$/.exec(k); if(m) return nq2(m[1],+m[2]); } if(/^m1[A-Z]/.test(k)) return M1.G[k](); if(/^e2[A-Z]/.test(k)) return ME2.G[k](); if(/^n[2-4][A-Z]/.test(k)) return M2.G[k](); if(/^s[1-5][A-Z]/.test(k)) return M3.G[k](); if(/^f2[A-Z]/.test(k)) return M5.G[k](); if(/^t3[A-Z]/.test(k)) return M6.G[k](); if(/^d4[A-Z]/.test(k)) return M7.G[k](); if(/^kb[A-Z]/.test(k)) return KB.G[k](); if(k.startsWith('gm')) return mq(GM[+k.slice(2)]); if(k.startsWith('gk')) return gq(GQ[+k.slice(2)]); if(k.startsWith('cj')) return cq(CJ[+k.slice(2)]); if(k.startsWith('kj')) return kq(KJ[+k.slice(2)]); const P=POOL[k]; used[k]=used[k]||shuffle(P.map((_,i)=>i)); if(!used[k].length) used[k]=shuffle(P.map((_,i)=>i)); return fq(P[used[k].pop()]); }); };
 
 /* ===== 説明ページの部品 ===== */
 const rule = s => `<div class="rule">${s}</div>`;
@@ -2026,6 +2026,130 @@ const TM = [
   [['不等式','数量の大小関係を、不等号を使って表した式。'],['不等式の性質','負の数をかけたり割ったりすると、不等号の向きが変わる。'],['1次不等式','移項して整理すると ax＞b などの形になる不等式。'],['連立不等式','いくつかの不等式を同時に満たす x の範囲を求める。共通部分。'],['|A|＜c','−c＜A＜c（c＞0）。'],['|A|＞c','A＜−c または c＜A（c＞0）。']],
 ];
 return { G, CH:[C2,C3,C4], TM };
+})();
+
+/* ===== 英語 文法 2章 基本文型 ===== */
+const ME2 = (() => {
+const uniq = a => a.filter((v,i,s)=>s.indexOf(v)===i);
+function Q(prompt, expr, ans, wrongs, hint, explain, extra){
+  const ch=uniq([ans, ...wrongs.filter(w=>w!=null&&w!==''&&w!==ans)]).slice(0,4);
+  return Object.assign({ raw:true, prompt, expr, answer:ans, choices:shuffle(ch), words:true, hint, explain, long:true }, extra||{}); }
+const L = (id,sec,t,sub,key,body) => ({ id, sec, t, sub, plan:Array.isArray(key)?key:Array(5).fill(key), body });
+const T = (plan,desc) => ({ id:'まとめ', sec:'章末テスト', t:'章末テスト', sub:desc, plan, test:true, body:()=>`<section class="panel"><h3>章末テスト</h3><p>この章の内容から10問出題します。問題の順番は毎回かわります。</p></section>` });
+const ex = s => `<p class="ex en">${s}</p>`;
+const tip = s => `<p class="small muted">${s}</p>`;
+const rul = s => `<div class="rule">${s}</div>`;
+const RN = { S:'S（主語）', V:'V（動詞）', O:'O（目的語）', C:'C（補語）', M:'M（修飾語）' };
+const RJ = { S:'主語', V:'動詞', O:'目的語', C:'補語', M:'修飾語' };
+const FORM = ['第1文型（S＋V）','第2文型（S＋V＋C）','第3文型（S＋V＋O）','第4文型（S＋V＋O＋O）','第5文型（S＋V＋O＋C）'];
+const B = {
+1:[[['S','Birds'],['V','sing'],['M','in the morning']],[['S','My grandfather'],['V','lives'],['M','near the sea']],[['S','The train'],['V','arrived'],['M','ten minutes late']],[['S','A small cat'],['V','was'],['M','under the table']],[['S','We'],['V','walked'],['M','to the station']],[['S','The sun'],['V','rises'],['M','in the east']],[['S','Kenta'],['V','swims'],['M','very fast']],[['S','The children'],['V','laughed'],['M','loudly']]],
+2:[[['S','The soup'],['V','smells'],['C','good']],[['S','My sister'],['V','became'],['C','a doctor']],[['S','The leaves'],['V','turn'],['C','red'],['M','in autumn']],[['S','You'],['V','look'],['C','tired'],['M','today']],[['S','His story'],['V','sounds'],['C','strange']],[['S','The students'],['V','kept'],['C','quiet'],['M','during the test']],[['S','Mr. Sato'],['V','is'],['C','our new teacher']],[['S','It'],['V','got'],['C','dark'],['M','very quickly']]],
+3:[[['S','I'],['V','visited'],['O','my uncle'],['M','last Sunday']],[['S','She'],['V','plays'],['O','the piano'],['M','every day']],[['S','Tom'],['V','opened'],['O','the window']],[['S','We'],['V','enjoyed'],['O','the concert']],[['S','My brother'],['V','wants'],['O','a new bike']],[['S','They'],['V','discussed'],['O','the problem'],['M','for an hour']],[['S','The boy'],['V','reached'],['O','the top of the mountain']],[['S','Emi'],['V','became'],['O','friends'],['M','with Lucy']]],
+4:[[['S','My aunt'],['V','gave'],['O1','me'],['O2','a watch']],[['S','Mr. Ito'],['V','teaches'],['O1','us'],['O2','English']],[['S','She'],['V','made'],['O1','her son'],['O2','a sandwich']],[['S','Ken'],['V','showed'],['O1','his friends'],['O2','the photos']],[['S','My father'],['V','bought'],['O1','me'],['O2','a dictionary']],[['S','The nurse'],['V','told'],['O1','the children'],['O2','an interesting story']],[['S','I'],['V','sent'],['O1','Yumi'],['O2','a birthday card']],[['S','Mika'],['V','lent'],['O1','him'],['O2','her umbrella']]],
+5:[[['S','The news'],['V','made'],['O','everyone'],['C','happy']],[['S','We'],['V','call'],['O','our dog'],['C','Momo']],[['S','He'],['V','keeps'],['O','his room'],['C','clean']],[['S','They'],['V','named'],['O','the baby'],['C','Hana']],[['S','I'],['V','found'],['O','the movie'],['C','boring']],[['S','The hot weather'],['V','made'],['O','us'],['C','thirsty']],[['S','She'],['V','left'],['O','the door'],['C','open']],[['S','The people'],['V','elected'],['O','her'],['C','mayor']]],
+};
+B[3]=B[3].filter(s=>s[1][1]!=='became'); // became は第2文型
+const sent = (s,hi) => s.map(([r,w],i)=>i===hi?`<u>${w}</u>`:w).join(' ')+'.';
+const role = r => r[0];
+const parse = s => s.map(([r,w])=>`<b>${r==='O1'?'O（人）':r==='O2'?'O（物）':r}</b> ${w}`).join('　/　');
+const pickS = f => { const s=pick(B[f]); return s; };
+const ADJ = [['This cake tastes ( ).','sweet',['sweetly','sweetness','sweeten']],['She looked ( ) at the party.','happy',['happily','happiness','happen']],['The music sounds ( ).','beautiful',['beautifully','beauty','beautify']],['The milk went ( ).','bad',['badly','worse than','badness']],['Please keep ( ) in the library.','quiet',['quietly','quietness','quieten']],['The baby soon fell ( ).','asleep',['sleep','sleepily','slept']],['Your idea seems ( ).','interesting',['interestingly','interest','interests']],['The weather became ( ) in the afternoon.','warm',['warmly','warmth','warming up']]];
+const OC5 = [['The news made everyone ( ).','happy',['happily','happiness','to happy']],['Please leave the window ( ).','open',['opened up','openly','to open']],['I found this book very ( ).','useful',['usefully','use','usefulness']],['The long walk made me ( ).','tired',['tiredly','tire','to tire']],['Try to keep your desk ( ).','clean',['cleanly','cleaning','to clean']],['They named the cat ( ).','Tama',['to Tama','for Tama','as Tama’s']],['We painted the wall ( ).','white',['whitely','whiten','whiteness']]];
+const PRON = { me:['me','my','I','mine'], us:['us','our','we','ours'], him:['him','his','he','himself'], her:['her','she','hers','herself'], them:['them','their','they','theirs'] };
+const TOF = { gave:'to', teaches:'to', showed:'to', told:'to', sent:'to', lent:'to', made:'for', bought:'for' };
+const SAME = [
+  ['She made him a sandwich.','彼女は彼にサンドイッチを作ってあげた。',['彼女は彼をサンドイッチにした。','彼女は彼にサンドイッチを作らせた。','彼女は彼とサンドイッチを作った。'],'第4文型（S＋V＋O＋O）。make＋人＋物 で「人に物を作ってあげる」。'],
+  ['She made him angry.','彼女は彼を怒らせた。',['彼女は彼に怒った。','彼女は怒って彼を作った。','彼女は彼のために怒った。'],'第5文型（S＋V＋O＋C）。him＝angry の関係で「彼を怒った状態にした」。'],
+  ['I found the book easy.','私はその本がやさしいとわかった。',['私はその本を簡単に見つけた。','私はやさしい本を見つけた。','私はその本をやさしくした。'],'第5文型。the book＝easy の関係。「本がやさしいとわかった」。'],
+  ['I found the book easily.','私はその本を簡単に見つけた。',['私はその本がやさしいとわかった。','私はやさしい本を見つけた。','私はその本をやさしくした。'],'第3文型。easily は副詞（M）で「簡単に」見つけた。'],
+  ['He got angry.','彼は怒った。',['彼は怒りを手に入れた。','彼は人を怒らせた。','彼は怒られた。'],'第2文型。get＋形容詞 で「〜になる」。'],
+  ['He got a ticket.','彼はチケットを手に入れた。',['彼はチケットになった。','彼は人にチケットをあげた。','彼はチケットを作った。'],'第3文型。get＋O で「〜を手に入れる」。'],
+  ['He got me a ticket.','彼は私にチケットを手に入れてくれた。',['彼は私をチケットにした。','私は彼にチケットをあげた。','彼は私のチケットを取った。'],'第4文型。get＋人＋物 で「人に物を手に入れてあげる」。'],
+  ['The leaves turned red.','葉が赤くなった。',['葉を赤くした。','葉が赤を回した。','赤い葉が向きを変えた。'],'第2文型。turn＋形容詞 で「〜になる」。'],
+  ['He kept the money.','彼はそのお金を持っていた（取っておいた）。',['彼はお金のままだった。','彼はお金を静かにさせた。','彼はお金をあげた。'],'第3文型。keep＋O で「〜を持ち続ける」。'],
+  ['He kept silent.','彼はだまったままだった。',['彼は沈黙を持っていた。','彼は人をだまらせた。','彼は静けさを守った人だった。'],'第2文型。keep＋形容詞 で「〜のままでいる」。']];
+const G = {
+  e2Which(){ const f=pick([1,2,3,4,5]), s=pickS(f);
+    return Q('次の英文の文型はどれ？', `<span class="en">${sent(s)}</span>`, FORM[f-1], FORM.filter((_,i)=>i!==f-1),
+      'まず動詞（V）を見つけ、そのあとに何が続くかを見ます。前置詞のついた語句や副詞は M（修飾語）で、文型には数えません。',
+      `${parse(s)}<br>→ <b>${FORM[f-1]}</b>`); },
+  e2Elem(){ const f=pick([1,2,3,4,5]), s=pickS(f), i=Math.floor(Math.random()*s.length), r=role(s[i][0]);
+    return Q('下線部は、文の要素のうちどれ？', `<span class="en">${sent(s,i)}</span>`, RN[r], Object.values(RN).filter(x=>x!==RN[r]),
+      'S＝「〜は・〜が」、V＝動詞、O＝「〜を・〜に」、C＝S や O を説明する語、M＝それ以外の飾りの語句です。',
+      `${parse(s)}<br>下線部は <b>${RN[r]}</b>`); },
+  e2Tr(){ const f=pick([1,1,2,3,3,4,5]), s=pickS(f), vi=s.findIndex(p=>p[0]==='V'), tr=f>=3;
+    return Q('下線部の動詞は、自動詞・他動詞のどちらとして使われている？', `<span class="en">${sent(s,vi)}</span>`, tr?'他動詞':'自動詞', [tr?'自動詞':'他動詞'],
+      '動詞のすぐあとに「〜を」にあたる目的語（O）があれば他動詞、なければ自動詞です。',
+      `${parse(s)}<br>${tr?'目的語（O）があるので <b>他動詞</b>':'目的語（O）がないので <b>自動詞</b>'}`); },
+  e2C(){ const [q,a,w]=pick(ADJ);
+    return Q('（　）に入る語として正しいものはどれ？', `<span class="en">${q.replace('( )','（　）')}</span>`, a, w,
+      '第2文型の C（補語）には、形容詞や名詞が入ります。副詞（-ly）は C になれません。',
+      `<span class="en">${q.replace('( )','<b>'+a+'</b>')}</span><br>主語の状態を説明する C なので、形容詞の <b>${a}</b>。`); },
+  e2OC(){ const f=pick([2,3]), s=pickS(f), i=s.findIndex(p=>p[0]==='C'||p[0]==='O'), r=role(s[i][0]);
+    return Q('下線部は、補語（C）・目的語（O）のどちら？', `<span class="en">${sent(s,i)}</span>`, RN[r], [RN[r==='C'?'O':'C']],
+      'S＝下線部 の関係（イコール）が成り立てば C、成り立たなければ O です。',
+      `${parse(s)}<br>${r==='C'?`${s[0][1]}＝${s[i][1]} の関係が成り立つので <b>C（補語）</b>`:`${s[0][1]}≠${s[i][1]} なので <b>O（目的語）</b>`}`); },
+  e2OO(){ const s=pick(B[4].filter(x=>PRON[x[2][1]])), p=s[2][1], c=PRON[p];
+    const q=s.map(([r,w])=>r==='O1'?'（　）':w).join(' ')+'.';
+    return Q('（　）に入る語として正しいものはどれ？', `<span class="en">${q}</span>`, p, c.filter(x=>x!==p),
+      '第4文型は「S＋V＋人（〜に）＋物（〜を）」。動詞のすぐあとの「人」は目的格（me, us, him など）にします。',
+      `<span class="en">${sent(s)}</span><br>${parse(s)}<br>目的語なので目的格の <b>${p}</b>。`); },
+  e2ToFor(){ const s=pick(B[4]), v=s[1][1], tf=TOF[v];
+    const q=`${s[0][1]} ${v} ${s[3][1]} （　） ${s[2][1]}.`;
+    return Q('次の第4文型を第3文型に書きかえる。（　）に入る語はどれ？', `<span class="en">${sent(s)}</span><br>→ <span class="en">${q}</span>`, tf, ['to','for','of','with'].filter(x=>x!==tf),
+      '相手に届くことが必要な動詞（give, send, show, teach, tell, lend など）は to、相手のためにする動詞（make, buy, cook, get など）は for を使います。',
+      `<span class="en">${s[0][1]} ${v} ${s[3][1]} <b>${tf}</b> ${s[2][1]}.</span><br>${v} は ${tf==='to'?'相手に届ける動詞なので to':'相手のためにする動詞なので for'}。`); },
+  e2OC5(){ const [q,a,w]=pick(OC5);
+    return Q('（　）に入る語句として正しいものはどれ？', `<span class="en">${q.replace('( )','（　）')}</span>`, a, w,
+      '第5文型の C は、O がどんな状態かを説明します（O＝C）。形容詞や名詞が入り、副詞は入りません。',
+      `<span class="en">${q.replace('( )','<b>'+a+'</b>')}</span><br>O＝C の関係（O が ${a} の状態）になる。`); },
+  e2Same(){ const [e,a,w,x]=pick(SAME);
+    return Q('次の英文の意味として正しいものはどれ？', `<span class="en">${e}</span>`, a, w,
+      '同じ動詞でも、あとに続く形（文型）によって意味が変わります。',
+      `${x}`); },
+};
+const LESSONS = [
+  L('1-1','1　文の要素','文の要素','S・V・O・C・M','e2Elem',()=>`
+    <section class="panel"><h3>文をつくる5つの要素</h3><table class="dtab"><tr><th>記号</th><th>名前</th><th>はたらき</th></tr><tr><td>S</td><td>主語</td><td>「〜は・〜が」にあたる</td></tr><tr><td>V</td><td>動詞</td><td>「〜する・〜である」</td></tr><tr><td>O</td><td>目的語</td><td>「〜を・〜に」にあたる</td></tr><tr><td>C</td><td>補語</td><td>S や O が「何か・どんなか」を説明する</td></tr><tr><td>M</td><td>修飾語</td><td>場所・時・様子などを付け加える飾り</td></tr></table>
+    ${ex('<b>S</b> My sister　<b>V</b> plays　<b>O</b> tennis　<b>M</b> after school.')}${tip('M（修飾語）は文型には数えません。前置詞＋名詞（in the park など）や副詞（fast, yesterday など）が M になります。')}</section>`),
+  L('1-2',null,'自動詞と他動詞','目的語があるか','e2Tr',()=>`
+    <section class="panel"><h3>自動詞・他動詞</h3>${rul('自動詞：目的語（O）をとらない動詞<br>他動詞：目的語（O）をとる動詞')}
+    ${ex('He <b>runs</b> in the park.（自動詞：O がない）<br>He <b>runs</b> a small shop.（他動詞：a small shop が O）')}${tip('同じ動詞でも、自動詞・他動詞の両方で使えるものが多くあります。文の中での使われ方で判断します。')}</section>`),
+  L('2-1','2　5つの文型','第1文型　S＋V','M を見分ける','e2Which',()=>`
+    <section class="panel"><h3>第1文型（S＋V）</h3><p>補語も目的語も必要としない動詞（完全自動詞）の文です。後ろに M（修飾語）がつくことが多い。</p>
+    ${ex('<b>S</b> The baby　<b>V</b> cried　<b>M</b> all night.')}${ex('<b>S</b> My keys　<b>V</b> are　<b>M</b> on the desk.')}${tip('be 動詞でも「〜にある・いる」（存在）の意味なら第1文型です。')}</section>`),
+  L('2-2',null,'第2文型　S＋V＋C','S＝C の関係','e2C',()=>`
+    <section class="panel"><h3>第2文型（S＋V＋C）</h3>${rul('S＝C の関係が成り立つ。C には名詞・形容詞が入る')}
+    ${ex('<b>S</b> Mr. Mori　<b>V</b> is　<b>C</b> a pilot.（Mr. Mori＝a pilot）')}${ex('<b>S</b> This bread　<b>V</b> smells　<b>C</b> nice.')}
+    <p class="small">第2文型をとる主な動詞：be, become, get, turn, grow（〜になる）／look, seem（〜に見える）／sound, smell, taste, feel（〜に聞こえる・におう・味がする・感じる）／keep, remain（〜のままでいる）</p>${tip('C に副詞は入りません。× look happily　○ look happy')}</section>`),
+  L('2-3',null,'第3文型　S＋V＋O','O と C の区別','e2OC',()=>`
+    <section class="panel"><h3>第3文型（S＋V＋O）</h3><p>目的語を1つとる動詞（他動詞）の文です。</p>${ex('<b>S</b> We　<b>V</b> cleaned　<b>O</b> the classroom.')}
+    ${rul('S＝○ が成り立つ → C（第2文型）<br>S≠○ → O（第3文型）')}${ex('She became <b>a nurse</b>.（She＝a nurse → C）<br>She met <b>a nurse</b>.（She≠a nurse → O）')}</section>`),
+  L('2-4',null,'第4文型　S＋V＋O＋O','人に物を','e2OO',()=>`
+    <section class="panel"><h3>第4文型（S＋V＋O＋O）</h3>${rul('S＋V＋人（〜に）＋物（〜を）')}
+    ${ex('<b>S</b> Grandma　<b>V</b> gave　<b>O</b> me　<b>O</b> a sweater.')}${ex('<b>S</b> Ms. Kato　<b>V</b> teaches　<b>O</b> us　<b>O</b> math.')}
+    <p class="small">第4文型をとる主な動詞：give, send, show, teach, tell, lend, make, buy, cook, get など</p>${tip('「人」に代名詞が入るときは目的格（me, us, him, her, them）にします。')}</section>`),
+  L('2-5',null,'第5文型　S＋V＋O＋C','O＝C の関係','e2OC5',()=>`
+    <section class="panel"><h3>第5文型（S＋V＋O＋C）</h3>${rul('O＝C の関係が成り立つ。C は O の状態や名前を説明する')}
+    ${ex('<b>S</b> The song　<b>V</b> made　<b>O</b> me　<b>C</b> sad.（me＝sad）')}${ex('<b>S</b> We　<b>V</b> call　<b>O</b> him　<b>C</b> Taku.（him＝Taku）')}
+    <p class="small">第5文型をとる主な動詞：make（〜を…にする）／keep, leave（〜を…のままにしておく）／call, name（〜を…と呼ぶ・名づける）／find（〜が…だとわかる）</p></section>`),
+  L('3-1','3　文型の見分け方','文型を見分ける','5つの文型','e2Which',()=>`
+    <section class="panel"><h3>見分ける手順</h3>${rul('① V を見つける<br>② M（前置詞＋名詞、副詞）をかっこでくくる<br>③ 残った語句の数と、イコールの関係で判断する')}
+    ${ex('My mother made me a cake (on my birthday).<br>→ me と a cake の2つ、me≠a cake → 第4文型')}${ex('My mother made me happy.<br>→ me＝happy → 第5文型')}</section>`),
+  L('3-2',null,'第4文型と第3文型の書きかえ','to と for','e2ToFor',()=>`
+    <section class="panel"><h3>書きかえ</h3>${rul('S＋V＋人＋物 ＝ S＋V＋物＋to／for＋人')}
+    ${ex('Ken lent me his bike. ＝ Ken lent his bike <b>to</b> me.')}${ex('Dad cooked us dinner. ＝ Dad cooked dinner <b>for</b> us.')}
+    <table class="dtab"><tr><th>to をとる</th><td>give, send, show, teach, tell, lend, pass など（相手に届く）</td></tr><tr><th>for をとる</th><td>make, buy, cook, get, choose, find など（相手のためにする）</td></tr></table></section>`),
+  L('3-3',null,'同じ動詞・ちがう文型','make・find・get・keep','e2Same',()=>`
+    <section class="panel"><h3>文型で意味が変わる</h3>
+    ${ex('She made him a cake.（第4）彼女は彼にケーキを作った。<br>She made him angry.（第5）彼女は彼を怒らせた。')}
+    ${ex('I found the box easily.（第3）私はその箱を簡単に見つけた。<br>I found the box empty.（第5）私はその箱が空だとわかった。')}
+    ${ex('It got cold.（第2）寒くなった。<br>He got a job.（第3）彼は仕事を得た。')}${tip('動詞のあとの語句が「O か C か」「O が1つか2つか」を確かめると、意味が決まります。')}</section>`),
+  T(['e2Elem','e2Tr','e2Which','e2Which','e2C','e2OC','e2OO','e2OC5','e2ToFor','e2Same'],'基本文型の10問'),
+];
+const TERMS = [['文の要素','S（主語）・V（動詞）・O（目的語）・C（補語）・M（修飾語）。'],['自動詞','目的語をとらない動詞。'],['他動詞','目的語をとる動詞。'],['第2文型','S＋V＋C。S＝C の関係。'],['第4文型','S＋V＋人＋物。「人に物を〜する」。'],['第5文型','S＋V＋O＋C。O＝C の関係。'],['to と for','第4文型→第3文型の書きかえで、give などは to、make などは for。']];
+return { G, LESSONS, TERMS };
 })();
 
 /* ===== 数学Ⅰ 集合と命題（問題は毎回つくりかわります） ===== */
@@ -6306,7 +6430,7 @@ const BC_LESSONS = [
 /* ===== 用語カード ===== */
 const TERMS = {
   m1:M1.TERMS,
-  r2:M2.TM[0], r3:M2.TM[1], r4:M2.TM[2],
+  e2:ME2.TERMS, r2:M2.TM[0], r3:M2.TM[1], r4:M2.TM[2],
   m3:M3.TERMS.slice(0,8),
   m4:M3.TERMS.slice(8),
   kb:KB.TERMS,
@@ -6332,6 +6456,7 @@ const UNITS = {
   gk:{ no:'国', title:'語句高校レベル', subject:'国語', course:'jpn', subj:4, lessons:GK_LESSONS, cards:'gk', drill:'gk' },
   cj:{ no:'文法 2章', title:'接続詞', subject:'国語', course:'jpn', subj:5, lessons:CJ_LESSONS, cards:'cj', drill:'cj' },
   hk:{ no:'国', title:'漢字高校レベル', subject:'国語', course:'jpn', subj:4, lessons:KJ_LESSONS, cards:'hk', drill:'hk' },
+  e2:{ no:'文法 2章', title:'基本文型', subject:'英語', course:'eng', subj:0, lessons:ME2.LESSONS, cards:'e2' },
   r2:{ no:'数と式 2章', title:'実数', subject:'数学', course:'math', subj:0, lessons:M2.CH[0], cards:'r2', drill:'r2' },
   r3:{ no:'数と式 3章', title:'平方根', subject:'数学', course:'math', subj:0, lessons:M2.CH[1], cards:'r3', drill:'r3' },
   r4:{ no:'数と式 4章', title:'1次不等式', subject:'数学', course:'math', subj:0, lessons:M2.CH[2], cards:'r4', drill:'r4' },
@@ -6436,7 +6561,7 @@ const CATALOG = [
     { id:'math', name:'数学', k:'数', note:'数学Ⅰ', subjects:[
       K('数と式','式',{ t:'式の展開と因数分解', ready:'m1' },{ t:'実数', ready:'r2' },{ t:'平方根', ready:'r3' },{ t:'1次不等式', ready:'r4' }), K('集合と論理','論',{ t:'集合', ready:'m3' },{ t:'命題と論理', ready:'m4' }), K('2次関数','関',{ t:'関数とグラフ', ready:'q1' },{ t:'2次関数の最大・最小', ready:'q2' },{ t:'2次関数の決定', ready:'q3' },{ t:'2次方程式', ready:'q4' },{ t:'グラフと x軸・直線', ready:'q5' },{ t:'2次不等式', ready:'q6' }), K('図形と計量','図',{ t:'三角比', ready:'z1' },{ t:'三角比の拡張', ready:'z2' },{ t:'正弦定理・余弦定理', ready:'z3' },{ t:'図形の面積', ready:'z4' },{ t:'空間図形', ready:'z5' }), K('データの分析','デ',{ t:'データの整理と代表値', ready:'d1' },{ t:'データの散らばり', ready:'d2' },{ t:'相関', ready:'d4' },{ t:'仮説検定', ready:'d5' }), KAKO ] },
     { id:'eng', name:'英語', k:'英', note:'文法・読解', subjects:[
-      K('文法','文',{ t:'基礎文法', go:'海月時間 ▶ 英語 ▶ 文法' },'基本文型','基本時制','完了形・進行形','助動詞','不定詞','動名詞','分詞','受動態','比較','関係詞','仮定法','否定','接続詞','名詞・冠詞','代名詞','形容詞・副詞','前置詞'), K('語い・会話文','語','単語・熟語','会話文'), K('読解','読','短い英文','長文読解'), KAKO ] },
+      K('文法','文',{ t:'基礎文法', go:'海月時間 ▶ 英語 ▶ 文法' },{ t:'基本文型', ready:'e2' },'基本時制','完了形・進行形','助動詞','不定詞','動名詞','分詞','受動態','比較','関係詞','仮定法','否定','接続詞','名詞・冠詞','代名詞','形容詞・副詞','前置詞'), K('語い・会話文','語','単語・熟語','会話文'), K('読解','読','短い英文','長文読解'), KAKO ] },
     { id:'geo', name:'地理', k:'理', note:'地理総合', subjects:[
       K('地図と地理情報','図','地図の読み方','地理情報システム'), K('生活文化','文','世界の気候と暮らし','産業と貿易'), K('防災','防','自然災害と防災'), KAKO ] },
     { id:'hist', name:'歴史', k:'歴', note:'歴史総合', subjects:[
