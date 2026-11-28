@@ -6728,7 +6728,7 @@ function vRecord(){
 function vPool(){
   const s=poolInit(), g=growOf(s.fed), got=new Set(s.born.map(t=>t.sp)), b=S.born?spOf(S.born):null, nextG=GROW.find(x=>x.at>s.fed);
   return `<div class="stack"><div class="hello"><div class="eyebrow">潮だまり</div><h1>波を寄せて<br>仲間を呼ぼう</h1></div>
-  <div class="poolbox">${tideSVG(s.born)}<div class="poolcount"><span>潮だまりの仲間 <b class="num">${s.born.length}</b></span><span>図鑑 <b class="num">${got.size}</b> / ${SP.length}</span></div></div>
+  <div class="poolbox">${tideSVG(s.born)}<div class="poolcount"><span>潮だまりの仲間 <b class="num">${s.born.length}</b></span></div></div>
   ${b?`<div class="panel born pop"><svg viewBox="-30 -30 60 60" class="bsv">${art(b.id)}</svg><div><p class="small muted">潮だまりにやってきた！</p><h3>${b.name}</h3><p class="small">${b.note}</p></div></div>`:''}
   <div class="panel grow"><div class="growtop"><div><p class="small muted">いまの潮だまり</p><h3>${g.n}</h3><p class="small">${g.d}</p></div>${stageSVG(s.fed)}</div>
     <div class="meter"><i style="width:${s.fed/POOL_NEED*100}%"></i></div>
@@ -6736,8 +6736,7 @@ function vPool(){
     <div class="wavebal">${WAVE_I}<span>もっている波 <b class="num">${s.waves}</b></span></div>
     ${S.poolMsg?`<p class="poolmsg pop">${S.poolMsg}</p>`:''}
     <div class="two"><button class="btn" data-act="feed" data-arg="1" ${s.waves?'':'disabled'}>1つ寄せる</button><button class="btn ghost" data-act="feed" data-arg="all" ${s.waves?'':'disabled'}>まとめて寄せる</button></div>
-    ${s.waves?'':'<p class="small muted">まだクリアしていない波（5分の学習）を1つクリアすると、波が1つたまります。</p>'}</div>
-  <div class="panel"><h3>潮だまり図鑑</h3><div class="zukan" style="margin-top:10px">${SP.map(sp=>got.has(sp.id)?`<div class="zk"><svg viewBox="-24 -24 48 48">${art(sp.id)}</svg><b>${sp.name}</b><span>${sp.note}</span></div>`:`<div class="zk no"><svg viewBox="-24 -24 48 48"><circle r="13" fill="currentColor" opacity=".16"/></svg><b>？？？</b></div>`).join('')}</div></div></div>`;
+    ${s.waves?'':'<p class="small muted">まだクリアしていない波（5分の学習）を1つクリアすると、波が1つたまります。</p>'}</div></div>`;
 }
 function vSettings(){
   const send = !GAS_URL ? `<span class="status">送信先がまだ設定されていません</span>` : R.outbox.length ? `<span class="status wait">送信待ち ${R.outbox.length}件（つながったら送ります）</span>` : `<span class="status ok">先生に送信済み</span>`;
